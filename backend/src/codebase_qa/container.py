@@ -18,11 +18,11 @@ def default_embedder(settings: Settings) -> Embedder:
 
 
 def default_generator(settings: Settings) -> Generator:
-    from openai import OpenAI
+    from google import genai
 
-    from codebase_qa.generation.openai_generator import OpenAIGenerator
+    from codebase_qa.generation.gemini_generator import GeminiGenerator
 
-    return OpenAIGenerator(OpenAI(api_key=settings.openai_api_key), settings.openai_model)
+    return GeminiGenerator(genai.Client(api_key=settings.gemini_api_key), settings.gemini_model)
 
 
 class Container:

@@ -5,7 +5,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request
 from codebase_qa.api.schemas import AskRequest, AskResponse, IndexRepoRequest, RepoOut
 from codebase_qa.config import get_settings
 from codebase_qa.container import Container
-from codebase_qa.generation.openai_generator import GenerationError
+from codebase_qa.generation.gemini_generator import GenerationError
 from codebase_qa.ingestion.git import GitError
 
 

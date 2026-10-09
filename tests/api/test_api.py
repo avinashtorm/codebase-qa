@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from codebase_qa.api.app import create_app
 from codebase_qa.config import Settings
 from codebase_qa.container import Container
-from codebase_qa.generation.openai_generator import GenerationError
+from codebase_qa.generation.gemini_generator import GenerationError
 from tests.fakes import fake_embedder, fake_generator
 
 RepoFactory = Callable[..., Path]
@@ -52,7 +52,7 @@ def test_index_bad_url_returns_400(client: TestClient, tmp_path: Path) -> None:
 
 class FailingGenerator:
     def generate(self, question: str, context: list) -> None:
-        raise GenerationError("language model request failed: RateLimitError")
+        raise GenerationError("language model request failed with status 429")
 
 
 def test_generation_failure_returns_503(tmp_path: Path, make_repo: RepoFactory) -> None:
@@ -64,4 +64,4 @@ def test_generation_failure_returns_503(tmp_path: Path, make_repo: RepoFactory) 
     client.post("/repos", json={"url": make_repo().as_uri()})
     response = client.post("/ask", json={"repo_id": "origin", "question": "login"})
     assert response.status_code == 503
-    assert response.json() == {"detail": "language model request failed: RateLimitError"}
+    assert response.json() == {"detail": "language model request failed with status 429"}
