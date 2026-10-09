@@ -60,8 +60,8 @@ on CPU. "fusion" combines the reranker ranking with the first-stage ranking by R
 Why the reranker hurts here: it was trained on natural-language passage ranking, and on this repo it consistently
 prefers prose and prose-like code over implementations. In the 14 questions where vector had the right answer at
 rank 1 and the reranker did not, its new top 1 was a docs file (`deployment.md`, `backend/README.md`,
-`development.md`) 4 times, a test whose name restates the question (`test_user.py`, `test_login.py`) 6 times, or
-generated types twice. Example: c19 "How does the backend authenticate a user's email and password?" moves from
+`development.md`) 3 times, a test whose name restates the question (`test_user.py`, `test_login.py`,
+`test_items.py`) 5 times, generated types once, and a neighbouring but wrong code chunk 5 times. Example: c19 "How does the backend authenticate a user's email and password?" moves from
 `crud.py:45-60` (`authenticate`) to `tests/crud/test_user.py:20-27` (`test_authenticate_user`, score 0.99).
 
 Decision: the app defaults to tree-sitter + vector (best Hit@1 and MRR, ~50 ms). Reranking stays available as an
