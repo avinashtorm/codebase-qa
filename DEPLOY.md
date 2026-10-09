@@ -15,19 +15,20 @@ Only Caddy is reachable from the internet. Caddy gets and renews the HTTPS certi
 
 ## What it costs
 
-Prices are Azure's public pay-as-you-go prices for Linux in **East US**; other regions differ by roughly ±25%.
-The portal shows the exact price for your region when you pick the size.
+Prices are Azure's public pay-as-you-go prices for Linux in **Central India** (from the Azure retail prices API,
+October 2026). The portal shows the exact price for your region when you pick the size.
 
 | Item | Choice | Price | Per month if always on |
 |---|---|---|---|
-| VM | **B2als v2** (2 vCPU, 4 GB RAM, x86, AMD) | $0.0376 / hour | about $27.45 |
-| VM (fallback) | B2s (2 vCPU, 4 GB RAM, x86, Intel) | $0.0416 / hour | about $30.37 |
-| OS disk | 30 GiB Standard SSD | | about $2.40 |
+| VM | **B2als v2** (2 vCPU, 4 GB RAM, x86, AMD) | $0.0246 / hour | about $17.96 |
+| OS disk | 30 GiB Standard SSD (E4) | | about $2.64 |
 | Public IP | Standard, static | $0.005 / hour | about $3.65 |
 | Traffic | Outbound data | first 100 GB free | $0 for a demo |
 
-- **Always on:** about **$33.50 per month**, so the $100 credit lasts about **3 months**.
-- **With auto-shutdown at night** (running about 12 hours a day): about **$20 per month**, roughly 5 months.
+- **Always on:** about **$24.25 per month**, so the $100 credit lasts about **4 months**.
+- **With auto-shutdown at night** (running about 12 hours a day): about **$15.30 per month**, roughly 6.5 months.
+- Other x86 sizes with 4 GB in Central India cost more: B2s and B2ls v2 $0.0448/h (~$32.70/month),
+  D2als v6 $0.0520/h (~$37.96/month). In East US, B2als v2 is $0.0376/h (~$27.45/month).
 - A stopped (deallocated) VM costs nothing for compute, but the disk and the public IP are still billed (about $6 per month).
 - Deleting the resource group (step 14) stops all charges.
 - Azure for Students has a spending limit. When the credit runs out, your resources are switched off. You are not charged
@@ -41,7 +42,9 @@ Sizes with 1-2 GB (B1s, B1ms, B2ats v2) run out of memory. The steps below also 
 ## Step 1: Pick a region and check your credit
 
 1. Open <https://portal.azure.com> and sign in with your student account.
-2. Check your remaining credit at <https://www.microsoftazuresponsorships.com/Balance>.
+2. Check your remaining credit: search the portal for **Education**, open the **Education** hub and look at the
+   credit shown on its **Overview** page. (The older Sponsorships balance page shows "no active sponsorship" for
+   Azure for Students, which is expected.)
 3. Choose a region close to you. Student subscriptions sometimes only allow certain regions. If the portal later says a
    size or region is "not available" or blocked by policy, pick another region from its list.
 
@@ -58,7 +61,7 @@ Sizes with 1-2 GB (B1s, B1ms, B2ats v2) run out of memory. The steps below also 
    - **Security type:** Standard.
    - **Image:** **Ubuntu Server 24.04 LTS - x64 Gen2**.
    - **VM architecture:** x64.
-   - **Size:** click **See all sizes**, search `B2als_v2`, select it. If it is not offered, choose `B2s`.
+   - **Size:** click **See all sizes**, search `B2als_v2`, select it. If it is not offered in your region, choose `B2s`.
      The price per month is shown next to the size.
    - **Authentication type:** SSH public key.
    - **Username:** `azureuser`.
@@ -119,8 +122,8 @@ about a minute.
 4. Click **Next**. Add alert conditions of type **Actual** at **50%**, **80%** and **100%**, enter your email under
    **Alert recipients**, and click **Create**.
 
-If the portal says budgets are not supported for your subscription type, keep an eye on
-<https://www.microsoftazuresponsorships.com/Balance> instead. Cost data in Azure appears with a delay of up to a day.
+If the portal says budgets are not supported for your subscription type, keep an eye on the remaining credit in the
+**Education** hub instead. Cost data in Azure appears with a delay of up to a day.
 
 ## Step 7: Connect to the VM over SSH from Windows
 
