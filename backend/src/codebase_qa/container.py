@@ -81,6 +81,7 @@ class Container:
             repos_dir=self.settings.repos_dir,
             bm25_dir=self.settings.bm25_dir,
             clone_timeout=self.settings.clone_timeout_seconds,
+            max_repo_bytes=self.settings.max_repo_size_mb * 1024 * 1024,
         )
 
     def repo_record(self, repo_id: str) -> RepoRecord | None:

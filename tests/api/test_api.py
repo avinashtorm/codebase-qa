@@ -1,34 +1,43 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 
 from codebase_qa.api.app import create_app
-from codebase_qa.config import Settings
 from codebase_qa.container import Container
 from codebase_qa.generation.gemini_generator import GenerationError
 from tests.conftest import FIXTURE_FILES
-from tests.fakes import fake_embedder, fake_generator
+from tests.fakes import fake_embedder, fake_generator, make_settings, wait_for_job
 
 RepoFactory = Callable[..., Path]
 
 
-@pytest.fixture
-def client(tmp_path: Path) -> TestClient:
-    settings = Settings(_env_file=None, data_dir=tmp_path / "data", min_vector_score=0.0)
-    container = Container(settings, embedder_factory=fake_embedder, generator_factory=fake_generator)
+def build_client(tmp_path: Path, generator_factory: Callable = fake_generator, **overrides: object) -> TestClient:
+    settings = make_settings(tmp_path / "data", **overrides)
+    container = Container(settings, embedder_factory=fake_embedder, generator_factory=generator_factory)
     return TestClient(create_app(container))
 
 
+@pytest.fixture
+def client(tmp_path: Path) -> Iterator[TestClient]:
+    with build_client(tmp_path) as test_client:
+        yield test_client
+
+
+def index(client: TestClient, url: str) -> dict:
+    response = client.post("/repos", json={"url": url})
+    assert response.status_code == 202
+    job = wait_for_job(client, response.json()["job_id"])
+    assert job["status"] == "succeeded", job
+    return job
+
+
 def test_index_list_and_ask(client: TestClient, make_repo: RepoFactory) -> None:
-    origin = make_repo()
-    indexed = client.post("/repos", json={"url": origin.as_uri()})
-    assert indexed.status_code == 200
-    repo = indexed.json()
-    assert repo["repo_id"] == "origin"
-    assert repo["file_count"] == 4
-    assert repo["chunk_count"] >= 4
+    job = index(client, make_repo().as_uri())
+    assert job["kind"] == "index"
+    assert job["result"]["repo_id"] == "origin"
+    assert job["result"]["file_count"] == 4
 
     listed = client.get("/repos").json()
     assert [r["repo_id"] for r in listed] == ["origin"]
@@ -46,9 +55,12 @@ def test_ask_unknown_repo_returns_404(client: TestClient) -> None:
     assert response.status_code == 404
 
 
-def test_index_bad_url_returns_400(client: TestClient, tmp_path: Path) -> None:
+def test_failed_clone_is_reported_on_the_job(client: TestClient, tmp_path: Path) -> None:
     response = client.post("/repos", json={"url": (tmp_path / "missing").as_uri()})
-    assert response.status_code == 400
+    job = wait_for_job(client, response.json()["job_id"])
+    assert job["status"] == "failed"
+    assert job["error"].startswith("git clone failed")
+    assert str(tmp_path) not in job["error"] and "Users" not in job["error"]
 
 
 class FailingGenerator:
@@ -57,30 +69,24 @@ class FailingGenerator:
 
 
 def test_generation_failure_returns_503(tmp_path: Path, make_repo: RepoFactory) -> None:
-    settings = Settings(_env_file=None, data_dir=tmp_path / "data", min_vector_score=0.0)
-    container = Container(
-        settings, embedder_factory=fake_embedder, generator_factory=lambda _: FailingGenerator()
-    )
-    client = TestClient(create_app(container))
-    client.post("/repos", json={"url": make_repo().as_uri()})
-    response = client.post("/ask", json={"repo_id": "origin", "question": "login"})
+    with build_client(tmp_path, generator_factory=lambda _: FailingGenerator()) as client:
+        index(client, make_repo().as_uri())
+        response = client.post("/ask", json={"repo_id": "origin", "question": "login"})
     assert response.status_code == 503
     assert response.json() == {"detail": "language model request failed with status 429"}
 
 
 def test_low_relevance_question_is_refused_without_llm(tmp_path: Path, make_repo: RepoFactory) -> None:
-    settings = Settings(_env_file=None, data_dir=tmp_path / "data", min_vector_score=0.99)
-    container = Container(settings, embedder_factory=fake_embedder, generator_factory=fake_generator)
-    client = TestClient(create_app(container))
-    client.post("/repos", json={"url": make_repo().as_uri()})
-    body = client.post("/ask", json={"repo_id": "origin", "question": "banana bread recipe"}).json()
+    with build_client(tmp_path, min_vector_score=0.99) as client:
+        index(client, make_repo().as_uri())
+        body = client.post("/ask", json={"repo_id": "origin", "question": "banana bread recipe"}).json()
     assert body["used_llm"] is False
     assert body["citations"] == []
     assert "generation" not in body["timings_ms"]
 
 
 def test_ask_returns_snippets_with_original_line_numbers(client: TestClient, make_repo: RepoFactory) -> None:
-    client.post("/repos", json={"url": make_repo().as_uri()})
+    index(client, make_repo().as_uri())
     body = client.post("/ask", json={"repo_id": "origin", "question": "AuthService login token"}).json()
     citation = body["citations"][0]
     source_lines = str(FIXTURE_FILES[citation["path"]]).splitlines()

@@ -1,0 +1,37 @@
+{
+ "config": "reindex-benchmark",
+ "timestamp": "2026-10-09T11:43:38+00:00",
+ "repo": "https://github.com/fastapi/full-stack-fastapi-template",
+ "old_sha": "3ecbabf77142d595263ae5d5586ca06c6ca8c72a",
+ "new_sha": "7257e606cb94eada1dca40173e2b7f99dd549bc6",
+ "commits_between": 10,
+ "chunker": "treesitter",
+ "full_index_seconds_old": 206.49,
+ "full_index_seconds_new": 122.09,
+ "incremental_seconds": 16.975,
+ "speedup": 7.2,
+ "report": {
+  "repo_id": "origin",
+  "old_sha": "3ecbabf77142d595263ae5d5586ca06c6ca8c72a",
+  "new_sha": "7257e606cb94eada1dca40173e2b7f99dd549bc6",
+  "method": "git-diff",
+  "files_added": 0,
+  "files_modified": 15,
+  "files_deleted": 0,
+  "files_renamed": 0,
+  "chunks_added": 81,
+  "chunks_removed": 80,
+  "seconds": 16.975,
+  "stage_ms": {
+   "pull": 1242.0,
+   "detect_changes": 101.3,
+   "delete_chunks": 199.0,
+   "chunk_embed_add": 14199.2,
+   "bm25_rebuild": 843.1
+  },
+  "files_changed": 15
+ },
+ "total_files": 212,
+ "total_chunks": 1087,
+ "identical_to_full_rebuild": true
+}

@@ -1,10 +1,10 @@
 import json
-import shutil
 from dataclasses import asdict
 from pathlib import Path
 
 import bm25s
 
+from codebase_qa.fs import remove_tree
 from codebase_qa.models import Chunk, RetrievedChunk
 from codebase_qa.retrieval.tokenizer import code_tokenize
 from codebase_qa.timing import timed
@@ -28,8 +28,7 @@ class BM25Index:
         return cls(model, ordered)
 
     def save(self, directory: Path) -> None:
-        if directory.exists():
-            shutil.rmtree(directory)
+        remove_tree(directory)
         directory.mkdir(parents=True)
         if self.model is not None:
             self.model.save(str(directory), show_progress=False)

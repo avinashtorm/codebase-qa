@@ -1,6 +1,7 @@
 import hashlib
 import math
 import re
+import time
 
 from codebase_qa.config import Settings
 from codebase_qa.models import Citation, GeneratedAnswer, RetrievedChunk
@@ -46,3 +47,24 @@ def fake_embedder(_: Settings) -> HashingEmbedder:
 
 def fake_generator(_: Settings) -> EchoGenerator:
     return EchoGenerator()
+
+
+def make_settings(data_dir: object, **overrides: object) -> Settings:
+    values: dict[str, object] = {
+        "data_dir": data_dir,
+        "min_vector_score": 0.0,
+        "allow_local_repos": True,
+        "demo_repo_url": "",
+        "demo_password": "",
+    }
+    return Settings(_env_file=None, **(values | overrides))
+
+
+def wait_for_job(client: object, job_id: str, headers: dict[str, str] | None = None, timeout: float = 60.0) -> dict:
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        job = client.get(f"/jobs/{job_id}", headers=headers or {}).json()
+        if job["status"] in ("succeeded", "failed"):
+            return job
+        time.sleep(0.05)
+    raise TimeoutError(f"job {job_id} did not finish")

@@ -28,6 +28,14 @@ class Settings(BaseSettings):
     min_rerank_score: float = 0.0
     top_k: int = 8
     clone_timeout_seconds: float = 120.0
+    max_repo_size_mb: int = 200
+    max_repos: int = 5
+    ask_rate_limit_per_minute: int = 10
+    index_rate_limit_per_hour: int = 10
+    trust_proxy: bool = False
+    allow_local_repos: bool = False
+    github_token: str = ""
+    log_level: str = "INFO"
     llm_cache: bool = False
 
     @property

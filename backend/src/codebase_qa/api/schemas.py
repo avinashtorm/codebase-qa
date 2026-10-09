@@ -1,6 +1,10 @@
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 from codebase_qa.generation.grounding import snippet_for
+from codebase_qa.indexing.indexer import ReindexReport
+from codebase_qa.indexing.jobs import Job
 from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.qa import AskResult
 
@@ -28,6 +32,73 @@ class RepoOut(BaseModel):
             indexed_at=record.indexed_at,
             file_count=record.file_count,
             chunk_count=record.chunk_count,
+        )
+
+
+class JobOut(BaseModel):
+    job_id: str
+    kind: str
+    repo_id: str
+    status: str
+    progress: str
+    result: dict[str, Any] | None
+    error: str | None
+    created_at: str
+    finished_at: str | None
+
+    @classmethod
+    def from_job(cls, job: Job) -> "JobOut":
+        return cls(
+            job_id=job.job_id,
+            kind=job.kind,
+            repo_id=job.repo_id,
+            status=job.status,
+            progress=job.progress,
+            result=job.result,
+            error=job.error,
+            created_at=job.created_at,
+            finished_at=job.finished_at,
+        )
+
+
+class HealthOut(BaseModel):
+    status: str
+    repos: int
+    active_jobs: int
+    password_required: bool
+
+
+class ReindexOut(BaseModel):
+    repo_id: str
+    old_sha: str
+    new_sha: str
+    method: str
+    files_changed: int
+    files_added: int
+    files_modified: int
+    files_deleted: int
+    files_renamed: int
+    chunks_added: int
+    chunks_removed: int
+    seconds: float
+    stage_ms: dict[str, float]
+
+    @classmethod
+    def from_report(cls, report: ReindexReport) -> "ReindexOut":
+        return cls(
+            repo_id=report.repo_id,
+            old_sha=report.old_sha,
+            new_sha=report.new_sha,
+            method=report.method,
+            files_changed=report.files_changed,
+            files_added=report.files_added,
+            files_modified=report.files_modified,
+            files_deleted=report.files_deleted,
+            files_renamed=report.files_renamed,
+            chunks_added=report.chunks_added,
+            chunks_removed=report.chunks_removed,
+            seconds=report.seconds,
+            stage_ms=report.stage_ms,
         )
 
 
