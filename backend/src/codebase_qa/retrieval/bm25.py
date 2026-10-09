@@ -7,6 +7,7 @@ import bm25s
 
 from codebase_qa.models import Chunk, RetrievedChunk
 from codebase_qa.retrieval.tokenizer import code_tokenize
+from codebase_qa.timing import timed
 
 CHUNKS_FILE = "chunks.json"
 
@@ -65,6 +66,10 @@ class BM25Retriever:
 
     def __init__(self, index: BM25Index) -> None:
         self.index = index
+        self.timings: dict[str, float] = {}
 
     def retrieve(self, query: str, k: int) -> list[RetrievedChunk]:
-        return self.index.search(query, k)
+        timings: dict[str, float] = {}
+        results = timed(timings, "bm25_search", lambda: self.index.search(query, k))
+        self.timings = timings
+        return results

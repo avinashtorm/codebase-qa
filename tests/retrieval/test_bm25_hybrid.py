@@ -60,6 +60,7 @@ class StaticRetriever:
         self.name = name
         self.results = results
         self.requested: list[int] = []
+        self.timings: dict[str, float] = {name: 1.0}
 
     def retrieve(self, query: str, k: int) -> list[RetrievedChunk]:
         self.requested.append(k)
@@ -69,6 +70,8 @@ class StaticRetriever:
 def test_hybrid_requests_candidates_from_both_and_truncates() -> None:
     vector = StaticRetriever("vector", ranked("a", "b"))
     keyword = StaticRetriever("bm25", ranked("b", "c"))
-    results = HybridRetriever(vector, keyword, candidates=50).retrieve("q", 2)
+    hybrid = HybridRetriever(vector, keyword, candidates=50)
+    results = hybrid.retrieve("q", 2)
     assert [item.chunk.chunk_id for item in results] == ["b", "a"]
     assert vector.requested == [50] and keyword.requested == [50]
+    assert set(hybrid.timings) == {"vector", "bm25", "fusion"}

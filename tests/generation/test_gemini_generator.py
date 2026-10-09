@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -68,3 +69,14 @@ def test_cache_avoids_repeat_requests(tmp_path: Path) -> None:
     generator = GeminiGenerator(SimpleNamespace(models=models), "m", cache=ResponseCache(tmp_path))
     assert generator.generate("q", CONTEXT).answer == generator.generate("q", CONTEXT).answer
     assert len(models.calls) == 1
+
+
+def test_structured_json_response_is_parsed_into_citations() -> None:
+    citation = {"path": "app/auth.py", "start_line": 2, "end_line": 4}
+    payload = json.dumps({"answer": "Login is in AuthService.", "citations": [citation]})
+    generator, models, _ = make_generator([payload])
+    answer = generator.generate("Where is login?", CONTEXT)
+    assert answer.answer == "Login is in AuthService."
+    assert answer.citations == [Citation("app/auth.py", 2, 4)]
+    config = models.calls[0]["config"]
+    assert config.response_mime_type == "application/json"

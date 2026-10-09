@@ -1,5 +1,6 @@
 from codebase_qa.interfaces import Retriever
 from codebase_qa.models import Chunk, RetrievedChunk
+from codebase_qa.timing import timed
 
 
 def reciprocal_rank_fusion(rankings: dict[str, list[RetrievedChunk]], k: int = 60) -> list[RetrievedChunk]:
@@ -28,10 +29,14 @@ class HybridRetriever:
         self.keyword = keyword
         self.candidates = candidates
         self.rrf_k = rrf_k
+        self.timings: dict[str, float] = {}
 
     def retrieve(self, query: str, k: int) -> list[RetrievedChunk]:
         rankings = {
             "vector": self.vector.retrieve(query, self.candidates),
             "bm25": self.keyword.retrieve(query, self.candidates),
         }
-        return reciprocal_rank_fusion(rankings, self.rrf_k)[:k]
+        timings = self.vector.timings | self.keyword.timings
+        fused = timed(timings, "fusion", lambda: reciprocal_rank_fusion(rankings, self.rrf_k))
+        self.timings = timings
+        return fused[:k]

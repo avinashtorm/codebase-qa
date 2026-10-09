@@ -82,3 +82,10 @@ def test_compare_table_uses_latest_run_per_config() -> None:
     table = render_table(latest_per_config(runs))
     assert "0.500" in table
     assert "0.100" not in table
+
+
+def test_suggest_threshold_sits_between_off_topic_and_lowest_dev_score() -> None:
+    from eval.calibrate import suggest_threshold
+
+    assert suggest_threshold([0.70, 0.80], [0.40, 0.60, 0.75]) == 0.65
+    assert suggest_threshold([0.70], [0.90]) == 0.69

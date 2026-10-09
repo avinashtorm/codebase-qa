@@ -17,8 +17,13 @@ class Embedder(Protocol):
 
 class Retriever(Protocol):
     name: str
+    timings: dict[str, float]
 
     def retrieve(self, query: str, k: int) -> list[RetrievedChunk]: ...
+
+
+class Reranker(Protocol):
+    def score(self, query: str, candidates: list[RetrievedChunk]) -> list[float]: ...
 
 
 class Generator(Protocol):

@@ -43,3 +43,28 @@ chunk overlapping an expected location (`-` = not in the top 10).
    without containing the implementation.
 4. Next steps, each to be measured: a cross-encoder reranker over the fused top 30 (phase 7) to recover precision at
    rank 1 while keeping hybrid's recall; excluding generated files from the index; weighting vector above BM25 in RRF.
+
+# Reranking (phase 7)
+
+Cross-encoder `BAAI/bge-reranker-base` scores the top 30 first-stage candidates (header + code, max 512 tokens)
+on CPU. "fusion" combines the reranker ranking with the first-stage ranking by RRF instead of replacing it.
+
+| Config | Hit@1 | Hit@5 | Recall@10 | MRR | Mean retrieval latency |
+|---|---|---|---|---|---|
+| vector | 0.571 | 0.714 | 0.767 | 0.651 | 46 ms |
+| hybrid | 0.371 | 0.686 | 0.795 | 0.500 | 54 ms |
+| vector + rerank | 0.314 | 0.657 | 0.762 | 0.478 | 17.0 s (rerank 16.9 s) |
+| hybrid + rerank | 0.314 | 0.657 | 0.748 | 0.471 | 16.6 s (rerank 16.4 s) |
+| hybrid + rerank fusion | 0.400 | 0.743 | 0.838 | 0.544 | 18.6 s |
+
+Why the reranker hurts here: it was trained on natural-language passage ranking, and on this repo it consistently
+prefers prose and prose-like code over implementations. In the 14 questions where vector had the right answer at
+rank 1 and the reranker did not, its new top 1 was a docs file (`deployment.md`, `backend/README.md`,
+`development.md`) 4 times, a test whose name restates the question (`test_user.py`, `test_login.py`) 6 times, or
+generated types twice. Example: c19 "How does the backend authenticate a user's email and password?" moves from
+`crud.py:45-60` (`authenticate`) to `tests/crud/test_user.py:20-27` (`test_authenticate_user`, score 0.99).
+
+Decision: the app defaults to tree-sitter + vector (best Hit@1 and MRR, ~50 ms). Reranking stays available as an
+option (`RERANK=true`, `RERANK_FUSION=true`). Fusion has the best Recall@10 and Hit@5, which would matter if the
+generator saw more context, but it costs ~18 s per question on CPU. A code-specific reranker or excluding tests and
+docs from rerank candidates are the obvious follow-ups.

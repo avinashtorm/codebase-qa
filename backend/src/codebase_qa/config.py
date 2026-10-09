@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     retrieval_mode: Literal["vector", "bm25", "hybrid"] = "vector"
     hybrid_candidates: int = 50
     rrf_k: int = 60
+    rerank: bool = False
+    rerank_candidates: int = 30
+    rerank_fusion: bool = False
+    min_vector_score: float = 0.0
+    min_rerank_score: float = 0.0
     top_k: int = 8
     clone_timeout_seconds: float = 120.0
     llm_cache: bool = False
@@ -32,6 +37,10 @@ class Settings(BaseSettings):
     @property
     def chroma_dir(self) -> Path:
         return self.data_dir / "chroma"
+
+    @property
+    def refusal_thresholds(self) -> dict[str, float]:
+        return {"vector": self.min_vector_score, "rerank": self.min_rerank_score}
 
     @property
     def bm25_dir(self) -> Path:

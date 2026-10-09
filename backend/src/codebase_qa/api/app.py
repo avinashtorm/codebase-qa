@@ -41,7 +41,7 @@ def create_app(container: Container | None = None) -> FastAPI:
             result = services.pipeline(record).ask(body.question)
         except GenerationError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
-        return AskResponse.from_result(result)
+        return AskResponse.from_result(result, record.commit_sha)
 
     return app
 

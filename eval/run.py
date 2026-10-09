@@ -41,10 +41,12 @@ def evaluate_question(
     question: EvalQuestion,
     with_answers: bool,
 ) -> dict[str, Any]:
-    retriever = container.retriever(record)
+    pipeline = container.pipeline(record)
+    retriever = pipeline.retriever
     started = time.perf_counter()
     ranked = retriever.retrieve(question.question, RETRIEVAL_DEPTH)
     retrieval_ms = (time.perf_counter() - started) * 1000
+    stage_ms = dict(retriever.timings)
     spans = [item.chunk for item in ranked]
     result: dict[str, Any] = {
         "id": question.id,
@@ -53,13 +55,14 @@ def evaluate_question(
         "expected": [asdict(location) for location in question.expected_locations],
         "retrieved": [describe(item) for item in ranked],
         "retrieval": asdict(score_retrieval(spans, question.expected_locations)),
-        "latency_ms": {"retrieval": round(retrieval_ms, 1)},
+        "latency_ms": {"retrieval": round(retrieval_ms, 1)} | stage_ms,
     }
     if with_answers:
-        context = ranked[: container.settings.top_k]
-        started = time.perf_counter()
-        answer = container.generator.generate(question.question, context)
-        result["latency_ms"]["generation"] = round((time.perf_counter() - started) * 1000, 1)
+        answered = pipeline.answer(question.question, ranked[: container.settings.top_k], {})
+        answer = answered.answer
+        if "generation" in answered.timings_ms:
+            result["latency_ms"]["generation"] = answered.timings_ms["generation"]
+        result["used_llm"] = answer.used_llm
         result["answer"] = answer.answer
         result["citations"] = [citation.location for citation in answer.citations]
         result["invalid_citations"] = answer.invalid_citations
@@ -77,7 +80,9 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, float]:
         metrics["citation_precision"] = average([row["citation_scores"]["precision"] for row in answered])
         metrics["citation_any_correct"] = average([row["citation_scores"]["any_correct"] for row in answered])
         metrics["invalid_citations"] = sum(row["invalid_citations"] for row in answered)
-    for stage in ("retrieval", "generation"):
+        metrics["refused"] = sum(not row["used_llm"] for row in answered)
+    stages = sorted({stage for row in rows for stage in row["latency_ms"]})
+    for stage in stages:
         values = [row["latency_ms"][stage] for row in rows if stage in row["latency_ms"]]
         if values:
             metrics[f"{stage}_ms_mean"] = round(sum(values) / len(values), 1)
@@ -142,6 +147,10 @@ def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
     return {
         "chunker": settings.chunker,
         "retrieval_mode": settings.retrieval_mode,
+        "rerank": settings.rerank,
+        "rerank_candidates": settings.rerank_candidates,
+        "rerank_fusion": settings.rerank_fusion,
+        "reranker_model": settings.reranker_model if settings.rerank else None,
         "top_k": settings.top_k,
         "embedding_model": settings.embedding_model,
         "llm": settings.gemini_model,
@@ -150,7 +159,13 @@ def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
 
 
 def settings_overrides(args: argparse.Namespace) -> dict[str, Any]:
-    overrides: dict[str, Any] = {"chunker": args.chunker, "retrieval_mode": args.mode, "llm_cache": True}
+    overrides: dict[str, Any] = {
+        "chunker": args.chunker,
+        "retrieval_mode": args.mode,
+        "rerank": args.rerank or args.rerank_fusion,
+        "rerank_fusion": args.rerank_fusion,
+        "llm_cache": True,
+    }
     if args.llm_model:
         overrides["gemini_model"] = args.llm_model
     return overrides
@@ -161,6 +176,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--config", required=True, help="name recorded with the results")
     parser.add_argument("--chunker", default="fixed")
     parser.add_argument("--mode", default="vector", choices=["vector", "bm25", "hybrid"])
+    parser.add_argument("--rerank", action="store_true", help="rerank the top 30 candidates with a cross-encoder")
+    parser.add_argument("--rerank-fusion", action="store_true", help="fuse reranker and first-stage ranks with RRF")
     parser.add_argument("--split", default="dev", choices=["dev", "held_out", "all"])
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--answers", action="store_true", help="also generate answers and score citations")

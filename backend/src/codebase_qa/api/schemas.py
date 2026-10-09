@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+from codebase_qa.generation.grounding import snippet_for
 from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.qa import AskResult
 
@@ -39,6 +40,8 @@ class CitationOut(BaseModel):
     path: str
     start_line: int
     end_line: int
+    language: str
+    snippet: str
 
 
 class ContextChunkOut(BaseModel):
@@ -56,13 +59,23 @@ class AskResponse(BaseModel):
     citations: list[CitationOut]
     context: list[ContextChunkOut]
     timings_ms: dict[str, float]
+    used_llm: bool
+    invalid_citations: int
+    commit_sha: str
 
     @classmethod
-    def from_result(cls, result: AskResult) -> "AskResponse":
+    def from_result(cls, result: AskResult, commit_sha: str) -> "AskResponse":
+        languages = {item.chunk.path: item.chunk.language for item in result.context}
         return cls(
             answer=result.answer.answer,
             citations=[
-                CitationOut(path=c.path, start_line=c.start_line, end_line=c.end_line)
+                CitationOut(
+                    path=c.path,
+                    start_line=c.start_line,
+                    end_line=c.end_line,
+                    language=languages.get(c.path, "text"),
+                    snippet=snippet_for(c, result.context),
+                )
                 for c in result.answer.citations
             ],
             context=[
@@ -78,4 +91,7 @@ class AskResponse(BaseModel):
                 for item in result.context
             ],
             timings_ms=result.timings_ms,
+            used_llm=result.answer.used_llm,
+            invalid_citations=result.answer.invalid_citations,
+            commit_sha=commit_sha,
         )

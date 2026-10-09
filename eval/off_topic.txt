@@ -1,0 +1,12 @@
+What happens when a payment fails?
+How does the Stripe webhook handler verify signatures?
+Where is the Kafka consumer group configured?
+Where is the GraphQL schema defined?
+How are Kubernetes Helm charts templated?
+Where is the Redis cache invalidated?
+How are WebSocket messages broadcast to all clients?
+Where is the iOS push notification sent?
+How is the Rust FFI binding generated?
+How is the recommendation model trained?
+Where are S3 uploads resized into thumbnails?
+What is the recipe for banana bread?

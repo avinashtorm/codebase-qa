@@ -37,7 +37,7 @@ def test_index_list_and_ask(client: TestClient, make_repo: RepoFactory) -> None:
     body = answer.json()
     assert body["context"][0]["path"] == "app/auth.py"
     assert body["citations"][0]["path"] == "app/auth.py"
-    assert set(body["timings_ms"]) == {"retrieval", "generation"}
+    assert {"retrieval", "embed_query", "vector_search", "generation"} <= set(body["timings_ms"])
 
 
 def test_ask_unknown_repo_returns_404(client: TestClient) -> None:
