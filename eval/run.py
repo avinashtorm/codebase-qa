@@ -8,6 +8,7 @@ from typing import Any
 
 from codebase_qa.config import Settings
 from codebase_qa.container import Container
+from codebase_qa.generation.gemini_generator import GenerationError
 from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.ingestion.git import repo_id_from_url
 from codebase_qa.models import RetrievedChunk
@@ -106,10 +107,17 @@ def run(args: argparse.Namespace, container: Container | None = None) -> Path:
     record = ensure_indexed(container, args.repo_url)
     questions = load_questions(args.questions, split=args.split, limit=args.limit)
     rows = []
+    generation_error: str | None = None
     for index, question in enumerate(questions, start=1):
-        rows.append(evaluate_question(container, record, question, args.answers))
+        with_answers = args.answers and generation_error is None
+        try:
+            rows.append(evaluate_question(container, record, question, with_answers))
+        except GenerationError as exc:
+            generation_error = str(exc)
+            print(f"generation stopped: {generation_error}")
+            rows.append(evaluate_question(container, record, question, False))
         print(f"[{index}/{len(questions)}] {question.id} hit@5={rows[-1]['retrieval']['hit_at_5']:.0f}")
-        if args.answers and args.delay:
+        if with_answers and args.delay:
             time.sleep(args.delay)
     payload = {
         "config": args.config,
@@ -117,6 +125,8 @@ def run(args: argparse.Namespace, container: Container | None = None) -> Path:
         "split": args.split,
         "question_count": len(rows),
         "with_answers": args.answers,
+        "answered_count": sum("citation_scores" in row for row in rows),
+        "generation_error": generation_error,
         "settings": describe_settings(settings, record),
         "metrics": aggregate(rows),
         "by_category": by_category(rows),
@@ -139,7 +149,10 @@ def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
 
 
 def settings_overrides(args: argparse.Namespace) -> dict[str, Any]:
-    return {"chunker": args.chunker}
+    overrides: dict[str, Any] = {"chunker": args.chunker, "llm_cache": True}
+    if args.llm_model:
+        overrides["gemini_model"] = args.llm_model
+    return overrides
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -150,6 +163,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--answers", action="store_true", help="also generate answers and score citations")
     parser.add_argument("--delay", type=float, default=0.0, help="seconds between LLM calls")
+    parser.add_argument("--llm-model", default=None, help="override GEMINI_MODEL for this run")
     parser.add_argument("--questions", type=Path, default=DEFAULT_QUESTIONS)
     parser.add_argument("--results-dir", type=Path, default=RESULTS_DIR)
     parser.add_argument("--repo-url", default=DEFAULT_REPO_URL)

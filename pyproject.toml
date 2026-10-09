@@ -14,7 +14,8 @@ dependencies = [
     "pydantic-settings>=2.3",
     "chromadb>=0.5",
     "sentence-transformers>=3.0",
-    "tree-sitter-language-pack>=0.7",
+    "tree-sitter==0.25.2",
+    "tree-sitter-language-pack==0.13.0",
     "bm25s>=0.2",
     "google-genai>=1.0",
     "httpx>=0.27",
@@ -40,7 +41,7 @@ pythonpath = ["backend/src", "."]
 addopts = "-q"
 
 [tool.ruff]
-line-length = 110
+line-length = 120
 target-version = "py311"
 extend-exclude = ["data"]
 

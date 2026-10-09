@@ -20,9 +20,12 @@ def default_embedder(settings: Settings) -> Embedder:
 def default_generator(settings: Settings) -> Generator:
     from google import genai
 
+    from codebase_qa.generation.cache import ResponseCache
     from codebase_qa.generation.gemini_generator import GeminiGenerator
 
-    return GeminiGenerator(genai.Client(api_key=settings.gemini_api_key), settings.gemini_model)
+    cache = ResponseCache(settings.llm_cache_dir) if settings.llm_cache else None
+    client = genai.Client(api_key=settings.gemini_api_key)
+    return GeminiGenerator(client, settings.gemini_model, cache=cache)
 
 
 class Container:

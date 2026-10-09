@@ -1,9 +1,11 @@
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 from google.genai import errors
 
-from codebase_qa.generation.gemini_generator import GeminiGenerator, GenerationError
+from codebase_qa.generation.cache import ResponseCache
+from codebase_qa.generation.gemini_generator import GeminiGenerator, GenerationError, QuotaExhaustedError
 from codebase_qa.models import Chunk, Citation, RetrievedChunk
 
 
@@ -51,3 +53,18 @@ def test_non_retryable_error_raises_generation_error() -> None:
     with pytest.raises(GenerationError, match="status 400"):
         generator.generate("q", CONTEXT)
     assert sleeps == []
+
+
+def test_daily_quota_is_not_retried() -> None:
+    quota = errors.ClientError(429, {"error": {"message": "GenerateRequestsPerDayPerProjectPerModel-FreeTier"}})
+    generator, _, sleeps = make_generator([quota])
+    with pytest.raises(QuotaExhaustedError):
+        generator.generate("q", CONTEXT)
+    assert sleeps == []
+
+
+def test_cache_avoids_repeat_requests(tmp_path: Path) -> None:
+    models = FakeModels(["first app/auth.py:1-2"])
+    generator = GeminiGenerator(SimpleNamespace(models=models), "m", cache=ResponseCache(tmp_path))
+    assert generator.generate("q", CONTEXT).answer == generator.generate("q", CONTEXT).answer
+    assert len(models.calls) == 1

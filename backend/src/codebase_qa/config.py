@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     chunker: str = "fixed"
     top_k: int = 8
     clone_timeout_seconds: float = 120.0
+    llm_cache: bool = False
 
     @property
     def repos_dir(self) -> Path:
@@ -27,6 +28,10 @@ class Settings(BaseSettings):
     @property
     def chroma_dir(self) -> Path:
         return self.data_dir / "chroma"
+
+    @property
+    def llm_cache_dir(self) -> Path:
+        return self.data_dir / "llm_cache"
 
     @property
     def registry_path(self) -> Path:
