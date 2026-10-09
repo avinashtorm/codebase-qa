@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     reranker_model: str = "BAAI/bge-reranker-base"
 
+    chunker: str = "fixed"
+    top_k: int = 8
+    clone_timeout_seconds: float = 120.0
+
     @property
     def repos_dir(self) -> Path:
         return self.data_dir / "repos"
@@ -23,6 +27,10 @@ class Settings(BaseSettings):
     @property
     def chroma_dir(self) -> Path:
         return self.data_dir / "chroma"
+
+    @property
+    def registry_path(self) -> Path:
+        return self.data_dir / "registry.json"
 
 
 @lru_cache
