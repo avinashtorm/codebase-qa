@@ -1,125 +1,355 @@
-# Deploying Codebase Q&A
+# Deploying Codebase Q&A on an Azure VM
 
-Two supported routes:
+This guide puts the app on a small Ubuntu virtual machine in Azure, paid for by the Azure for Students credit.
+At the end you will have `https://<your-name>.<region>.cloudapp.azure.com` with a real HTTPS certificate.
 
-| Route | What runs | HTTPS | Persistence | Cost |
-|---|---|---|---|---|
-| A. Hugging Face Docker Space | One container: FastAPI on `127.0.0.1:8000` + Streamlit on `7860` (`deploy/start.sh`) | Provided by Hugging Face | Ephemeral unless you add persistent storage | Free CPU tier works |
-| B. Linux VM with Docker Compose | `backend`, `frontend`, `caddy` containers | Automatic (Caddy + Let's Encrypt) | Named volume `app-data` | Your VM |
+You do not need Docker on your own computer. Everything Docker-related runs on the VM. From Windows you only use
+the Azure portal in a browser, PowerShell (for `ssh`, `scp` and `git`) and this project folder.
 
-In both routes the browser only talks to Streamlit. Streamlit calls the backend over HTTP inside the container
-or the compose network, and the backend is never exposed publicly.
+```
+Browser --HTTPS--> Caddy (ports 80/443) --> Streamlit frontend (7860) --> FastAPI backend (8000)
+                   [all three run as Docker containers on the VM, defined in docker-compose.yml]
+```
 
-## Configuration
+Only Caddy is reachable from the internet. Caddy gets and renews the HTTPS certificate from Let's Encrypt automatically.
 
-| Name | Kind | Required | Default | Purpose |
-|---|---|---|---|---|
-| `GEMINI_API_KEY` | secret | yes | - | Google AI Studio key used for answer generation |
-| `GEMINI_MODEL` | variable | no | `gemini-3.5-flash-lite` | Gemini model name |
-| `DEMO_PASSWORD` | secret | recommended for public demos | empty (no password) | Required in the UI before anything can be indexed or asked |
-| `DEMO_REPO_URL` | variable | no | empty | Repository indexed automatically at startup if it is not indexed yet |
-| `MAX_REPOS` | variable | no | `5` | Maximum number of indexed repositories |
-| `MAX_REPO_SIZE_MB` | variable | no | `200` | Repositories larger than this are rejected (GitHub API size and on-disk check) |
-| `ASK_RATE_LIMIT_PER_MINUTE` | variable | no | `10` | Per-visitor limit on questions |
-| `INDEX_RATE_LIMIT_PER_HOUR` | variable | no | `10` | Per-visitor limit on index requests |
-| `GITHUB_TOKEN` | secret | no | empty | Raises the GitHub API rate limit for the repo size check (no scopes needed) |
-| `DATA_DIR` | variable | no | `/app/data` in the image | Where clones, Chroma, BM25 and the registry live |
-| `DOMAIN` | variable | route B only | - | Public hostname for Caddy, e.g. `qa.example.com` |
+## What it costs
 
-Never commit `.env`; it is gitignored and excluded from the Docker build context.
+Prices are Azure's public pay-as-you-go prices for Linux in **East US**; other regions differ by roughly ±25%.
+The portal shows the exact price for your region when you pick the size.
 
-## Route A: Hugging Face Docker Space
+| Item | Choice | Price | Per month if always on |
+|---|---|---|---|
+| VM | **B2als v2** (2 vCPU, 4 GB RAM, x86, AMD) | $0.0376 / hour | about $27.45 |
+| VM (fallback) | B2s (2 vCPU, 4 GB RAM, x86, Intel) | $0.0416 / hour | about $30.37 |
+| OS disk | 30 GiB Standard SSD | | about $2.40 |
+| Public IP | Standard, static | $0.005 / hour | about $3.65 |
+| Traffic | Outbound data | first 100 GB free | $0 for a demo |
 
-1. Create a Hugging Face account and a **write** access token: <https://huggingface.co/settings/tokens>
-   (New token, type "Write").
-2. Create the Space: <https://huggingface.co/new-space>
-   - Owner: your account. Space name: for example `codebase-qa`.
-   - SDK: **Docker**, template **Blank**.
-   - Hardware: **CPU basic (free)** is enough. Visibility: Public or Private.
-3. In the Space, open **Settings -> Variables and secrets** and add:
-   - Secret `GEMINI_API_KEY` = your Gemini key.
-   - Secret `DEMO_PASSWORD` = a password you will share with reviewers (recommended).
-   - Variable `GEMINI_MODEL` = `gemini-3.5-flash-lite`.
-   - Variable `DEMO_REPO_URL` = `https://github.com/fastapi/full-stack-fastapi-template`.
-4. Push this repository to the Space (from the project root):
+- **Always on:** about **$33.50 per month**, so the $100 credit lasts about **3 months**.
+- **With auto-shutdown at night** (running about 12 hours a day): about **$20 per month**, roughly 5 months.
+- A stopped (deallocated) VM costs nothing for compute, but the disk and the public IP are still billed (about $6 per month).
+- Deleting the resource group (step 14) stops all charges.
+- Azure for Students has a spending limit. When the credit runs out, your resources are switched off. You are not charged
+  and no card is needed.
+
+Why 4 GB of RAM: the backend loads PyTorch and the embedding model, and building the Docker image needs memory too.
+Sizes with 1-2 GB (B1s, B1ms, B2ats v2) run out of memory. The steps below also add a 2 GB swap file as a safety net.
+
+---
+
+## Step 1: Pick a region and check your credit
+
+1. Open <https://portal.azure.com> and sign in with your student account.
+2. Check your remaining credit at <https://www.microsoftazuresponsorships.com/Balance>.
+3. Choose a region close to you. Student subscriptions sometimes only allow certain regions. If the portal later says a
+   size or region is "not available" or blocked by policy, pick another region from its list.
+
+## Step 2: Create the virtual machine
+
+1. In the portal search bar type **Virtual machines** and open it, then click **Create -> Azure virtual machine**.
+2. **Basics** tab:
+   - **Subscription:** Azure for Students.
+   - **Resource group:** click **Create new** and enter `codebase-qa-rg`. Everything for this project goes in it,
+     so you can delete it all at once later.
+   - **Virtual machine name:** `codebase-qa-vm`.
+   - **Region:** the region from step 1.
+   - **Availability options:** No infrastructure redundancy required.
+   - **Security type:** Standard.
+   - **Image:** **Ubuntu Server 24.04 LTS - x64 Gen2**.
+   - **VM architecture:** x64.
+   - **Size:** click **See all sizes**, search `B2als_v2`, select it. If it is not offered, choose `B2s`.
+     The price per month is shown next to the size.
+   - **Authentication type:** SSH public key.
+   - **Username:** `azureuser`.
+   - **SSH public key source:** Generate new key pair. **Key pair name:** `codebase-qa-key`.
+   - **Public inbound ports:** Allow selected ports, and tick **SSH (22)**, **HTTP (80)** and **HTTPS (443)**.
+3. **Disks** tab:
+   - **OS disk size:** Image default (30 GiB).
+   - **OS disk type:** Standard SSD (locally-redundant storage).
+   - Tick **Delete with VM**.
+4. **Networking** tab: keep the defaults (new virtual network, new public IP).
+   Tick **Delete public IP and NIC when VM is deleted**.
+5. **Management** tab: you can enable **Auto-shutdown** here, or do it in step 5.
+6. Click **Review + create**, wait for "Validation passed", then **Create**.
+7. A window asks you to **Download private key and create resource**. Click it and keep the downloaded
+   `codebase-qa-key.pem` file. It is your only way to log in: never share it or put it in git.
+8. Wait for "Your deployment is complete" (1-2 minutes), then click **Go to resource**.
+
+## Step 3: Check that ports 80 and 443 are open
+
+Caddy needs port 80 to prove to Let's Encrypt that it controls your domain, and port 443 to serve HTTPS.
+
+1. In the VM, open **Networking -> Network settings**.
+2. Under **Inbound port rules** you should see rules allowing **22**, **80** and **443**.
+3. If 80 or 443 is missing, click **Create port rule -> Inbound port rule**:
+   - Service: **HTTP** (then repeat with **HTTPS**), Action: Allow, then click **Add**.
+4. Optional but recommended: open the rule for port **22**, change **Source** to **My IP address** and save. Only your
+   current internet connection can then try to log in over SSH. If your home IP changes later, update this rule.
+
+## Step 4: Give the VM a free domain name
+
+1. In the VM **Overview**, click the **Public IP address** value. This opens the public IP resource.
+2. Go to **Settings -> Configuration**.
+3. Check that **Assignment** is **Static**.
+4. In **DNS name label** enter a unique lowercase name, for example `codebase-qa-avinash`, and click **Save**.
+5. Your domain is now shown under the label, for example `codebase-qa-avinash.eastus.cloudapp.azure.com`.
+   Write it down; this guide calls it `YOUR_DOMAIN`.
+6. Check it from PowerShell on Windows (it should print the VM's public IP):
+   ```powershell
+   Resolve-DnsName YOUR_DOMAIN
+   ```
+
+## Step 5: Turn on auto-shutdown
+
+1. In the VM, open **Operations -> Auto-shutdown**.
+2. Set **Enabled** to On, choose a **Scheduled shutdown** time (for example 23:00) and your **Time zone**.
+3. Optionally enable the notification and enter your email address; you will be warned 30 minutes before shutdown.
+4. Click **Save**.
+
+To use the app again after a shutdown, open the VM and click **Start** in **Overview**. Docker starts with the VM and
+`restart: unless-stopped` brings all three containers back automatically, so you don't need to log in. Give it
+about a minute.
+
+## Step 6: Set a budget alert
+
+1. Search the portal for **Cost Management + Billing**, open **Cost Management -> Budgets**, and click **Add**.
+2. **Scope:** your Azure for Students subscription.
+3. **Name:** `codebase-qa-budget`, **Reset period:** Monthly, **Amount:** for example `40`.
+4. Click **Next**. Add alert conditions of type **Actual** at **50%**, **80%** and **100%**, enter your email under
+   **Alert recipients**, and click **Create**.
+
+If the portal says budgets are not supported for your subscription type, keep an eye on
+<https://www.microsoftazuresponsorships.com/Balance> instead. Cost data in Azure appears with a delay of up to a day.
+
+## Step 7: Connect to the VM over SSH from Windows
+
+Windows 10/11 already include the `ssh` and `scp` commands. Use **PowerShell** (not the old cmd).
+
+1. Create a `.ssh` folder in your user folder and move the key into it:
+   ```powershell
+   New-Item -ItemType Directory -Force "$HOME\.ssh"
+   ```
+   ```powershell
+   Move-Item "$HOME\Downloads\codebase-qa-key.pem" "$HOME\.ssh\codebase-qa-key.pem"
+   ```
+2. Restrict the key file to your Windows user. Without this, ssh may refuse it with "UNPROTECTED PRIVATE KEY FILE":
+   ```powershell
+   icacls "$HOME\.ssh\codebase-qa-key.pem" /inheritance:r /grant:r "$($env:USERNAME):(R)"
+   ```
+3. Connect (replace `YOUR_DOMAIN`):
+   ```powershell
+   ssh -i "$HOME\.ssh\codebase-qa-key.pem" azureuser@YOUR_DOMAIN
+   ```
+   The first time, type `yes` to trust the server. The prompt changes to `azureuser@codebase-qa-vm:~$`;
+   you are now typing commands on the VM. Type `exit` to leave.
+
+All commands in steps 8 and 10-13 that are not marked PowerShell run **on the VM**, inside this SSH session.
+
+## Step 8: Prepare the VM and install Docker
+
+1. Update Ubuntu (this takes a few minutes):
    ```bash
-   git remote add space https://huggingface.co/spaces/<your-username>/codebase-qa
-   git push space main
+   sudo apt-get update && sudo apt-get upgrade -y
    ```
-   When asked for credentials use your Hugging Face username and the write token as the password.
-   If the Space was created with an initial commit, use `git push --force space main` the first time.
-5. Watch **Logs -> Build**. The build installs CPU PyTorch and downloads both models into the image
-   (expect 10-20 minutes). The README front matter (`sdk: docker`, `app_port: 7860`) tells Spaces which port to serve.
-6. When the Space is **Running**, the demo repository is indexed in the background (about 3-5 minutes on the free CPU).
-   The sidebar shows the job progress; you can ask questions once the repository appears in the picker.
-
-Notes
-- Free Spaces have ephemeral disk: after a restart the demo repo is indexed again automatically. To keep indexes,
-  enable persistent storage in the Space settings and set the variable `DATA_DIR=/data`.
-- Free Spaces sleep after inactivity; the first request after sleeping takes a minute to start the container.
-- If the build fails, the build log names the failing Dockerfile step. If the app fails at runtime, `start.sh` stops the
-  container when either process exits, so the Space shows "Runtime error" with the cause in **Logs -> Container**.
-
-## Route B: Linux VM with Docker Compose
-
-Prerequisites: a Linux VM (2 vCPU / 4 GB RAM minimum, 8 GB recommended), a DNS `A` record pointing your domain at
-the VM's public IP, and inbound ports 80 and 443 open.
-
-1. Install Docker Engine and the compose plugin: <https://docs.docker.com/engine/install/>
-2. Clone the repository on the VM:
+2. Add a 2 GB swap file so the image build cannot run out of memory:
    ```bash
-   git clone https://github.com/<you>/codebase-qa.git
+   sudo fallocate -l 2G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
    ```
    ```bash
-   cd codebase-qa
+   echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
    ```
-3. Create `.env` next to `docker-compose.yml`:
+3. Install Docker Engine and the Compose plugin with Docker's official install script:
+   ```bash
+   curl -fsSL https://get.docker.com | sudo sh
    ```
-   DOMAIN=qa.example.com
-   GEMINI_API_KEY=...
+4. Allow your user to run Docker without `sudo`:
+   ```bash
+   sudo usermod -aG docker azureuser
+   ```
+5. Log out (`exit`) and connect again with the ssh command from step 7, so the group change takes effect.
+6. Check that Docker works:
+   ```bash
+   docker run --rm hello-world
+   ```
+   ```bash
+   docker compose version
+   ```
+   You should see "Hello from Docker!" and a Compose version (v2.x).
+
+## Step 9: Copy the project to the VM
+
+No GitHub needed: you package the current commit on Windows and upload it.
+
+1. In **PowerShell on Windows**, go to the project folder:
+   ```powershell
+   cd "$HOME\OneDrive\Desktop\codebase-qa"
+   ```
+2. Package the committed code. This does not include `.env`, `.venv` or `data`, so your secrets and local
+   indexes stay on your PC:
+   ```powershell
+   git archive --format=tar.gz -o "$HOME\codebase-qa.tar.gz" HEAD
+   ```
+3. Upload it to the VM's home folder:
+   ```powershell
+   scp -i "$HOME\.ssh\codebase-qa-key.pem" "$HOME\codebase-qa.tar.gz" azureuser@YOUR_DOMAIN:~/
+   ```
+4. **On the VM**, unpack it:
+   ```bash
+   mkdir -p ~/codebase-qa && tar -xzf ~/codebase-qa.tar.gz -C ~/codebase-qa
+   ```
+   ```bash
+   cd ~/codebase-qa && ls
+   ```
+   You should see `docker-compose.yml`, `Dockerfile`, `backend`, `frontend`, `deploy` and the other project files.
+
+If you push the project to GitHub later, you can use `git clone` on the VM instead of steps 1-4.
+
+## Step 10: Create the .env file on the server
+
+The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git or in the Docker image.
+
+1. Open the editor:
+   ```bash
+   nano ~/codebase-qa/.env
+   ```
+2. Paste this, replacing the values (in nano, right-click pastes):
+   ```
+   DOMAIN=YOUR_DOMAIN
+   GEMINI_API_KEY=your-gemini-api-key
    GEMINI_MODEL=gemini-3.5-flash-lite
-   DEMO_PASSWORD=...
+   DEMO_PASSWORD=choose-a-password-for-reviewers
    DEMO_REPO_URL=https://github.com/fastapi/full-stack-fastapi-template
    ```
-4. Build and start:
+3. Save with **Ctrl+O**, then **Enter**, and exit with **Ctrl+X**.
+4. Make the file readable only by you:
    ```bash
-   docker compose up -d --build
+   chmod 600 ~/codebase-qa/.env
    ```
-5. Check status and logs (backend logs are JSON lines):
+
+| Setting | Required | Meaning |
+|---|---|---|
+| `DOMAIN` | yes | The domain from step 4, without `https://` |
+| `GEMINI_API_KEY` | yes | Your Google AI Studio key |
+| `GEMINI_MODEL` | no | Defaults to `gemini-3.5-flash-lite` |
+| `DEMO_PASSWORD` | recommended | Visitors must enter it before indexing or asking |
+| `DEMO_REPO_URL` | no | Indexed automatically on first start |
+| `MAX_REPOS` | no | Max indexed repositories (default 5) |
+| `MAX_REPO_SIZE_MB` | no | Larger repositories are rejected (default 200) |
+| `ASK_RATE_LIMIT_PER_MINUTE` | no | Questions per visitor per minute (default 10) |
+| `INDEX_RATE_LIMIT_PER_HOUR` | no | Index requests per visitor per hour (default 10) |
+| `GITHUB_TOKEN` | no | Raises GitHub's API limit for the repo size check (a token with no scopes is enough) |
+
+## Step 11: Start the stack
+
+1. Build the image and start all three containers in the background:
+   ```bash
+   cd ~/codebase-qa && docker compose up -d --build
+   ```
+   The first build takes **10-20 minutes**: it installs CPU-only PyTorch and downloads both models into the image.
+   Later builds reuse the cached layers and are much faster.
+2. Check the status:
    ```bash
    docker compose ps
    ```
-   ```bash
-   docker compose logs -f backend
+   Wait until `backend` and `frontend` show `(healthy)` and `caddy` shows `Up`.
+3. Open `https://YOUR_DOMAIN` in your browser. The first visit can take up to a minute while Caddy obtains the
+   certificate.
+4. Enter the demo password in the sidebar. The demo repository indexes in the background (about 3-5 minutes); the
+   progress is visible in the backend logs (step 12). Once it appears in the **Repository** picker, ask a question.
+
+## Step 12: Check logs and health
+
+All commands run on the VM in `~/codebase-qa`.
+
+- Follow the backend logs (JSON lines: requests, indexing jobs, errors). Press **Ctrl+C** to stop following:
+  ```bash
+  docker compose logs -f backend
+  ```
+- Caddy logs (certificate problems show up here):
+  ```bash
+  docker compose logs --tail 100 caddy
+  ```
+- Frontend logs:
+  ```bash
+  docker compose logs --tail 100 frontend
+  ```
+- Backend health from inside the VM:
+  ```bash
+  docker compose exec backend python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8000/health').read().decode())"
+  ```
+- Memory and disk:
+  ```bash
+  free -h && df -h /
+  ```
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Browser can't connect at all | VM stopped, or ports 80/443 closed | Start the VM; check step 3 |
+| Certificate error, Caddy logs mention "challenge" | DNS label wrong or port 80 blocked | Check `DOMAIN` in `.env` against step 4, check step 3, then `docker compose restart caddy` |
+| "Cannot reach the backend" in the page | Backend still starting or crashed | `docker compose ps`, `docker compose logs backend` |
+| Answers fail with status 429 | Gemini free-tier daily quota used up | Wait for the reset, or set another `GEMINI_MODEL` in `.env` and run `docker compose up -d` |
+| Build stops with "Killed" | Out of memory | Make sure swap from step 8 is on (`free -h`), then build again |
+
+## Step 13: Update to a new version
+
+1. In **PowerShell on Windows**, package and upload the new commit as in step 9:
+   ```powershell
+   cd "$HOME\OneDrive\Desktop\codebase-qa"
    ```
-   Caddy obtains a Let's Encrypt certificate on the first request to `https://$DOMAIN`.
-6. Update to a new version:
+   ```powershell
+   git archive --format=tar.gz -o "$HOME\codebase-qa.tar.gz" HEAD
+   ```
+   ```powershell
+   scp -i "$HOME\.ssh\codebase-qa-key.pem" "$HOME\codebase-qa.tar.gz" azureuser@YOUR_DOMAIN:~/
+   ```
+2. **On the VM**, replace the code but keep `.env`:
    ```bash
-   git pull && docker compose up -d --build
+   cd ~/codebase-qa && find . -mindepth 1 -maxdepth 1 ! -name .env -exec rm -rf {} +
+   ```
+   ```bash
+   tar -xzf ~/codebase-qa.tar.gz -C ~/codebase-qa
+   ```
+3. Rebuild and restart. Your indexes and the HTTPS certificate are kept, because they live in Docker volumes:
+   ```bash
+   docker compose up -d --build
+   ```
+4. Remove old image layers to free disk space:
+   ```bash
+   docker image prune -f
    ```
 
-What the stack does
-- `backend`: FastAPI, data in the named volume `app-data`, health check on `/health`, `restart: unless-stopped`.
-- `frontend`: Streamlit, waits for a healthy backend, health check on `/_stcore/health`.
-- `caddy`: terminates TLS for `$DOMAIN` and proxies to the frontend (WebSockets included); certificates persist in
-  `caddy-data`.
-- Back up the index with `docker run --rm -v codebase-qa_app-data:/data -v "$PWD":/backup alpine tar czf /backup/app-data.tgz -C /data .`
+## Step 14: Stop or remove everything
 
-## GitHub Actions
+- **Pause:** VM **Overview -> Stop**. Compute billing stops; disk and IP still cost about $6 per month.
+- **Remove completely:** search **Resource groups**, open `codebase-qa-rg`, click **Delete resource group**, and type
+  its name to confirm. This deletes the VM, disk, IP and network, and stops all charges.
 
-- `.github/workflows/ci.yml` runs on every push and pull request: `ruff check`, the full pytest suite (no network
-  model calls, no API key needed) and a Docker image build.
-- `.github/workflows/eval.yml` is manual (**Actions -> Eval subset -> Run workflow**). It indexes the test repository,
-  evaluates the first 10 dev questions (never the held-out ones) and writes the metrics table to the job summary.
-  For answer-level metrics add the repository secret `GEMINI_API_KEY` (**Settings -> Secrets and variables -> Actions**)
-  and optionally the variable `GEMINI_MODEL`. Untick "answers" to run retrieval-only without a key.
+## Backups (optional)
+
+The indexes live in the Docker volume `codebase-qa_app-data`. To save a copy on the VM:
+```bash
+docker run --rm -v codebase-qa_app-data:/data -v "$HOME":/backup alpine tar czf /backup/app-data.tgz -C /data .
+```
+You can always rebuild an index by re-indexing the repository, so backups are a convenience, not a requirement.
+
+## GitHub Actions (optional)
+
+If you push the project to GitHub:
+- `.github/workflows/ci.yml` runs on every push: `ruff check`, the full test suite (no API key needed) and a Docker
+  image build, so the Dockerfile is verified before it reaches the VM.
+- `.github/workflows/eval.yml` is started by hand (**Actions -> Eval subset -> Run workflow**) and posts the metrics for
+  the first 10 dev questions as the job summary. For answer-level metrics add the repository secret `GEMINI_API_KEY`
+  under **Settings -> Secrets and variables -> Actions**.
 
 ## Security model
 
-- Only `https://github.com/<owner>/<repo>` URLs are accepted; repositories are shallow-cloned with a timeout,
-  without tags, hooks, symlinks, LFS smudging or the `ext` transport, and are never executed.
-- Size limit checked before cloning (GitHub API) and after cloning (on disk); the number of repositories is capped.
-- Indexing runs as a single-worker background job (`GET /jobs/{id}` for progress).
-- Per-visitor rate limits on `/ask` and `POST /repos`. The visitor IP is the last `X-Forwarded-For` hop added by the
-  trusted proxy (Hugging Face or Caddy), forwarded by Streamlit to the private backend.
-- Optional demo password on every endpoint except `/health`; errors never include stack traces or server paths.
+- Only `https://github.com/<owner>/<repo>` URLs are accepted. Repositories are shallow-cloned with a timeout, without
+  tags, hooks, symlinks, LFS downloads or the `ext` transport, and their code is never executed.
+- The repository size is checked before cloning (GitHub API) and after cloning (on disk), and the number of
+  repositories is capped.
+- Indexing runs as a single background job at a time; progress is available at `GET /jobs/{id}`.
+- Per-visitor rate limits apply to `/ask` and `POST /repos`. The visitor IP is the last `X-Forwarded-For` hop, added by
+  Caddy and forwarded by Streamlit to the backend, which is not reachable from the internet.
+- The optional demo password protects every endpoint except `/health`. Errors never include stack traces or server
+  paths.

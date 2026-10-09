@@ -12,7 +12,6 @@ ENV PYTHONUNBUFFERED=1 \
     EMBEDDING_MODEL=${EMBEDDING_MODEL} \
     RERANKER_MODEL=${RERANKER_MODEL} \
     DATA_DIR=/app/data \
-    BACKEND_URL=http://127.0.0.1:8000 \
     TRUST_PROXY=true
 
 RUN apt-get update \
@@ -32,11 +31,10 @@ RUN python -c "from sentence_transformers import CrossEncoder, SentenceTransform
     && python -c "from tree_sitter_language_pack import get_parser; [get_parser(name) for name in ('python', 'javascript', 'typescript', 'tsx', 'go', 'java')]"
 
 COPY frontend ./frontend
-COPY deploy/start.sh ./start.sh
 
-RUN chmod +x start.sh && mkdir -p /app/data && chown -R user:user /app/data /opt/models
+RUN mkdir -p /app/data && chown -R user:user /app/data /opt/models
 
 ENV HF_HUB_OFFLINE=1
 USER user
-EXPOSE 7860
-CMD ["./start.sh"]
+EXPOSE 8000 7860
+CMD ["uvicorn", "codebase_qa.api.app:app", "--host", "0.0.0.0", "--port", "8000"]

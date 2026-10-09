@@ -1,3 +1,11 @@
+name: codebase-qa
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   backend:
     build: .
@@ -12,6 +20,7 @@ services:
     expose:
       - "8000"
     restart: unless-stopped
+    logging: *logging
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"]
       interval: 30s
@@ -38,6 +47,7 @@ services:
       backend:
         condition: service_healthy
     restart: unless-stopped
+    logging: *logging
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:7860/_stcore/health', timeout=5)"]
       interval: 30s
@@ -52,7 +62,7 @@ services:
       - "443:443"
       - "443:443/udp"
     environment:
-      DOMAIN: ${DOMAIN:?set DOMAIN in .env, e.g. qa.example.com}
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env, e.g. my-codebase-qa.eastus.cloudapp.azure.com}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
@@ -61,6 +71,7 @@ services:
       frontend:
         condition: service_healthy
     restart: unless-stopped
+    logging: *logging
 
 volumes:
   app-data:
