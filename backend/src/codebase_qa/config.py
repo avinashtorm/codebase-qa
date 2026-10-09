@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-3.8-flash"
+    gemini_model: str = "gemini-3.5-flash-lite"
     demo_password: str = ""
     demo_repo_url: str = ""
 
@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     reranker_model: str = "BAAI/bge-reranker-base"
 
-    chunker: str = "fixed"
+    chunker: str = "treesitter"
     top_k: int = 8
     clone_timeout_seconds: float = 120.0
     llm_cache: bool = False

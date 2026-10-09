@@ -13,31 +13,16 @@ def file_header(path: str) -> str:
     return f"# File: {path}"
 
 
-class FixedSizeChunker:
-    name = "fixed"
-
-    def __init__(self, chunk_lines: int = 40, overlap: int = 10) -> None:
-        if overlap >= chunk_lines:
-            raise ValueError("overlap must be smaller than chunk_lines")
-        self.chunk_lines = chunk_lines
-        self.overlap = overlap
-
-    def chunk(self, source: SourceFile) -> list[Chunk]:
-        return self.chunk_span(source, split_lines(source.content), 1)
-
-    def chunk_span(self, source: SourceFile, lines: list[str], first_line: int) -> list[Chunk]:
-        chunks: list[Chunk] = []
-        step = self.chunk_lines - self.overlap
-        start = 0
-        while start < len(lines):
-            end = min(start + self.chunk_lines, len(lines))
-            text = "\n".join(lines[start:end])
-            if text.strip():
-                chunks.append(make_chunk(source, text, first_line + start, first_line + end - 1))
-            if end == len(lines):
-                break
-            start += step
-        return chunks
+def line_windows(first: int, last: int, size: int, overlap: int) -> list[tuple[int, int]]:
+    windows: list[tuple[int, int]] = []
+    start = first
+    while start <= last:
+        end = min(start + size - 1, last)
+        windows.append((start, end))
+        if end == last:
+            break
+        start = end + 1 - overlap
+    return windows
 
 
 def make_chunk(source: SourceFile, text: str, start_line: int, end_line: int, header: str = "") -> Chunk:
@@ -51,3 +36,22 @@ def make_chunk(source: SourceFile, text: str, start_line: int, end_line: int, he
         content=text,
         header=header or file_header(source.path),
     )
+
+
+class FixedSizeChunker:
+    name = "fixed"
+
+    def __init__(self, chunk_lines: int = 40, overlap: int = 10) -> None:
+        if overlap >= chunk_lines:
+            raise ValueError("overlap must be smaller than chunk_lines")
+        self.chunk_lines = chunk_lines
+        self.overlap = overlap
+
+    def chunk(self, source: SourceFile) -> list[Chunk]:
+        lines = split_lines(source.content)
+        chunks: list[Chunk] = []
+        for start, end in line_windows(1, len(lines), self.chunk_lines, self.overlap):
+            text = "\n".join(lines[start - 1 : end])
+            if text.strip():
+                chunks.append(make_chunk(source, text, start, end))
+        return chunks
