@@ -12,8 +12,16 @@ JOB_TIMEOUT_SECONDS = 900
 st.set_page_config(page_title="Codebase Q&A", page_icon=":mag:", layout="wide")
 
 
+def visitor_ip() -> str:
+    forwarded = st.context.headers.get("X-Forwarded-For")
+    if isinstance(forwarded, str) and forwarded:
+        return forwarded.split(",")[-1].strip()
+    address = st.context.ip_address
+    return address if isinstance(address, str) else ""
+
+
 def client() -> BackendClient:
-    return BackendClient(BACKEND_URL, st.session_state.get("password", ""))
+    return BackendClient(BACKEND_URL, st.session_state.get("password", ""), visitor_ip())
 
 
 def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:

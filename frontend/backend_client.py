@@ -10,8 +10,16 @@ class BackendError(RuntimeError):
 
 
 class BackendClient:
-    def __init__(self, base_url: str, password: str = "", transport: httpx.BaseTransport | None = None) -> None:
+    def __init__(
+        self,
+        base_url: str,
+        password: str = "",
+        client_ip: str = "",
+        transport: httpx.BaseTransport | None = None,
+    ) -> None:
         headers = {"X-Demo-Password": password} if password else {}
+        if client_ip:
+            headers["X-Forwarded-For"] = client_ip
         self.http = httpx.Client(base_url=base_url, headers=headers, timeout=120.0, transport=transport)
 
     def request(self, method: str, path: str, **kwargs: Any) -> Any:

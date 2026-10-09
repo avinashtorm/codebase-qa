@@ -47,7 +47,8 @@ def test_github_link_points_at_commit_and_lines() -> None:
 
 
 def mock_backend(handler: callable) -> BackendClient:
-    return BackendClient("http://backend", password="pw", transport=httpx.MockTransport(handler))
+    transport = httpx.MockTransport(handler)
+    return BackendClient("http://backend", password="pw", client_ip="203.0.113.7", transport=transport)
 
 
 def test_client_sends_password_and_parses_json() -> None:
@@ -55,11 +56,12 @@ def test_client_sends_password_and_parses_json() -> None:
 
     def handler(request: httpx.Request) -> httpx.Response:
         seen["password"] = request.headers.get("x-demo-password")
+        seen["ip"] = request.headers.get("x-forwarded-for")
         seen["body"] = json.loads(request.content)
         return httpx.Response(200, json={"answer": "ok"})
 
     assert mock_backend(handler).ask("repo", "q?") == {"answer": "ok"}
-    assert seen == {"password": "pw", "body": {"repo_id": "repo", "question": "q?"}}
+    assert seen == {"password": "pw", "ip": "203.0.113.7", "body": {"repo_id": "repo", "question": "q?"}}
 
 
 def test_client_raises_backend_error_with_detail() -> None:

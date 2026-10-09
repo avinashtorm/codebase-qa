@@ -1,0 +1,42 @@
+FROM python:3.11-slim
+
+ARG TORCH_VERSION=2.14.1
+ARG EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
+ARG RERANKER_MODEL=BAAI/bge-reranker-base
+
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    HF_HOME=/opt/models \
+    TOKENIZERS_PARALLELISM=false \
+    EMBEDDING_MODEL=${EMBEDDING_MODEL} \
+    RERANKER_MODEL=${RERANKER_MODEL} \
+    DATA_DIR=/app/data \
+    BACKEND_URL=http://127.0.0.1:8000 \
+    TRUST_PROXY=true
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --uid 1000 user
+
+WORKDIR /app
+
+RUN pip install "torch==${TORCH_VERSION}" --index-url https://download.pytorch.org/whl/cpu
+
+COPY pyproject.toml ./
+COPY backend ./backend
+RUN pip install ".[frontend]"
+
+RUN python -c "from sentence_transformers import CrossEncoder, SentenceTransformer; SentenceTransformer('${EMBEDDING_MODEL}'); CrossEncoder('${RERANKER_MODEL}')" \
+    && python -c "from tree_sitter_language_pack import get_parser; [get_parser(name) for name in ('python', 'javascript', 'typescript', 'tsx', 'go', 'java')]"
+
+COPY frontend ./frontend
+COPY deploy/start.sh ./start.sh
+
+RUN chmod +x start.sh && mkdir -p /app/data && chown -R user:user /app/data /opt/models
+
+ENV HF_HUB_OFFLINE=1
+USER user
+EXPOSE 7860
+CMD ["./start.sh"]
