@@ -1,0 +1,2862 @@
+{
+ "config": "grounded-treesitter-vector-answers",
+ "timestamp": "2026-10-09T11:17:50+00:00",
+ "split": "dev",
+ "question_count": 35,
+ "with_answers": true,
+ "answered_count": 35,
+ "generation_error": null,
+ "settings": {
+  "chunker": "treesitter",
+  "retrieval_mode": "vector",
+  "rerank": false,
+  "rerank_candidates": 30,
+  "rerank_fusion": false,
+  "reranker_model": null,
+  "top_k": 8,
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "llm": "gemini-3.5-flash-lite",
+  "repo_commit": "7257e606cb94eada1dca40173e2b7f99dd549bc6"
+ },
+ "metrics": {
+  "hit_at_1": 0.5714,
+  "hit_at_5": 0.7143,
+  "recall_at_10": 0.7667,
+  "mrr": 0.651,
+  "citation_precision": 0.7143,
+  "citation_any_correct": 0.7714,
+  "invalid_citations": 1,
+  "refused": 0,
+  "embed_query_ms_mean": 112.1,
+  "generation_ms_mean": 2257.5,
+  "retrieval_ms_mean": 127.1,
+  "vector_search_ms_mean": 14.9
+ },
+ "by_category": {
+  "config": {
+   "count": 5,
+   "hit_at_1": 0.4,
+   "hit_at_5": 0.6,
+   "recall_at_10": 0.6,
+   "mrr": 0.5,
+   "citation_precision": 0.4,
+   "citation_any_correct": 0.4,
+   "invalid_citations": 0,
+   "refused": 0,
+   "embed_query_ms_mean": 186.2,
+   "generation_ms_mean": 1934.6,
+   "retrieval_ms_mean": 202.8,
+   "vector_search_ms_mean": 16.4
+  },
+  "how-does": {
+   "count": 10,
+   "hit_at_1": 0.5,
+   "hit_at_5": 0.6,
+   "recall_at_10": 0.7333,
+   "mrr": 0.5952,
+   "citation_precision": 0.6,
+   "citation_any_correct": 0.8,
+   "invalid_citations": 0,
+   "refused": 0,
+   "embed_query_ms_mean": 89.5,
+   "generation_ms_mean": 2010.2,
+   "retrieval_ms_mean": 102.8,
+   "vector_search_ms_mean": 13.2
+  },
+  "what-happens-when": {
+   "count": 8,
+   "hit_at_1": 0.5,
+   "hit_at_5": 0.75,
+   "recall_at_10": 0.6875,
+   "mrr": 0.6042,
+   "citation_precision": 0.75,
+   "citation_any_correct": 0.75,
+   "invalid_citations": 1,
+   "refused": 0,
+   "embed_query_ms_mean": 90.3,
+   "generation_ms_mean": 1659.4,
+   "retrieval_ms_mean": 104.9,
+   "vector_search_ms_mean": 14.4
+  },
+  "where-is": {
+   "count": 12,
+   "hit_at_1": 0.75,
+   "hit_at_5": 0.8333,
+   "recall_at_10": 0.9167,
+   "mrr": 0.7917,
+   "citation_precision": 0.9167,
+   "citation_any_correct": 0.9167,
+   "invalid_citations": 0,
+   "refused": 0,
+   "embed_query_ms_mean": 114.6,
+   "generation_ms_mean": 2996.8,
+   "retrieval_ms_mean": 130.6,
+   "vector_search_ms_mean": 15.9
+  }
+ },
+ "questions": [
+  {
+   "id": "c01",
+   "category": "where-is",
+   "question": "Where is the JWT access token created?",
+   "expected": [
+    {
+     "path": "backend/app/core/security.py",
+     "start_line": 22,
+     "end_line": 26
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/security.py:22-26",
+     "score": 0.746
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:14-16",
+     "score": 0.6886
+    },
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.6835
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6786
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:161-173",
+     "score": 0.674
+    },
+    {
+     "location": "backend/app/models.py:119-121",
+     "score": 0.6708
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:16-25",
+     "score": 0.6581
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.6559
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:22-38",
+     "score": 0.6542
+    },
+    {
+     "location": "backend/app/models.py:113-116",
+     "score": 0.6495
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 328.0,
+    "embed_query": 300.6,
+    "vector_search": 27.3,
+    "generation": 1847.5
+   },
+   "used_llm": true,
+   "answer": "The JWT access token is created in the `create_access_token` function in `backend/app/core/security.py` using `jwt.encode`.",
+   "citations": [
+    "backend/app/core/security.py:22-26"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c03",
+   "category": "where-is",
+   "question": "Where is the current user extracted from the bearer token in API requests?",
+   "expected": [
+    {
+     "path": "backend/app/api/deps.py",
+     "start_line": 30,
+     "end_line": 46
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.8005
+    },
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.744
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:26-34",
+     "score": 0.7421
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:90-114",
+     "score": 0.7388
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:15-23",
+     "score": 0.732
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:146-158",
+     "score": 0.7277
+    },
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.7237
+    },
+    {
+     "location": "backend/app/api/deps.py:49-49",
+     "score": 0.7189
+    },
+    {
+     "location": "backend/app/models.py:113-116",
+     "score": 0.7189
+    },
+    {
+     "location": "backend/app/api/routes/users.py:124-129",
+     "score": 0.7173
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 110.2,
+    "embed_query": 97.4,
+    "vector_search": 12.6,
+    "generation": 2005.7
+   },
+   "used_llm": true,
+   "answer": "The current user is extracted from the token using the `get_current_user` dependency function located in `backend/app/api/deps.py`.",
+   "citations": [
+    "backend/app/api/deps.py:30-46"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c04",
+   "category": "where-is",
+   "question": "Where is the login endpoint that returns an access token defined?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/login.py",
+     "start_line": 23,
+     "end_line": 42
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.7468
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:16-25",
+     "score": 0.7421
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.7336
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:14-16",
+     "score": 0.7321
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:7-35",
+     "score": 0.7168
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:22-38",
+     "score": 0.7127
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:345-350",
+     "score": 0.7122
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:28-34",
+     "score": 0.708
+    },
+    {
+     "location": "backend/app/core/security.py:22-26",
+     "score": 0.7058
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:361-366",
+     "score": 0.7047
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.3333333333333333
+   },
+   "latency_ms": {
+    "retrieval": 102.7,
+    "embed_query": 89.8,
+    "vector_search": 12.7,
+    "generation": 3190.2
+   },
+   "used_llm": true,
+   "answer": "The login endpoint that returns an access token is defined in `backend/app/api/routes/login.py` at the `/login/access-token` route.",
+   "citations": [
+    "backend/app/api/routes/login.py:23-25"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c05",
+   "category": "where-is",
+   "question": "Where is the check that the current user is a superuser implemented?",
+   "expected": [
+    {
+     "path": "backend/app/api/deps.py",
+     "start_line": 52,
+     "end_line": 57
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.7809
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:15-23",
+     "score": 0.7577
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:53-58",
+     "score": 0.7437
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:493-505",
+     "score": 0.7313
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:61-66",
+     "score": 0.7289
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:26-34",
+     "score": 0.7247
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:79-87",
+     "score": 0.7125
+    },
+    {
+     "location": "backend/app/api/routes/users.py:32-51",
+     "score": 0.7054
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:60-76",
+     "score": 0.7031
+    },
+    {
+     "location": "backend/app/api/routes/users.py:132-143",
+     "score": 0.7027
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 118.2,
+    "embed_query": 101.4,
+    "vector_search": 16.6,
+    "generation": 2487.4
+   },
+   "used_llm": true,
+   "answer": "The check that the current user is a superuser is implemented in the `get_current_active_superuser` function in `backend/app/api/deps.py`.",
+   "citations": [
+    "backend/app/api/deps.py:52-57"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c07",
+   "category": "where-is",
+   "question": "Where is the password reset token generated?",
+   "expected": [
+    {
+     "path": "backend/app/utils.py",
+     "start_line": 105,
+     "end_line": 115
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.7706
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.7448
+    },
+    {
+     "location": "backend/app/utils.py:70-84",
+     "score": 0.7197
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.7196
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:113-126",
+     "score": 0.7104
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.7101
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:99-158",
+     "score": 0.7087
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:49-67",
+     "score": 0.7084
+    },
+    {
+     "location": "packages/react-email/emails/reset_password.tsx:14-47",
+     "score": 0.6993
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:82-110",
+     "score": 0.6989
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 123.0,
+    "embed_query": 105.0,
+    "vector_search": 17.9,
+    "generation": 2034.8
+   },
+   "used_llm": true,
+   "answer": "The password reset token is generated by the `generate_password_reset_token` function in `backend/app/utils.py`.",
+   "citations": [
+    "backend/app/utils.py:105-115"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c08",
+   "category": "where-is",
+   "question": "Where is the Item database table and its relationship to its owner defined?",
+   "expected": [
+    {
+     "path": "backend/app/models.py",
+     "start_line": 87,
+     "end_line": 93
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/models.py:86-93",
+     "score": 0.7149
+    },
+    {
+     "location": "backend/app/models.py:69-72",
+     "score": 0.6671
+    },
+    {
+     "location": "backend/app/models.py:50-55",
+     "score": 0.6654
+    },
+    {
+     "location": "backend/app/crud.py:63-68",
+     "score": 0.6478
+    },
+    {
+     "location": "backend/app/models.py:96-100",
+     "score": 0.6437
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:834-844",
+     "score": 0.6295
+    },
+    {
+     "location": "backend/tests/utils/item.py:9-16",
+     "score": 0.6267
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:61-85",
+     "score": 0.6252
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:809-814",
+     "score": 0.6199
+    },
+    {
+     "location": "frontend/src/components/Items/ItemActionsMenu.tsx:14-16",
+     "score": 0.6173
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 118.2,
+    "embed_query": 102.3,
+    "vector_search": 15.8,
+    "generation": 4183.7
+   },
+   "used_llm": true,
+   "answer": "The `Item` database table and its relationship to its owner are defined in `backend/app/models.py` on lines 86 to 93.",
+   "citations": [
+    "backend/app/models.py:86-93"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c09",
+   "category": "where-is",
+   "question": "Where is CORS configured for the backend?",
+   "expected": [
+    {
+     "path": "backend/app/main.py",
+     "start_line": 27,
+     "end_line": 33
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/main.py:1-11",
+     "score": 0.7092
+    },
+    {
+     "location": "development.md:31-70",
+     "score": 0.6863
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.683
+    },
+    {
+     "location": "backend/app/core/config.py:15-31",
+     "score": 0.6746
+    },
+    {
+     "location": ".github/workflows/deploy.yml:31-54",
+     "score": 0.6743
+    },
+    {
+     "location": "backend/app/main.py:18-36",
+     "score": 0.6719
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.6675
+    },
+    {
+     "location": "frontend/tsconfig.json:1-31",
+     "score": 0.664
+    },
+    {
+     "location": "compose.override.yml:61-100",
+     "score": 0.6604
+    },
+    {
+     "location": ".dockerignore:1-10",
+     "score": 0.6589
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.16666666666666666
+   },
+   "latency_ms": {
+    "retrieval": 109.5,
+    "embed_query": 91.8,
+    "vector_search": 17.6,
+    "generation": 6903.1
+   },
+   "used_llm": true,
+   "answer": "CORS is configured in `backend/app/main.py` using `CORSMiddleware` with origins allowed from `settings.FRONTEND_HOST`.",
+   "citations": [
+    "backend/app/main.py:24-31"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c11",
+   "category": "where-is",
+   "question": "Where is the first superuser created when the database is initialised?",
+   "expected": [
+    {
+     "path": "backend/app/core/db.py",
+     "start_line": 15,
+     "end_line": 33
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/db.py:15-33",
+     "score": 0.7329
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:53-58",
+     "score": 0.7226
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:61-66",
+     "score": 0.719
+    },
+    {
+     "location": "backend/app/core/db.py:1-12",
+     "score": 0.7078
+    },
+    {
+     "location": "deployment.md:61-97",
+     "score": 0.706
+    },
+    {
+     "location": "backend/app/models.py:50-55",
+     "score": 0.7054
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:60-76",
+     "score": 0.7053
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:146-162",
+     "score": 0.6981
+    },
+    {
+     "location": "frontend/tests/config.ts:18-19",
+     "score": 0.6944
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6904
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 99.6,
+    "embed_query": 88.4,
+    "vector_search": 11.1,
+    "generation": 1441.7
+   },
+   "used_llm": true,
+   "answer": "The first superuser is created in `init_db` within `backend/app/core/db.py` when it checks if a user with the email matching `settings.FIRST_SUPERUSER` exists, and if not, creates one using `crud.create_user` with `is_superuser=True`.",
+   "citations": [
+    "backend/app/core/db.py:15-33"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c12",
+   "category": "where-is",
+   "question": "Where does the frontend store the access token after a successful login?",
+   "expected": [
+    {
+     "path": "frontend/src/hooks/useAuth.ts",
+     "start_line": 41,
+     "end_line": 46
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.7199
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:16-25",
+     "score": 0.712
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.7118
+    },
+    {
+     "location": "frontend/tests/login.spec.ts:79-117",
+     "score": 0.6986
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:33-49",
+     "score": 0.6948
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:35-51",
+     "score": 0.6932
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:22-38",
+     "score": 0.6931
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:14-16",
+     "score": 0.6913
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:28-34",
+     "score": 0.688
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:37-46",
+     "score": 0.6829
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "retrieval": 114.6,
+    "embed_query": 97.2,
+    "vector_search": 17.3,
+    "generation": 4055.0
+   },
+   "used_llm": true,
+   "answer": "I don't know based on the indexed code",
+   "citations": [],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c15",
+   "category": "where-is",
+   "question": "Where is the health check endpoint implemented?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/utils.py",
+     "start_line": 29,
+     "end_line": 31
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/utils.py:29-31",
+     "score": 0.6921
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:275-284",
+     "score": 0.6741
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:764-771",
+     "score": 0.642
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:757-762",
+     "score": 0.6389
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:773-773",
+     "score": 0.6166
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.5933
+    },
+    {
+     "location": "release-notes.md:271-310",
+     "score": 0.5885
+    },
+    {
+     "location": "frontend/src/routeTree.gen.ts:1-60",
+     "score": 0.5859
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:31-45",
+     "score": 0.5812
+    },
+    {
+     "location": "README.md:1-40",
+     "score": 0.581
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 105.8,
+    "embed_query": 86.7,
+    "vector_search": 18.9,
+    "generation": 3590.8
+   },
+   "used_llm": true,
+   "answer": "The health check endpoint is implemented in `backend/app/api/routes/utils.py` via the `health_check` function.",
+   "citations": [
+    "backend/app/api/routes/utils.py:29-31"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c16",
+   "category": "where-is",
+   "question": "Where are the HTML email templates rendered?",
+   "expected": [
+    {
+     "path": "backend/app/utils.py",
+     "start_line": 25,
+     "end_line": 31
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/utils.py:25-31",
+     "score": 0.8252
+    },
+    {
+     "location": "backend/app/utils.py:60-67",
+     "score": 0.7438
+    },
+    {
+     "location": "packages/react-email/ui/Layout.tsx:1-12",
+     "score": 0.7391
+    },
+    {
+     "location": "README.md:31-70",
+     "score": 0.7319
+    },
+    {
+     "location": "packages/react-email/ui/Layout.tsx:14-18",
+     "score": 0.7186
+    },
+    {
+     "location": "packages/react-email/ui/Layout.tsx:20-55",
+     "score": 0.7171
+    },
+    {
+     "location": "packages/react-email/emails/test_email.tsx:11-35",
+     "score": 0.7158
+    },
+    {
+     "location": "packages/react-email/ui/Layout.tsx:57-111",
+     "score": 0.7155
+    },
+    {
+     "location": "backend/README.md:121-145",
+     "score": 0.713
+    },
+    {
+     "location": "packages/react-email/ui/Heading.tsx:1-1",
+     "score": 0.7107
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 132.3,
+    "embed_query": 122.6,
+    "vector_search": 9.6,
+    "generation": 2395.7
+   },
+   "used_llm": true,
+   "answer": "HTML email templates are rendered in the `render_email_template` function located in `backend/app/utils.py`, which reads the template file and uses a template engine to render it with the provided context.",
+   "citations": [
+    "backend/app/utils.py:25-31"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c18",
+   "category": "where-is",
+   "question": "Where is the public user signup endpoint?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 146,
+     "end_line": 159
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:146-159",
+     "score": 0.6675
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:196-211",
+     "score": 0.664
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:60-81",
+     "score": 0.6581
+    },
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.6524
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:42-58",
+     "score": 0.6515
+    },
+    {
+     "location": "backend/app/api/routes/private.py:23-38",
+     "score": 0.6495
+    },
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.6483
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:82-141",
+     "score": 0.6456
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:319-339",
+     "score": 0.6443
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:342-355",
+     "score": 0.6405
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 105.6,
+    "embed_query": 91.6,
+    "vector_search": 13.8,
+    "generation": 1826.4
+   },
+   "used_llm": true,
+   "answer": "The public user signup endpoint is defined at `/api/v1/users/signup` in the backend route handler `register_user`.",
+   "citations": [
+    "backend/app/api/routes/users.py:146-148"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c19",
+   "category": "how-does",
+   "question": "How does the backend authenticate a user's email and password?",
+   "expected": [
+    {
+     "path": "backend/app/crud.py",
+     "start_line": 45,
+     "end_line": 60
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.7694
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:20-27",
+     "score": 0.738
+    },
+    {
+     "location": "backend/tests/utils/user.py:30-49",
+     "score": 0.73
+    },
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.7225
+    },
+    {
+     "location": "backend/app/api/routes/users.py:146-159",
+     "score": 0.7219
+    },
+    {
+     "location": "backend/tests/utils/user.py:10-19",
+     "score": 0.7194
+    },
+    {
+     "location": "backend/app/api/routes/login.py:100-123",
+     "score": 0.7172
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.7157
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:30-34",
+     "score": 0.7122
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:96-130",
+     "score": 0.7073
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 101.9,
+    "embed_query": 86.9,
+    "vector_search": 14.8,
+    "generation": 2391.7
+   },
+   "used_llm": true,
+   "answer": "The backend authenticates a user by looking up the user in the database using their email (`get_user_by_email`), verifying the provided password against the stored hashed password (`verify_password`), and optionally updating the password hash if a rehash is required.",
+   "citations": [
+    "backend/app/crud.py:45-60"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c22",
+   "category": "how-does",
+   "question": "How are old password hashes upgraded when a user logs in?",
+   "expected": [
+    {
+     "path": "backend/app/crud.py",
+     "start_line": 52,
+     "end_line": 59
+    },
+    {
+     "path": "backend/app/core/security.py",
+     "start_line": 11,
+     "end_line": 16
+    },
+    {
+     "path": "backend/app/core/security.py",
+     "start_line": 29,
+     "end_line": 32
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/tests/api/routes/test_login.py:129-162",
+     "score": 0.7387
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:96-130",
+     "score": 0.7338
+    },
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.7286
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:165-191",
+     "score": 0.7185
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:224-264",
+     "score": 0.7056
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:267-279",
+     "score": 0.6873
+    },
+    {
+     "location": "backend/app/core/security.py:29-32",
+     "score": 0.687
+    },
+    {
+     "location": "backend/app/core/security.py:35-36",
+     "score": 0.6805
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.6802
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:300-316",
+     "score": 0.6772
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.3333333333333333,
+    "mrr": 0.14285714285714285
+   },
+   "latency_ms": {
+    "retrieval": 94.6,
+    "embed_query": 83.4,
+    "vector_search": 11.1,
+    "generation": 2923.4
+   },
+   "used_llm": true,
+   "answer": "When a user logs in with an older password hash format (such as bcrypt), the application verifies the password using `verify_password`, which calls `password_hash.verify_and_update()`. This automatically updates and upgrades the stored password hash to the current standard (argon2).",
+   "citations": [
+    "backend/app/core/security.py:29-32",
+    "backend/tests/api/routes/test_login.py:129-162",
+    "backend/tests/crud/test_user.py:96-130"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 3,
+    "correct_citations": 1,
+    "precision": 0.3333333333333333,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c23",
+   "category": "how-does",
+   "question": "How does password recovery avoid revealing whether an email address is registered?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/login.py",
+     "start_line": 53,
+     "end_line": 74
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.7218
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:67-79",
+     "score": 0.7043
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:49-64",
+     "score": 0.7024
+    },
+    {
+     "location": "backend/app/api/routes/login.py:100-123",
+     "score": 0.6791
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:51-79",
+     "score": 0.6662
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:80-130",
+     "score": 0.6584
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:342-355",
+     "score": 0.6555
+    },
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.6543
+    },
+    {
+     "location": "frontend/tests/reset-password.spec.ts:1-60",
+     "score": 0.6522
+    },
+    {
+     "location": "backend/app/api/routes/private.py:16-20",
+     "score": 0.6287
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 123.9,
+    "embed_query": 113.9,
+    "vector_search": 9.9,
+    "generation": 2848.9
+   },
+   "used_llm": true,
+   "answer": "To prevent email enumeration attacks, the password recovery endpoint always returns the same generic success response (\"If that email is registered, we sent a password recovery link\") with a status code of 200, regardless of whether the user actually exists in the system.",
+   "citations": [
+    "backend/app/api/routes/login.py:53-74"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c24",
+   "category": "how-does",
+   "question": "How does listing items differ between superusers and normal users?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/items.py",
+     "start_line": 13,
+     "end_line": 45
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/items.py:13-45",
+     "score": 0.6333
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:61-66",
+     "score": 0.6306
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:26-34",
+     "score": 0.6297
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:451-460",
+     "score": 0.6267
+    },
+    {
+     "location": "backend/app/api/routes/users.py:32-51",
+     "score": 0.6267
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6245
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:181-205",
+     "score": 0.6204
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:215-243",
+     "score": 0.6202
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:15-23",
+     "score": 0.619
+    },
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.6129
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 150.6,
+    "embed_query": 134.4,
+    "vector_search": 16.0,
+    "generation": 2793.6
+   },
+   "used_llm": true,
+   "answer": "When listing items, **superusers** retrieve all items in the database. In contrast, **normal users** only retrieve items where `Item.owner_id` matches their own user ID (`current_user.id`).",
+   "citations": [
+    "backend/app/api/routes/items.py:13-42"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c26",
+   "category": "how-does",
+   "question": "How does the frontend react when the API responds with 401 or 403?",
+   "expected": [
+    {
+     "path": "frontend/src/main.tsx",
+     "start_line": 22,
+     "end_line": 38
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/client/types.gen.ts:377-382",
+     "score": 0.7104
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:22-38",
+     "score": 0.6995
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:718-723",
+     "score": 0.6948
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:241-257",
+     "score": 0.6925
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:160-176",
+     "score": 0.6925
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:496-501",
+     "score": 0.6907
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:603-608",
+     "score": 0.6898
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:361-366",
+     "score": 0.6894
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:940-945",
+     "score": 0.6891
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:178-194",
+     "score": 0.6874
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "retrieval": 75.0,
+    "embed_query": 58.0,
+    "vector_search": 16.8,
+    "generation": 1580.3
+   },
+   "used_llm": true,
+   "answer": "I don't know based on the indexed code, as the provided context does not contain information about how the frontend handles 401 or 403 API responses.",
+   "citations": [],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c27",
+   "category": "how-does",
+   "question": "How does a logged-in user change their own password on the backend?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 103,
+     "end_line": 121
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.7286
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.7022
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:267-279",
+     "score": 0.7008
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.696
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:224-264",
+     "score": 0.6939
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:82-110",
+     "score": 0.6938
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:128-144",
+     "score": 0.6911
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:113-126",
+     "score": 0.6855
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:300-316",
+     "score": 0.6838
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:178-194",
+     "score": 0.6831
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 85.6,
+    "embed_query": 74.2,
+    "vector_search": 11.3,
+    "generation": 1826.1
+   },
+   "used_llm": true,
+   "answer": "A logged-in user changes their own password by sending a `PATCH` request to the `${settings.API_V1_STR}/users/me/password` endpoint with their current password and new password in the request body.",
+   "citations": [
+    "backend/app/api/routes/users.py:103-107",
+    "backend/tests/api/routes/test_users.py:224-235"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c28",
+   "category": "how-does",
+   "question": "How are API errors turned into toast notifications in the frontend?",
+   "expected": [
+    {
+     "path": "frontend/src/utils.ts",
+     "start_line": 3,
+     "end_line": 20
+    },
+    {
+     "path": "frontend/src/hooks/useCustomToast.ts",
+     "start_line": 10,
+     "end_line": 14
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/hooks/useCustomToast.ts:1-1",
+     "score": 0.7364
+    },
+    {
+     "location": "frontend/src/components/ui/sonner.tsx:40-40",
+     "score": 0.7274
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:352-357",
+     "score": 0.715
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:359-359",
+     "score": 0.7135
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:160-176",
+     "score": 0.7133
+    },
+    {
+     "location": "frontend/src/hooks/useCustomToast.ts:3-17",
+     "score": 0.7066
+    },
+    {
+     "location": "frontend/package.json:31-65",
+     "score": 0.7041
+    },
+    {
+     "location": "README.md:31-70",
+     "score": 0.704
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:178-194",
+     "score": 0.7023
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:22-38",
+     "score": 0.7018
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.5,
+    "mrr": 0.16666666666666666
+   },
+   "latency_ms": {
+    "retrieval": 85.2,
+    "embed_query": 71.1,
+    "vector_search": 14.0,
+    "generation": 1260.2
+   },
+   "used_llm": true,
+   "answer": "I don't know based on the indexed code. The provided context shows how toast notifications are created using `sonner` and `useCustomToast`, and how API calls are made via SDK methods, but it does not contain the logic connecting API errors to those toast notifications.",
+   "citations": [],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c30",
+   "category": "how-does",
+   "question": "How is pagination implemented when listing users?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 32,
+     "end_line": 51
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:32-51",
+     "score": 0.687
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:11-21",
+     "score": 0.6861
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:40-43",
+     "score": 0.6825
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:45-66",
+     "score": 0.6801
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:102-117",
+     "score": 0.6722
+    },
+    {
+     "location": "backend/app/models.py:64-66",
+     "score": 0.6683
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:36-38",
+     "score": 0.6619
+    },
+    {
+     "location": "backend/app/api/routes/items.py:13-45",
+     "score": 0.6599
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:23-34",
+     "score": 0.6537
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:68-83",
+     "score": 0.6523
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 111.9,
+    "embed_query": 98.5,
+    "vector_search": 13.3,
+    "generation": 1515.1
+   },
+   "used_llm": true,
+   "answer": "Pagination when listing users is implemented using `skip` and `limit` query parameters with default values of `0` and `100`, respectively. These parameters are passed to the SQL query via `.offset(skip).limit(limit)`.",
+   "citations": [
+    "backend/app/api/routes/users.py:36-43"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c31",
+   "category": "how-does",
+   "question": "How does the reset password page get the token and submit the new password?",
+   "expected": [
+    {
+     "path": "frontend/src/routes/reset-password.tsx",
+     "start_line": 28,
+     "end_line": 30
+    },
+    {
+     "path": "frontend/src/routes/reset-password.tsx",
+     "start_line": 84,
+     "end_line": 97
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.7483
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.7426
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:99-158",
+     "score": 0.7418
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.7373
+    },
+    {
+     "location": "frontend/tests/reset-password.spec.ts:61-114",
+     "score": 0.7366
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:113-126",
+     "score": 0.7294
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:69-98",
+     "score": 0.7239
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:49-67",
+     "score": 0.7201
+    },
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.7196
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:80-130",
+     "score": 0.7089
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.5,
+    "mrr": 0.14285714285714285
+   },
+   "latency_ms": {
+    "retrieval": 108.7,
+    "embed_query": 95.6,
+    "vector_search": 13.0,
+    "generation": 1601.1
+   },
+   "used_llm": true,
+   "answer": "The reset password page obtains the token from the search parameters using `Route.useSearch()`. When the form is submitted, the `onSubmit` function triggers a mutation (`mutation.mutate`) that calls `LoginService.resetPassword` with the new password and the token.",
+   "citations": [
+    "frontend/src/routes/reset-password.tsx:70-70",
+    "frontend/src/routes/reset-password.tsx:84-87",
+    "frontend/src/routes/reset-password.tsx:95-97"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 3,
+    "correct_citations": 2,
+    "precision": 0.6666666666666666,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c32",
+   "category": "how-does",
+   "question": "How is the selected colour theme remembered between visits?",
+   "expected": [
+    {
+     "path": "frontend/src/components/theme-provider.tsx",
+     "start_line": 37,
+     "end_line": 39
+    },
+    {
+     "path": "frontend/src/components/theme-provider.tsx",
+     "start_line": 95,
+     "end_line": 98
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/components/theme-provider.tsx:17-21",
+     "score": 0.6219
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:31-90",
+     "score": 0.6207
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:92-106",
+     "score": 0.599
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:9-9",
+     "score": 0.5988
+    },
+    {
+     "location": "frontend/src/components/Common/Appearance.tsx:19-23",
+     "score": 0.5983
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:23-29",
+     "score": 0.5889
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:108-115",
+     "score": 0.5854
+    },
+    {
+     "location": "frontend/src/index.css:31-70",
+     "score": 0.5835
+    },
+    {
+     "location": "frontend/src/index.css:1-40",
+     "score": 0.5693
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:11-15",
+     "score": 0.5677
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "retrieval": 90.6,
+    "embed_query": 78.6,
+    "vector_search": 11.9,
+    "generation": 1361.9
+   },
+   "used_llm": true,
+   "answer": "The selected colour theme is remembered between visits by storing it in the browser's `localStorage` using a specified `storageKey` (which defaults to `\"vite-ui-theme\"`).",
+   "citations": [
+    "frontend/src/components/theme-provider.tsx:34-36",
+    "frontend/src/components/theme-provider.tsx:94-97"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c35",
+   "category": "what-happens-when",
+   "question": "What happens when a user tries to log in with a wrong password?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/login.py",
+     "start_line": 30,
+     "end_line": 34
+    },
+    {
+     "path": "backend/app/crud.py",
+     "start_line": 52,
+     "end_line": 54
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/tests/api/routes/test_users.py:267-279",
+     "score": 0.6833
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.6829
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:28-34",
+     "score": 0.6764
+    },
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.6744
+    },
+    {
+     "location": "backend/app/api/routes/login.py:100-123",
+     "score": 0.6688
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:67-79",
+     "score": 0.6622
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:300-316",
+     "score": 0.66
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:49-64",
+     "score": 0.6587
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:82-110",
+     "score": 0.6565
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:113-126",
+     "score": 0.6529
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "retrieval": 125.3,
+    "embed_query": 117.0,
+    "vector_search": 8.2,
+    "generation": 1178.7
+   },
+   "used_llm": true,
+   "answer": "When a user tries to log in with an incorrect password, the access token endpoint responds with a status code of `400`.",
+   "citations": [
+    "backend/tests/api/routes/test_login.py:28-34"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c38",
+   "category": "what-happens-when",
+   "question": "What happens to a user's items when an admin deletes that user?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 214,
+     "end_line": 232
+    },
+    {
+     "path": "backend/app/models.py",
+     "start_line": 90,
+     "end_line": 92
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/items.py:99-113",
+     "score": 0.6756
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:54-93",
+     "score": 0.6748
+    },
+    {
+     "location": "backend/app/api/routes/users.py:214-232",
+     "score": 0.653
+    },
+    {
+     "location": "backend/app/api/routes/users.py:132-143",
+     "score": 0.6433
+    },
+    {
+     "location": "backend/tests/api/routes/test_items.py:129-139",
+     "score": 0.6336
+    },
+    {
+     "location": "frontend/src/components/Items/DeleteItem.tsx:54-92",
+     "score": 0.6331
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:27-53",
+     "score": 0.6318
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:420-448",
+     "score": 0.6255
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:95-95",
+     "score": 0.6211
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:463-479",
+     "score": 0.6111
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 0.5,
+    "mrr": 0.3333333333333333
+   },
+   "latency_ms": {
+    "retrieval": 107.4,
+    "embed_query": 92.2,
+    "vector_search": 15.1,
+    "generation": 1381.3
+   },
+   "used_llm": true,
+   "answer": "When an admin deletes a user, all items associated with that user are permanently deleted from the database alongside the user account.",
+   "citations": [
+    "backend/app/api/routes/users.py:227-228"
+   ],
+   "invalid_citations": 1,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c39",
+   "category": "what-happens-when",
+   "question": "What happens when a normal user requests an item that belongs to someone else?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/items.py",
+     "start_line": 48,
+     "end_line": 58
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/items.py:48-58",
+     "score": 0.675
+    },
+    {
+     "location": "backend/app/api/routes/items.py:75-96",
+     "score": 0.663
+    },
+    {
+     "location": "backend/app/api/routes/items.py:99-113",
+     "score": 0.647
+    },
+    {
+     "location": "backend/tests/utils/item.py:9-16",
+     "score": 0.6349
+    },
+    {
+     "location": "backend/app/api/routes/items.py:13-45",
+     "score": 0.6343
+    },
+    {
+     "location": "backend/app/api/routes/users.py:162-179",
+     "score": 0.6339
+    },
+    {
+     "location": "backend/app/api/routes/items.py:61-72",
+     "score": 0.6336
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6215
+    },
+    {
+     "location": "backend/tests/api/routes/test_items.py:55-65",
+     "score": 0.6198
+    },
+    {
+     "location": "backend/tests/api/routes/test_items.py:154-164",
+     "score": 0.6198
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 121.7,
+    "embed_query": 109.2,
+    "vector_search": 12.4,
+    "generation": 1203.3
+   },
+   "used_llm": true,
+   "answer": "When a normal user requests an item that belongs to someone else (or an item that does not exist), the application checks if the item exists and verifies permissions. If the item is not found, a `404` error (\"Item not found\") is raised. If the user is not a superuser and does not own the item, a `403` error (\"Not enough permissions\") is raised.",
+   "citations": [
+    "backend/app/api/routes/items.py:52-57"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c42",
+   "category": "what-happens-when",
+   "question": "What happens when an admin creates a new user while emails are enabled?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 57,
+     "end_line": 78
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:54-78",
+     "score": 0.727
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:37-57",
+     "score": 0.7091
+    },
+    {
+     "location": "backend/app/api/routes/users.py:146-159",
+     "score": 0.6862
+    },
+    {
+     "location": "backend/tests/utils/user.py:22-27",
+     "score": 0.681
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:11-17",
+     "score": 0.6797
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:146-162",
+     "score": 0.675
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6719
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:282-297",
+     "score": 0.6694
+    },
+    {
+     "location": "backend/app/core/config.py:51-55",
+     "score": 0.667
+    },
+    {
+     "location": "backend/app/api/routes/private.py:23-38",
+     "score": 0.6663
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 108.3,
+    "embed_query": 94.3,
+    "vector_search": 13.8,
+    "generation": 1704.2
+   },
+   "used_llm": true,
+   "answer": "When an admin creates a new user via the `create_user` endpoint and `settings.emails_enabled` is true along with `user_in.email`, the application generates a new account email using `generate_new_account_email` and sends it to the user's email address using `send_email`.",
+   "citations": [
+    "backend/app/api/routes/users.py:67-77"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c43",
+   "category": "what-happens-when",
+   "question": "What happens when the JWT sent with a request cannot be decoded?",
+   "expected": [
+    {
+     "path": "backend/app/api/deps.py",
+     "start_line": 31,
+     "end_line": 40
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.7049
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6805
+    },
+    {
+     "location": "backend/app/models.py:119-121",
+     "score": 0.6741
+    },
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.6735
+    },
+    {
+     "location": "frontend/src/client/core/types.gen.ts:35-92",
+     "score": 0.6697
+    },
+    {
+     "location": "backend/app/core/security.py:22-26",
+     "score": 0.6653
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:100-112",
+     "score": 0.6418
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:67-79",
+     "score": 0.6412
+    },
+    {
+     "location": "frontend/src/client/core/serverSentEvents.gen.ts:99-158",
+     "score": 0.6393
+    },
+    {
+     "location": "frontend/src/client/core/utils.gen.ts:113-140",
+     "score": 0.6389
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "retrieval": 114.8,
+    "embed_query": 90.3,
+    "vector_search": 24.3,
+    "generation": 1226.0
+   },
+   "used_llm": true,
+   "answer": "When the JWT sent with a request cannot be decoded (raising an `InvalidTokenError` or `ValidationError`), an `HTTPException` with status code `403 FORBIDDEN` and the detail \"Could not validate credentials\" is raised.",
+   "citations": [
+    "backend/app/api/deps.py:31-40"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c45",
+   "category": "what-happens-when",
+   "question": "What happens when a user changes their email to one already used by another account?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 89,
+     "end_line": 94
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:81-100",
+     "score": 0.6909
+    },
+    {
+     "location": "backend/app/api/routes/users.py:54-78",
+     "score": 0.6733
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:282-297",
+     "score": 0.6705
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:397-417",
+     "score": 0.6642
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:37-57",
+     "score": 0.6619
+    },
+    {
+     "location": "backend/app/utils.py:87-102",
+     "score": 0.6546
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6545
+    },
+    {
+     "location": "backend/app/api/routes/users.py:146-159",
+     "score": 0.6494
+    },
+    {
+     "location": "backend/app/api/routes/users.py:182-211",
+     "score": 0.6399
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:60-76",
+     "score": 0.6356
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 92.3,
+    "embed_query": 80.7,
+    "vector_search": 11.4,
+    "generation": 1367.7
+   },
+   "used_llm": true,
+   "answer": "When a user attempts to update their email to one that is already used by another account, the system checks if the email exists and whether its associated user ID differs from the current user's ID. If a conflict is found, it raises an HTTP exception with status code `409` and the detail message `\"User with this email already exists\"`.",
+   "citations": [
+    "backend/app/api/routes/users.py:86-92"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c47",
+   "category": "what-happens-when",
+   "question": "What happens in the frontend after a successful login?",
+   "expected": [
+    {
+     "path": "frontend/src/hooks/useAuth.ts",
+     "start_line": 41,
+     "end_line": 54
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/routes/login.tsx:35-51",
+     "score": 0.6756
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:33-49",
+     "score": 0.6557
+    },
+    {
+     "location": "frontend/tests/login.spec.ts:79-117",
+     "score": 0.6498
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:53-69",
+     "score": 0.6409
+    },
+    {
+     "location": "frontend/tests/reset-password.spec.ts:61-114",
+     "score": 0.6391
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:42-58",
+     "score": 0.6377
+    },
+    {
+     "location": "frontend/tests/utils/user.ts:31-35",
+     "score": 0.6376
+    },
+    {
+     "location": "development.md:31-70",
+     "score": 0.636
+    },
+    {
+     "location": "frontend/tests/login.spec.ts:19-78",
+     "score": 0.6344
+    },
+    {
+     "location": "release-notes.md:661-700",
+     "score": 0.634
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "retrieval": 67.6,
+    "embed_query": 53.7,
+    "vector_search": 13.8,
+    "generation": 2796.9
+   },
+   "used_llm": true,
+   "answer": "After a successful login, the user is redirected to the root URL (`/`) and a welcome message (\"Welcome back, nice to see you again!\") becomes visible.",
+   "citations": [
+    "frontend/tests/login.spec.ts:84-87"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c48",
+   "category": "what-happens-when",
+   "question": "What happens in the UI after a password change succeeds in user settings?",
+   "expected": [
+    {
+     "path": "frontend/src/components/UserSettings/ChangePassword.tsx",
+     "start_line": 54,
+     "end_line": 62
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:41-67",
+     "score": 0.6896
+    },
+    {
+     "location": "frontend/tests/user-settings.spec.ts:121-180",
+     "score": 0.6829
+    },
+    {
+     "location": "frontend/tests/user-settings.spec.ts:181-240",
+     "score": 0.6776
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:128-144",
+     "score": 0.6707
+    },
+    {
+     "location": "frontend/tests/reset-password.spec.ts:61-114",
+     "score": 0.6695
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:69-98",
+     "score": 0.6654
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:68-127",
+     "score": 0.6642
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:267-279",
+     "score": 0.6634
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:224-264",
+     "score": 0.6602
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:99-158",
+     "score": 0.6575
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 101.9,
+    "embed_query": 84.7,
+    "vector_search": 16.4,
+    "generation": 2417.1
+   },
+   "used_llm": true,
+   "answer": "After a password change succeeds in user settings, a success toast with the message **\"Password updated successfully\"** is displayed, and the form is reset.",
+   "citations": [
+    "frontend/src/components/UserSettings/ChangePassword.tsx:56-59"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c51",
+   "category": "config",
+   "question": "How long is an access token valid by default?",
+   "expected": [
+    {
+     "path": "backend/app/core/config.py",
+     "start_line": 24,
+     "end_line": 25
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/security.py:22-26",
+     "score": 0.6747
+    },
+    {
+     "location": "backend/app/core/config.py:15-31",
+     "score": 0.6613
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.657
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.6559
+    },
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.6355
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:16-25",
+     "score": 0.6351
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:28-34",
+     "score": 0.6319
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:14-16",
+     "score": 0.6281
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:113-126",
+     "score": 0.6269
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6263
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "retrieval": 75.9,
+    "embed_query": 64.4,
+    "vector_search": 11.4,
+    "generation": 1579.3
+   },
+   "used_llm": true,
+   "answer": "By default, an access token is valid for 8 days (`60 minutes * 24 hours * 8 days`).",
+   "citations": [
+    "backend/app/core/config.py:23-23"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c52",
+   "category": "config",
+   "question": "How is the DATABASE_URL adjusted to use the psycopg driver?",
+   "expected": [
+    {
+     "path": "backend/app/core/config.py",
+     "start_line": 33,
+     "end_line": 40
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/config.py:33-40",
+     "score": 0.8582
+    },
+    {
+     "location": "backend/app/alembic/env.py:33-34",
+     "score": 0.7266
+    },
+    {
+     "location": ".env:1-18",
+     "score": 0.7
+    },
+    {
+     "location": "backend/app/core/db.py:1-12",
+     "score": 0.6942
+    },
+    {
+     "location": "backend/pyproject.toml:1-40",
+     "score": 0.6924
+    },
+    {
+     "location": "backend/README.md:91-130",
+     "score": 0.6826
+    },
+    {
+     "location": "backend/app/alembic/env.py:37-55",
+     "score": 0.6763
+    },
+    {
+     "location": "backend/app/api/deps.py:26-27",
+     "score": 0.6724
+    },
+    {
+     "location": "backend/app/api/deps.py:21-23",
+     "score": 0.6718
+    },
+    {
+     "location": "backend/app/alembic/env.py:58-80",
+     "score": 0.6708
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 94.1,
+    "embed_query": 76.4,
+    "vector_search": 17.5,
+    "generation": 1929.0
+   },
+   "used_llm": true,
+   "answer": "The `DATABASE_URL` is adjusted by a field validator (`_use_psycopg_driver`) on `DATABASE_URL` that replaces `postgres://` or `postgresql://` with `postgresql+psycopg://`.",
+   "citations": [
+    "backend/app/core/config.py:33-40"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c54",
+   "category": "config",
+   "question": "Which ports does the local Mailpit mail catcher expose in development?",
+   "expected": [
+    {
+     "path": "compose.override.yml",
+     "start_line": 66,
+     "end_line": 75
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "compose.override.yml:31-70",
+     "score": 0.6373
+    },
+    {
+     "location": "development.md:61-100",
+     "score": 0.6356
+    },
+    {
+     "location": "compose.override.yml:61-100",
+     "score": 0.6258
+    },
+    {
+     "location": "release-notes.md:511-550",
+     "score": 0.6081
+    },
+    {
+     "location": "frontend/tests/utils/mailpit.ts:3-5",
+     "score": 0.6056
+    },
+    {
+     "location": "development.md:1-40",
+     "score": 0.6038
+    },
+    {
+     "location": "frontend/.dockerignore:1-2",
+     "score": 0.5903
+    },
+    {
+     "location": "backend/README.md:1-40",
+     "score": 0.5849
+    },
+    {
+     "location": "release-notes.md:61-100",
+     "score": 0.5823
+    },
+    {
+     "location": "release-notes.md:991-1020",
+     "score": 0.5764
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 520.3,
+    "embed_query": 504.1,
+    "vector_search": 16.0,
+    "generation": 1584.3
+   },
+   "used_llm": true,
+   "answer": "Mailpit exposes ports **8025** (for the web interface) and **1025** (for the SMTP server) in development.",
+   "citations": [
+    "compose.override.yml:61-70"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c56",
+   "category": "config",
+   "question": "Which environment variables does the backend container need in docker compose?",
+   "expected": [
+    {
+     "path": "compose.yml",
+     "start_line": 55,
+     "end_line": 65
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "development.md:91-130",
+     "score": 0.8088
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.7804
+    },
+    {
+     "location": "backend/Dockerfile:31-65",
+     "score": 0.7584
+    },
+    {
+     "location": "deployment-docker-compose.md:61-100",
+     "score": 0.7579
+    },
+    {
+     "location": ".github/workflows/test-docker-compose.yml:1-29",
+     "score": 0.7533
+    },
+    {
+     "location": ".github/workflows/deploy-docker-compose.yml:31-41",
+     "score": 0.7503
+    },
+    {
+     "location": "development.md:61-100",
+     "score": 0.7501
+    },
+    {
+     "location": "compose.override.yml:31-70",
+     "score": 0.746
+    },
+    {
+     "location": "compose.override.yml:1-40",
+     "score": 0.7413
+    },
+    {
+     "location": "backend/README.md:1-40",
+     "score": 0.7352
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "retrieval": 183.1,
+    "embed_query": 162.6,
+    "vector_search": 20.4,
+    "generation": 2269.7
+   },
+   "used_llm": true,
+   "answer": "The backend reads local settings from the `.env` file, which Docker Compose uses for variable interpolation and passes to the containers that need them.",
+   "citations": [
+    "development.md:91-92"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c58",
+   "category": "config",
+   "question": "How is the backend container health check configured in docker compose?",
+   "expected": [
+    {
+     "path": "compose.yml",
+     "start_line": 67,
+     "end_line": 71
+    }
+   ],
+   "retrieved": [
+    {
+     "location": ".github/workflows/test-docker-compose.yml:1-29",
+     "score": 0.7828
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.7703
+    },
+    {
+     "location": "compose.override.yml:31-70",
+     "score": 0.7435
+    },
+    {
+     "location": ".github/workflows/deploy-docker-compose.yml:31-41",
+     "score": 0.7358
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.7272
+    },
+    {
+     "location": "README.md:1-40",
+     "score": 0.7174
+    },
+    {
+     "location": "compose.override.yml:1-40",
+     "score": 0.7171
+    },
+    {
+     "location": "development.md:61-100",
+     "score": 0.716
+    },
+    {
+     "location": "README.md:61-88",
+     "score": 0.7083
+    },
+    {
+     "location": "development.md:91-130",
+     "score": 0.7077
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "retrieval": 140.4,
+    "embed_query": 123.5,
+    "vector_search": 16.7,
+    "generation": 2310.8
+   },
+   "used_llm": true,
+   "answer": "I don't know based on the indexed code. The context mentions starting services with health checks or running them via Docker Compose, but it does not specify how health checks themselves are configured inside the docker compose configuration files.",
+   "citations": [],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  }
+ ]
+}

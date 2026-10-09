@@ -8,6 +8,7 @@ from codebase_qa.api.app import create_app
 from codebase_qa.config import Settings
 from codebase_qa.container import Container
 from codebase_qa.generation.gemini_generator import GenerationError
+from tests.conftest import FIXTURE_FILES
 from tests.fakes import fake_embedder, fake_generator
 
 RepoFactory = Callable[..., Path]
@@ -15,7 +16,7 @@ RepoFactory = Callable[..., Path]
 
 @pytest.fixture
 def client(tmp_path: Path) -> TestClient:
-    settings = Settings(_env_file=None, data_dir=tmp_path / "data")
+    settings = Settings(_env_file=None, data_dir=tmp_path / "data", min_vector_score=0.0)
     container = Container(settings, embedder_factory=fake_embedder, generator_factory=fake_generator)
     return TestClient(create_app(container))
 
@@ -56,7 +57,7 @@ class FailingGenerator:
 
 
 def test_generation_failure_returns_503(tmp_path: Path, make_repo: RepoFactory) -> None:
-    settings = Settings(_env_file=None, data_dir=tmp_path / "data")
+    settings = Settings(_env_file=None, data_dir=tmp_path / "data", min_vector_score=0.0)
     container = Container(
         settings, embedder_factory=fake_embedder, generator_factory=lambda _: FailingGenerator()
     )
@@ -65,3 +66,25 @@ def test_generation_failure_returns_503(tmp_path: Path, make_repo: RepoFactory) 
     response = client.post("/ask", json={"repo_id": "origin", "question": "login"})
     assert response.status_code == 503
     assert response.json() == {"detail": "language model request failed with status 429"}
+
+
+def test_low_relevance_question_is_refused_without_llm(tmp_path: Path, make_repo: RepoFactory) -> None:
+    settings = Settings(_env_file=None, data_dir=tmp_path / "data", min_vector_score=0.99)
+    container = Container(settings, embedder_factory=fake_embedder, generator_factory=fake_generator)
+    client = TestClient(create_app(container))
+    client.post("/repos", json={"url": make_repo().as_uri()})
+    body = client.post("/ask", json={"repo_id": "origin", "question": "banana bread recipe"}).json()
+    assert body["used_llm"] is False
+    assert body["citations"] == []
+    assert "generation" not in body["timings_ms"]
+
+
+def test_ask_returns_snippets_with_original_line_numbers(client: TestClient, make_repo: RepoFactory) -> None:
+    client.post("/repos", json={"url": make_repo().as_uri()})
+    body = client.post("/ask", json={"repo_id": "origin", "question": "AuthService login token"}).json()
+    citation = body["citations"][0]
+    source_lines = str(FIXTURE_FILES[citation["path"]]).splitlines()
+    expected = source_lines[citation["start_line"] - 1 : citation["end_line"]]
+    assert citation["snippet"].splitlines() == expected
+    assert citation["language"] == "python"
+    assert len(body["commit_sha"]) == 40

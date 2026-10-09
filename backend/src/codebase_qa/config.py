@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     rerank: bool = False
     rerank_candidates: int = 30
     rerank_fusion: bool = False
-    min_vector_score: float = 0.0
+    min_vector_score: float = 0.60
     min_rerank_score: float = 0.0
     top_k: int = 8
     clone_timeout_seconds: float = 120.0

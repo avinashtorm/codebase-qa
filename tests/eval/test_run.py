@@ -38,7 +38,7 @@ def test_run_scores_questions_and_saves_results(tmp_path: Path, make_repo: RepoF
             "--answers",
         ]
     )
-    settings = Settings(_env_file=None, data_dir=tmp_path / "data", chunker="fixed")
+    settings = Settings(_env_file=None, data_dir=tmp_path / "data", chunker="fixed", min_vector_score=0.0)
     container = Container(settings, embedder_factory=fake_embedder, generator_factory=fake_generator)
 
     path = run(args, container)
