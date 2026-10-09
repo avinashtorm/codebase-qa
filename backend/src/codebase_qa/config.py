@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -17,6 +18,9 @@ class Settings(BaseSettings):
     reranker_model: str = "BAAI/bge-reranker-base"
 
     chunker: str = "treesitter"
+    retrieval_mode: Literal["vector", "bm25", "hybrid"] = "vector"
+    hybrid_candidates: int = 50
+    rrf_k: int = 60
     top_k: int = 8
     clone_timeout_seconds: float = 120.0
     llm_cache: bool = False
@@ -28,6 +32,10 @@ class Settings(BaseSettings):
     @property
     def chroma_dir(self) -> Path:
         return self.data_dir / "chroma"
+
+    @property
+    def bm25_dir(self) -> Path:
+        return self.data_dir / "bm25"
 
     @property
     def llm_cache_dir(self) -> Path:

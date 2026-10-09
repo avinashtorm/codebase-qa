@@ -7,6 +7,8 @@ from codebase_qa.indexing.indexer import Indexer
 from codebase_qa.indexing.registry import RepoRecord, RepoRegistry
 from codebase_qa.interfaces import Embedder, Generator, Retriever
 from codebase_qa.qa import QAPipeline
+from codebase_qa.retrieval.bm25 import BM25Index, BM25Retriever
+from codebase_qa.retrieval.hybrid import HybridRetriever
 from codebase_qa.retrieval.vector import VectorRetriever
 from codebase_qa.retrieval.vector_store import ChromaStore
 
@@ -38,6 +40,7 @@ class Container:
         self.settings = settings
         self.embedder_factory = embedder_factory
         self.generator_factory = generator_factory
+        self.bm25_cache: dict[tuple[str, str], BM25Index] = {}
 
     @cached_property
     def embedder(self) -> Embedder:
@@ -63,6 +66,7 @@ class Container:
             chunker=build_chunker(self.settings.chunker),
             registry=self.registry,
             repos_dir=self.settings.repos_dir,
+            bm25_dir=self.settings.bm25_dir,
             clone_timeout=self.settings.clone_timeout_seconds,
         )
 
@@ -72,8 +76,30 @@ class Container:
     def repo_records(self) -> list[RepoRecord]:
         return [record for record in self.registry.list() if record.chunker == self.settings.chunker]
 
+    def bm25_index(self, record: RepoRecord) -> BM25Index:
+        key = (record.collection, record.indexed_at)
+        if key not in self.bm25_cache:
+            path = self.indexer.bm25_path(record.collection)
+            if BM25Index.exists(path):
+                index = BM25Index.load(path)
+            else:
+                index = self.indexer.rebuild_bm25(self.store.collection(record.collection))
+            self.bm25_cache = {key: index}
+        return self.bm25_cache[key]
+
     def retriever(self, record: RepoRecord) -> Retriever:
-        return VectorRetriever(self.store.collection(record.collection), self.embedder)
+        mode = self.settings.retrieval_mode
+        if mode == "bm25":
+            return BM25Retriever(self.bm25_index(record))
+        vector = VectorRetriever(self.store.collection(record.collection), self.embedder)
+        if mode == "vector":
+            return vector
+        return HybridRetriever(
+            vector,
+            BM25Retriever(self.bm25_index(record)),
+            candidates=self.settings.hybrid_candidates,
+            rrf_k=self.settings.rrf_k,
+        )
 
     def pipeline(self, record: RepoRecord) -> QAPipeline:
         return QAPipeline(self.retriever(record), self.generator, top_k=self.settings.top_k)

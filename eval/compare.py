@@ -29,12 +29,12 @@ def latest_per_config(runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(latest.values(), key=lambda run: run["timestamp"])
 
 
-def format_value(value: Any) -> str:
+def format_value(key: str, value: Any) -> str:
     if value is None:
         return "-"
-    if isinstance(value, float) and value <= 1.0:
-        return f"{value:.3f}"
-    return f"{value:.0f}" if isinstance(value, float) else str(value)
+    if key.endswith("_ms_mean"):
+        return f"{value:.1f}" if value < 10 else f"{value:.0f}"
+    return f"{value:.3f}" if isinstance(value, float) else str(value)
 
 
 def render_table(runs: list[dict[str, Any]]) -> str:
@@ -46,7 +46,7 @@ def render_table(runs: list[dict[str, Any]]) -> str:
             run["config"],
             run["split"],
             str(run["question_count"]),
-            *[format_value(metrics.get(key)) for key, _ in COLUMNS],
+            *[format_value(key, metrics.get(key)) for key, _ in COLUMNS],
             run["timestamp"],
         ]
         lines.append("| " + " | ".join(cells) + " |")

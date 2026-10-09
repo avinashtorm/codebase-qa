@@ -7,6 +7,7 @@ from codebase_qa.ingestion.git import clone_repo
 from codebase_qa.ingestion.walker import walk_repo
 from codebase_qa.interfaces import Chunker, Embedder
 from codebase_qa.models import Chunk, ClonedRepo, SourceFile
+from codebase_qa.retrieval.bm25 import BM25Index
 from codebase_qa.retrieval.vector_store import ChromaStore, VectorCollection, collection_name
 
 logger = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ class Indexer:
         chunker: Chunker,
         registry: RepoRegistry,
         repos_dir: Path,
+        bm25_dir: Path,
         clone_timeout: float = 120.0,
     ) -> None:
         self.store = store
@@ -31,6 +33,7 @@ class Indexer:
         self.chunker = chunker
         self.registry = registry
         self.repos_dir = repos_dir
+        self.bm25_dir = bm25_dir
         self.clone_timeout = clone_timeout
 
     def collection_for(self, repo_id: str) -> str:
@@ -46,6 +49,7 @@ class Indexer:
         collection = self.store.collection(name)
         sources = walk_repo(Path(cloned.local_path), cloned.repo_id)
         files = self.add_sources(collection, sources)
+        self.rebuild_bm25(collection)
         record = RepoRecord(
             repo_id=cloned.repo_id,
             url=cloned.url,
@@ -61,6 +65,14 @@ class Indexer:
         self.registry.save(name, record)
         logger.info("indexed repo", extra={"repo_id": cloned.repo_id, "chunks": record.chunk_count})
         return record
+
+    def bm25_path(self, name: str) -> Path:
+        return self.bm25_dir / name
+
+    def rebuild_bm25(self, collection: VectorCollection) -> BM25Index:
+        index = BM25Index.build(collection.all_chunks())
+        index.save(self.bm25_path(collection.name))
+        return index
 
     def add_sources(self, collection: VectorCollection, sources: list[SourceFile]) -> dict[str, FileRecord]:
         files: dict[str, FileRecord] = {}

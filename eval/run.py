@@ -141,6 +141,7 @@ def run(args: argparse.Namespace, container: Container | None = None) -> Path:
 def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
     return {
         "chunker": settings.chunker,
+        "retrieval_mode": settings.retrieval_mode,
         "top_k": settings.top_k,
         "embedding_model": settings.embedding_model,
         "llm": settings.gemini_model,
@@ -149,7 +150,7 @@ def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
 
 
 def settings_overrides(args: argparse.Namespace) -> dict[str, Any]:
-    overrides: dict[str, Any] = {"chunker": args.chunker, "llm_cache": True}
+    overrides: dict[str, Any] = {"chunker": args.chunker, "retrieval_mode": args.mode, "llm_cache": True}
     if args.llm_model:
         overrides["gemini_model"] = args.llm_model
     return overrides
@@ -159,6 +160,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the retrieval/answer evaluation")
     parser.add_argument("--config", required=True, help="name recorded with the results")
     parser.add_argument("--chunker", default="fixed")
+    parser.add_argument("--mode", default="vector", choices=["vector", "bm25", "hybrid"])
     parser.add_argument("--split", default="dev", choices=["dev", "held_out", "all"])
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--answers", action="store_true", help="also generate answers and score citations")
