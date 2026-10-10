@@ -88,8 +88,9 @@ def test_visitor_indexes_a_repository_then_asks_about_it(page: AppTest, repo_url
     page.button(key="example_0").click().run()
     assert not page.exception
     assistant = [message for message in page.chat_message if message.name == "assistant"]
-    assert assistant and "See app/auth.py" in assistant[0].markdown[0].value
-    assert page.expander
+    assert assistant and assistant[0].markdown[0].value.startswith("See ")
+    citation = assistant[0].markdown[0].value.removeprefix("See ")
+    assert any(expander.label == citation for expander in page.expander)
 
 
 def test_new_repository_button_returns_to_the_landing_page(page: AppTest, repo_url: str) -> None:
