@@ -33,7 +33,7 @@ STYLE = """
   letter-spacing: 0.08em; margin: 1.4rem 0 0.4rem 0;}
 .hero-title {font-size: 2.1rem; font-weight: 700; margin-bottom: 0.2rem;}
 .hero-subtitle {color: #8B949E; font-size: 1.02rem; margin-bottom: 1.6rem;}
-.feature {border: 1px solid #30363D; border-radius: 10px; padding: 0.9rem 1rem; height: 100%;}
+.feature {border: 1px solid #30363D; border-radius: 10px; padding: 0.9rem 1rem; min-height: 12rem;}
 .feature b {display: block; margin-bottom: 0.25rem;}
 .feature span {color: #8B949E; font-size: 0.86rem;}
 .repo-title {font-size: 1.5rem; font-weight: 700; margin-bottom: 0;}
