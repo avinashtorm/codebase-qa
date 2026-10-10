@@ -10,9 +10,10 @@ from codebase_qa.config import Settings
 from codebase_qa.container import Container
 from codebase_qa.fs import remove_tree
 from codebase_qa.indexing.registry import RepoRecord
-from eval.run import DEFAULT_REPO_URL, RESULTS_DIR
+from eval.run import DEFAULT_REPO_URL, EVAL_DIR
 
 BENCH_DIR = Path("data/bench")
+BENCHMARKS_DIR = EVAL_DIR / "benchmarks"
 
 
 def git(cwd: Path, *args: str) -> str:
@@ -80,7 +81,8 @@ def main(argv: list[str] | None = None) -> None:
         "total_chunks": rebuilt.chunk_count,
         "identical_to_full_rebuild": identical,
     }
-    path = RESULTS_DIR / f"reindex-benchmark_{payload['timestamp'].replace(':', '').replace('-', '')}.json"
+    BENCHMARKS_DIR.mkdir(parents=True, exist_ok=True)
+    path = BENCHMARKS_DIR / f"reindex-benchmark_{payload['timestamp'].replace(':', '').replace('-', '')}.json"
     path.write_text(json.dumps(payload, indent=1), encoding="utf-8")
     print(json.dumps(payload, indent=1))
     print(f"saved {path}")

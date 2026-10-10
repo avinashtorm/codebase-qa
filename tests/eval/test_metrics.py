@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from eval.compare import latest_per_config, render_table
+from eval.compare import latest_per_config, load_results, render_table
 from eval.dataset import Location, load_questions
 from eval.metrics import (
     hit_at_k,
@@ -89,3 +89,23 @@ def test_suggest_threshold_sits_between_off_topic_and_lowest_dev_score() -> None
 
     assert suggest_threshold([0.70, 0.80], [0.40, 0.60, 0.75]) == 0.65
     assert suggest_threshold([0.70], [0.90]) == 0.69
+
+
+def test_load_results_ignores_files_that_are_not_eval_runs(tmp_path: Path) -> None:
+    run = {"config": "a", "split": "dev", "metrics": {}, "timestamp": "1", "question_count": 1}
+    (tmp_path / "a.json").write_text(json.dumps(run), encoding="utf-8")
+    benchmark = {"config": "reindex-benchmark", "timestamp": "2"}
+    (tmp_path / "bench.json").write_text(json.dumps(benchmark), encoding="utf-8")
+    assert load_results(tmp_path) == [run]
+
+
+def test_review_renders_expected_code_with_line_numbers_and_link(tmp_path: Path) -> None:
+    from eval.dataset import EvalQuestion
+    from eval.review import render_question
+
+    (tmp_path / "a.py").write_text("one\ntwo\nthree\n", encoding="utf-8")
+    question = EvalQuestion("q1", "Where?", "where-is", [Location("a.py", 2, 3)])
+    text = render_question(question, tmp_path, "https://github.com/o/r", "abc")
+    assert "## q1 [where-is] Where?" in text
+    assert "https://github.com/o/r/blob/abc/a.py#L2-L3" in text
+    assert "2  two\n3  three" in text

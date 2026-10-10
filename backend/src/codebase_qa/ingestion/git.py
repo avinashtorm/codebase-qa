@@ -5,21 +5,20 @@ import subprocess
 from pathlib import Path
 
 from codebase_qa.fs import remove_tree
+from codebase_qa.ingestion.github import InvalidRepoUrl, parse_github_url
 from codebase_qa.models import ClonedRepo
 
 logger = logging.getLogger(__name__)
-
-GITHUB_URL_PATTERN = re.compile(r"^https://github\.com/(?P<owner>[A-Za-z0-9_.-]+)/(?P<repo>[A-Za-z0-9_.-]+?)(?:\.git)?/?$")
-
 
 class GitError(RuntimeError):
     pass
 
 
 def repo_id_from_url(url: str) -> str:
-    match = GITHUB_URL_PATTERN.match(url.strip())
-    if match:
-        return f"{match['owner']}__{match['repo']}".lower()
+    try:
+        return parse_github_url(url).repo_id
+    except InvalidRepoUrl:
+        pass
     name = url.rstrip("/").split("/")[-1].removesuffix(".git")
     return re.sub(r"[^a-z0-9_.-]", "-", name.lower())
 

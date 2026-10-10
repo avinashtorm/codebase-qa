@@ -28,7 +28,7 @@ COPY backend ./backend
 RUN pip install ".[frontend]"
 
 RUN python -c "from sentence_transformers import CrossEncoder, SentenceTransformer; SentenceTransformer('${EMBEDDING_MODEL}'); CrossEncoder('${RERANKER_MODEL}')" \
-    && python -c "from tree_sitter_language_pack import get_parser; [get_parser(name) for name in ('python', 'javascript', 'typescript', 'tsx', 'go', 'java')]"
+    && python -c "from tree_sitter_language_pack import get_parser; from codebase_qa.chunking.treesitter.languages import SUPPORTED_GRAMMARS; [get_parser(name) for name in SUPPORTED_GRAMMARS]"
 
 COPY frontend ./frontend
 

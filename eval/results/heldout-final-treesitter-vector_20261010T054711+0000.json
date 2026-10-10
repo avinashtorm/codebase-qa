@@ -1,0 +1,1287 @@
+{
+ "config": "heldout-final-treesitter-vector",
+ "timestamp": "2026-10-10T05:47:11+00:00",
+ "split": "held_out",
+ "question_count": 15,
+ "with_answers": true,
+ "answered_count": 15,
+ "generation_error": null,
+ "settings": {
+  "chunker": "treesitter",
+  "retrieval_mode": "vector",
+  "rerank": false,
+  "rerank_candidates": 30,
+  "rerank_fusion": false,
+  "reranker_model": null,
+  "top_k": 8,
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "llm": "gemini-3.5-flash-lite",
+  "repo_commit": "7257e606cb94eada1dca40173e2b7f99dd549bc6"
+ },
+ "metrics": {
+  "hit_at_1": 0.5333,
+  "hit_at_5": 0.7333,
+  "recall_at_10": 0.8,
+  "mrr": 0.613,
+  "citation_precision": 0.6333,
+  "citation_any_correct": 0.7333,
+  "invalid_citations": 0,
+  "refused": 0,
+  "embed_query_ms_mean": 74.8,
+  "generation_ms_mean": 1705.6,
+  "retrieval_ms_mean": 86.4,
+  "vector_search_ms_mean": 11.5
+ },
+ "by_category": {
+  "config": {
+   "count": 2,
+   "hit_at_1": 0.5,
+   "hit_at_5": 1.0,
+   "recall_at_10": 1.0,
+   "mrr": 0.6667,
+   "citation_precision": 1.0,
+   "citation_any_correct": 1.0,
+   "invalid_citations": 0,
+   "refused": 0,
+   "embed_query_ms_mean": 65.3,
+   "generation_ms_mean": 1414.0,
+   "retrieval_ms_mean": 78.8,
+   "vector_search_ms_mean": 13.4
+  },
+  "how-does": {
+   "count": 4,
+   "hit_at_1": 0.25,
+   "hit_at_5": 0.25,
+   "recall_at_10": 0.5,
+   "mrr": 0.2778,
+   "citation_precision": 0.25,
+   "citation_any_correct": 0.25,
+   "invalid_citations": 0,
+   "refused": 0,
+   "embed_query_ms_mean": 62.9,
+   "generation_ms_mean": 1812.0,
+   "retrieval_ms_mean": 72.8,
+   "vector_search_ms_mean": 9.7
+  },
+  "what-happens-when": {
+   "count": 4,
+   "hit_at_1": 0.75,
+   "hit_at_5": 1.0,
+   "recall_at_10": 1.0,
+   "mrr": 0.8125,
+   "citation_precision": 0.625,
+   "citation_any_correct": 1.0,
+   "invalid_citations": 0,
+   "refused": 0,
+   "embed_query_ms_mean": 74.4,
+   "generation_ms_mean": 1605.4,
+   "retrieval_ms_mean": 83.8,
+   "vector_search_ms_mean": 9.4
+  },
+  "where-is": {
+   "count": 5,
+   "hit_at_1": 0.6,
+   "hit_at_5": 0.8,
+   "recall_at_10": 0.8,
+   "mrr": 0.7,
+   "citation_precision": 0.8,
+   "citation_any_correct": 0.8,
+   "invalid_citations": 0,
+   "refused": 0,
+   "embed_query_ms_mean": 88.5,
+   "generation_ms_mean": 1817.2,
+   "retrieval_ms_mean": 102.4,
+   "vector_search_ms_mean": 13.7
+  }
+ },
+ "questions": [
+  {
+   "id": "c02",
+   "category": "where-is",
+   "question": "Where are user passwords hashed?",
+   "expected": [
+    {
+     "path": "backend/app/core/security.py",
+     "start_line": 35,
+     "end_line": 36
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/security.py:35-36",
+     "score": 0.7347
+    },
+    {
+     "location": "backend/app/crud.py:40-42",
+     "score": 0.6696
+    },
+    {
+     "location": "backend/app/core/security.py:29-32",
+     "score": 0.6595
+    },
+    {
+     "location": "backend/app/models.py:20-22",
+     "score": 0.6528
+    },
+    {
+     "location": "backend/app/core/security.py:1-19",
+     "score": 0.6506
+    },
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.6431
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:165-191",
+     "score": 0.6421
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:96-130",
+     "score": 0.6389
+    },
+    {
+     "location": "backend/app/api/routes/private.py:1-13",
+     "score": 0.6372
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:1-8",
+     "score": 0.6357
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 179.2,
+    "embed_query": 161.9,
+    "vector_search": 17.2,
+    "generation": 2448.1
+   },
+   "used_llm": true,
+   "answer": "User passwords are hashed using `get_password_hash` in `backend/app/core/security.py`, which utilizes `password_hash.hash(password)`.",
+   "citations": [
+    "backend/app/core/security.py:35-36"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c06",
+   "category": "where-is",
+   "question": "Where are emails actually sent over SMTP?",
+   "expected": [
+    {
+     "path": "backend/app/utils.py",
+     "start_line": 34,
+     "end_line": 57
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/config.py:59-62",
+     "score": 0.6928
+    },
+    {
+     "location": "backend/app/utils.py:34-57",
+     "score": 0.6653
+    },
+    {
+     "location": "backend/app/api/routes/utils.py:11-26",
+     "score": 0.6602
+    },
+    {
+     "location": "backend/app/core/config.py:42-49",
+     "score": 0.6507
+    },
+    {
+     "location": "backend/app/api/routes/utils.py:1-8",
+     "score": 0.6505
+    },
+    {
+     "location": "compose.override.yml:61-100",
+     "score": 0.6458
+    },
+    {
+     "location": "backend/app/core/config.py:51-55",
+     "score": 0.6442
+    },
+    {
+     "location": "deployment-docker-compose.md:31-70",
+     "score": 0.6431
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:37-57",
+     "score": 0.6258
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.622
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "retrieval": 94.4,
+    "embed_query": 73.8,
+    "vector_search": 20.3,
+    "generation": 1715.3
+   },
+   "used_llm": true,
+   "answer": "Emails are sent over SMTP using the `emails` library within the `send_email` function in `backend/app/utils.py`.",
+   "citations": [
+    "backend/app/utils.py:34-56"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c10",
+   "category": "where-is",
+   "question": "Where are all the API route modules combined into one router?",
+   "expected": [
+    {
+     "path": "backend/app/api/main.py",
+     "start_line": 6,
+     "end_line": 14
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/main.py:1-14",
+     "score": 0.7333
+    },
+    {
+     "location": "frontend/src/routes/_layout.tsx:1-21",
+     "score": 0.6944
+    },
+    {
+     "location": "backend/app/main.py:1-11",
+     "score": 0.6915
+    },
+    {
+     "location": "frontend/src/routes/_layout/index.tsx:1-14",
+     "score": 0.6832
+    },
+    {
+     "location": "backend/app/api/routes/items.py:1-10",
+     "score": 0.6825
+    },
+    {
+     "location": "frontend/src/routes/__root.tsx:1-18",
+     "score": 0.6804
+    },
+    {
+     "location": "frontend/src/routeTree.gen.ts:1-60",
+     "score": 0.678
+    },
+    {
+     "location": "frontend/src/routeTree.gen.ts:141-200",
+     "score": 0.6721
+    },
+    {
+     "location": "frontend/src/components/Sidebar/User.tsx:1-20",
+     "score": 0.6686
+    },
+    {
+     "location": "backend/app/api/routes/private.py:1-13",
+     "score": 0.6682
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 89.5,
+    "embed_query": 76.6,
+    "vector_search": 12.7,
+    "generation": 1794.5
+   },
+   "used_llm": true,
+   "answer": "All the API route modules (login, users, utils, items, and conditionally private) are included and combined into `api_router` in `backend/app/api/main.py`.",
+   "citations": [
+    "backend/app/api/main.py:6-14"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c13",
+   "category": "where-is",
+   "question": "Where are the sidebar navigation entries defined, including the admin link?",
+   "expected": [
+    {
+     "path": "frontend/src/components/Sidebar/AppSidebar.tsx",
+     "start_line": 15,
+     "end_line": 25
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/components/Sidebar/AppSidebar.tsx:20-41",
+     "score": 0.7208
+    },
+    {
+     "location": "frontend/src/components/Sidebar/Main.tsx:23-60",
+     "score": 0.7131
+    },
+    {
+     "location": "frontend/src/routes/_layout/admin.tsx:59-74",
+     "score": 0.7015
+    },
+    {
+     "location": "frontend/src/components/Sidebar/Main.tsx:1-11",
+     "score": 0.6944
+    },
+    {
+     "location": "frontend/src/components/ui/sidebar.tsx:487-507",
+     "score": 0.6927
+    },
+    {
+     "location": "frontend/src/components/ui/sidebar.tsx:712-737",
+     "score": 0.6909
+    },
+    {
+     "location": "frontend/src/components/Sidebar/Main.tsx:19-21",
+     "score": 0.6896
+    },
+    {
+     "location": "frontend/src/components/Sidebar/AppSidebar.tsx:1-18",
+     "score": 0.6858
+    },
+    {
+     "location": "frontend/src/components/ui/sidebar.tsx:591-611",
+     "score": 0.6856
+    },
+    {
+     "location": "frontend/src/components/ui/sidebar.tsx:680-710",
+     "score": 0.6801
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 81.3,
+    "embed_query": 73.3,
+    "vector_search": 7.9,
+    "generation": 1538.2
+   },
+   "used_llm": true,
+   "answer": "The base sidebar navigation items (`Dashboard` and `Items`) are defined in `frontend/src/components/Sidebar/AppSidebar.tsx` as `baseItems`. The `Admin` link is conditionally added to these items if the current user is a superuser (`currentUser?.is_superuser`).",
+   "citations": [
+    "frontend/src/components/Sidebar/AppSidebar.tsx:20-28",
+    "frontend/src/components/Sidebar/AppSidebar.tsx:13-18"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 2,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c17",
+   "category": "where-is",
+   "question": "Where does the frontend configure the API base URL and attach the auth token to requests?",
+   "expected": [
+    {
+     "path": "frontend/src/main.tsx",
+     "start_line": 17,
+     "end_line": 20
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/client/core/auth.gen.ts:5-20",
+     "score": 0.7476
+    },
+    {
+     "location": "frontend/src/client/core/types.gen.ts:35-92",
+     "score": 0.7432
+    },
+    {
+     "location": ".github/workflows/deploy.yml:31-54",
+     "score": 0.7367
+    },
+    {
+     "location": "frontend/src/client/core/auth.gen.ts:1-1",
+     "score": 0.7244
+    },
+    {
+     "location": "development.md:31-70",
+     "score": 0.7239
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:1-12",
+     "score": 0.7238
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:69-70",
+     "score": 0.7212
+    },
+    {
+     "location": "backend/app/core/config.py:15-31",
+     "score": 0.721
+    },
+    {
+     "location": "frontend/src/client/client/client.gen.ts:70-129",
+     "score": 0.7204
+    },
+    {
+     "location": "frontend/src/client/client/types.gen.ts:19-50",
+     "score": 0.72
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "retrieval": 67.5,
+    "embed_query": 56.9,
+    "vector_search": 10.6,
+    "generation": 1589.8
+   },
+   "used_llm": true,
+   "answer": "The frontend development server uses the backend URL configured in `frontend/.env` (as stated in `development.md`). Additionally, the `Config` interface in `frontend/src/client/core/types.gen.ts` includes an `auth` property which can accept an auth token or a function returning an auth token that gets added to the request payload as defined by its `security` array.",
+   "citations": [
+    "development.md:42-42",
+    "frontend/src/client/core/types.gen.ts:35-40"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c21",
+   "category": "how-does",
+   "question": "How does login avoid leaking whether an email exists through response timing?",
+   "expected": [
+    {
+     "path": "backend/app/crud.py",
+     "start_line": 40,
+     "end_line": 51
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.7479
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:67-79",
+     "score": 0.7038
+    },
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.7007
+    },
+    {
+     "location": "frontend/tests/utils/mailpit.ts:7-46",
+     "score": 0.6992
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:121-180",
+     "score": 0.6888
+    },
+    {
+     "location": "frontend/tests/user-settings.spec.ts:61-120",
+     "score": 0.6883
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:282-297",
+     "score": 0.6843
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:49-64",
+     "score": 0.682
+    },
+    {
+     "location": "frontend/tests/login.spec.ts:19-78",
+     "score": 0.6795
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:397-417",
+     "score": 0.6774
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 123.4,
+    "embed_query": 105.9,
+    "vector_search": 17.3,
+    "generation": 1592.4
+   },
+   "used_llm": true,
+   "answer": "To prevent timing attacks and avoid leaking whether an email exists, the `authenticate` function runs password verification even when the user does not exist by using a dummy hash (`verify_password(password, DUMMY_HASH)`). This ensures the response time remains similar regardless of whether the email is registered in the database.",
+   "citations": [
+    "backend/app/crud.py:45-52"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c25",
+   "category": "how-does",
+   "question": "How does the frontend prevent unauthenticated users from opening protected pages?",
+   "expected": [
+    {
+     "path": "frontend/src/routes/_layout.tsx",
+     "start_line": 12,
+     "end_line": 21
+    },
+    {
+     "path": "frontend/src/hooks/useAuth.ts",
+     "start_line": 14,
+     "end_line": 16
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/tests/admin.spec.ts:181-205",
+     "score": 0.6994
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:1-60",
+     "score": 0.6833
+    },
+    {
+     "location": "backend/app/core/config.py:79-88",
+     "score": 0.6794
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:121-180",
+     "score": 0.6737
+    },
+    {
+     "location": ".github/workflows/guard-dependencies.yml:1-40",
+     "score": 0.6656
+    },
+    {
+     "location": "frontend/tests/sign-up.spec.ts:27-86",
+     "score": 0.6633
+    },
+    {
+     "location": "frontend/tests/login.spec.ts:79-117",
+     "score": 0.6633
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:61-120",
+     "score": 0.6622
+    },
+    {
+     "location": "frontend/tests/login.spec.ts:19-78",
+     "score": 0.661
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:132-143",
+     "score": 0.6606
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "retrieval": 59.8,
+    "embed_query": 52.0,
+    "vector_search": 7.7,
+    "generation": 1918.1
+   },
+   "used_llm": true,
+   "answer": "When an unauthenticated user or a user with an invalid token tries to access a protected route (such as `/settings`), the application redirects them to the `/login` page.",
+   "citations": [
+    "frontend/tests/login.spec.ts:95-105",
+    "frontend/tests/login.spec.ts:107-116"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c29",
+   "category": "how-does",
+   "question": "How does the admin page make sure only superusers can open it?",
+   "expected": [
+    {
+     "path": "frontend/src/routes/_layout/admin.tsx",
+     "start_line": 20,
+     "end_line": 29
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/tests/admin.spec.ts:181-205",
+     "score": 0.7516
+    },
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.689
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:1-60",
+     "score": 0.6886
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:451-460",
+     "score": 0.6661
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:61-66",
+     "score": 0.6657
+    },
+    {
+     "location": "frontend/src/routes/_layout/admin.tsx:59-74",
+     "score": 0.6655
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:53-58",
+     "score": 0.6638
+    },
+    {
+     "location": "backend/app/api/routes/users.py:32-51",
+     "score": 0.6579
+    },
+    {
+     "location": "frontend/src/routes/_layout/admin.tsx:20-37",
+     "score": 0.6509
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:61-120",
+     "score": 0.6494
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.1111111111111111
+   },
+   "latency_ms": {
+    "retrieval": 52.4,
+    "embed_query": 45.9,
+    "vector_search": 6.4,
+    "generation": 2032.7
+   },
+   "used_llm": true,
+   "answer": "Backend API endpoints for admin actions (such as retrieving users) rely on the `get_current_active_superuser` dependency, which raises an HTTP 403 error if `current_user.is_superuser` is false. On the frontend, non-superusers are prevented from accessing the admin page, which redirects them away or fails to display the expected contents.",
+   "citations": [
+    "backend/app/api/deps.py:52-57",
+    "backend/app/api/routes/users.py:32-35",
+    "frontend/tests/admin.spec.ts:183-195"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 3,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c33",
+   "category": "how-does",
+   "question": "How do the end-to-end tests read the emails sent by the application?",
+   "expected": [
+    {
+     "path": "frontend/tests/utils/mailpit.ts",
+     "start_line": 7,
+     "end_line": 46
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/utils.py:11-26",
+     "score": 0.6978
+    },
+    {
+     "location": "backend/app/utils.py:60-67",
+     "score": 0.68
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:37-46",
+     "score": 0.6791
+    },
+    {
+     "location": "packages/react-email/emails/test_email.tsx:11-35",
+     "score": 0.6761
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:261-273",
+     "score": 0.6741
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:37-57",
+     "score": 0.6718
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:49-64",
+     "score": 0.6715
+    },
+    {
+     "location": "packages/react-email/emails/test_email.tsx:6-9",
+     "score": 0.6666
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:67-79",
+     "score": 0.6605
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:121-180",
+     "score": 0.6564
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "retrieval": 55.5,
+    "embed_query": 47.9,
+    "vector_search": 7.5,
+    "generation": 1704.8
+   },
+   "used_llm": true,
+   "answer": "I don't know based on the indexed code. The provided code context does not contain any end-to-end tests that read emails sent by the application; it only shows tests that mock the `send_email` function or test API routes like login, token usage, and user creation.",
+   "citations": [],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "c37",
+   "category": "what-happens-when",
+   "question": "What happens when a superuser tries to delete their own account?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 132,
+     "end_line": 143
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:132-143",
+     "score": 0.7419
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:493-505",
+     "score": 0.7145
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:451-460",
+     "score": 0.7062
+    },
+    {
+     "location": "backend/app/api/routes/users.py:214-232",
+     "score": 0.6964
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:463-479",
+     "score": 0.6846
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:508-521",
+     "score": 0.6409
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:54-93",
+     "score": 0.6385
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:132-144",
+     "score": 0.6374
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:420-448",
+     "score": 0.6322
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:213-225",
+     "score": 0.6263
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 98.8,
+    "embed_query": 87.9,
+    "vector_search": 10.7,
+    "generation": 1533.3
+   },
+   "used_llm": true,
+   "answer": "When a superuser attempts to delete their own account (either via `DELETE /api/v1/users/me` or by deleting their own user ID via `DELETE /api/v1/users/{user_id}`), an HTTP 403 error is raised with the detail message **\"Super users are not allowed to delete themselves\"**.",
+   "citations": [
+    "backend/app/api/routes/users.py:135-140",
+    "backend/app/api/routes/users.py:223-226"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c41",
+   "category": "what-happens-when",
+   "question": "What happens when a password reset token is invalid or expired?",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/login.py",
+     "start_line": 77,
+     "end_line": 90
+    },
+    {
+     "path": "backend/app/utils.py",
+     "start_line": 118,
+     "end_line": 125
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.7311
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.7269
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:113-126",
+     "score": 0.7037
+    },
+    {
+     "location": "frontend/tests/reset-password.spec.ts:61-114",
+     "score": 0.698
+    },
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.6891
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:69-98",
+     "score": 0.6733
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:28-34",
+     "score": 0.6637
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.6633
+    },
+    {
+     "location": "packages/react-email/emails/reset_password.tsx:14-47",
+     "score": 0.6616
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:267-279",
+     "score": 0.6614
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 96.9,
+    "embed_query": 88.0,
+    "vector_search": 8.8,
+    "generation": 1779.4
+   },
+   "used_llm": true,
+   "answer": "When a password reset token is invalid or expired, `verify_password_reset_token` raises an `InvalidTokenError` which causes it to return `None`. In the reset password endpoint, if the email cannot be verified from the token or the user does not exist, an HTTP 400 error with the detail `\"Invalid token\"` is raised. This is also tested and handled on the frontend by showing an `\"Invalid token\"` message.",
+   "citations": [
+    "backend/app/utils.py:118-125",
+    "backend/app/api/routes/login.py:82-88",
+    "backend/tests/api/routes/test_login.py:113-126",
+    "frontend/tests/reset-password.spec.ts:68-80"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 4,
+    "correct_citations": 2,
+    "precision": 0.5,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c46",
+   "category": "what-happens-when",
+   "question": "What happens if SECRET_KEY is left as changethis outside development?",
+   "expected": [
+    {
+     "path": "backend/app/core/config.py",
+     "start_line": 68,
+     "end_line": 88
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/config.py:68-77",
+     "score": 0.7293
+    },
+    {
+     "location": ".env:1-18",
+     "score": 0.6799
+    },
+    {
+     "location": "backend/app/core/config.py:79-88",
+     "score": 0.6693
+    },
+    {
+     "location": "backend/app/core/config.py:15-31",
+     "score": 0.6664
+    },
+    {
+     "location": "deployment.md:31-70",
+     "score": 0.6579
+    },
+    {
+     "location": ".github/workflows/pre-commit.yml:31-70",
+     "score": 0.656
+    },
+    {
+     "location": ".github/workflows/add-to-project.yml:1-22",
+     "score": 0.6523
+    },
+    {
+     "location": "backend/app/alembic/versions/1a31ce608336_add_cascade_delete_relationships.py:30-37",
+     "score": 0.6475
+    },
+    {
+     "location": "backend/app/alembic/versions/fe56fa70289e_add_created_at_to_user_and_item.py:27-31",
+     "score": 0.6453
+    },
+    {
+     "location": "frontend/src/routeTree.gen.ts:1-60",
+     "score": 0.6451
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 97.4,
+    "embed_query": 85.2,
+    "vector_search": 12.1,
+    "generation": 1560.1
+   },
+   "used_llm": true,
+   "answer": "If `SECRET_KEY` is left as `changethis` when `FASTAPI_ENV` is not set to `development`, a `ValueError` is raised.",
+   "citations": [
+    "backend/app/core/config.py:68-77"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c49",
+   "category": "what-happens-when",
+   "question": "What happens when an admin deletes a user from the admin UI?",
+   "expected": [
+    {
+     "path": "frontend/src/components/Admin/DeleteUser.tsx",
+     "start_line": 33,
+     "end_line": 48
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:54-93",
+     "score": 0.6943
+    },
+    {
+     "location": "backend/app/api/routes/users.py:214-232",
+     "score": 0.6804
+    },
+    {
+     "location": "backend/app/api/routes/users.py:132-143",
+     "score": 0.6686
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:27-53",
+     "score": 0.6578
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:420-448",
+     "score": 0.6461
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:22-25",
+     "score": 0.645
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:95-95",
+     "score": 0.6403
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:463-479",
+     "score": 0.637
+    },
+    {
+     "location": "frontend/src/components/UserSettings/DeleteConfirmation.tsx:21-80",
+     "score": 0.6295
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:451-460",
+     "score": 0.6234
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.25
+   },
+   "latency_ms": {
+    "retrieval": 42.2,
+    "embed_query": 36.3,
+    "vector_search": 5.9,
+    "generation": 1549.0
+   },
+   "used_llm": true,
+   "answer": "When an admin deletes a user via the admin UI, the `DeleteUser` component triggers a mutation that calls `UsersService.deleteUser`, which sends a delete request to the backend. On the backend, the `delete_user` endpoint verifies that the user exists and that the superuser is not trying to delete themselves. It then permanently deletes all items associated with the user, deletes the user record from the database, and commits the session, returning a success message.",
+   "citations": [
+    "frontend/src/components/Admin/DeleteUser.tsx:32-34",
+    "backend/app/api/routes/users.py:214-231"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c53",
+   "category": "config",
+   "question": "Which settings decide whether sending emails is enabled?",
+   "expected": [
+    {
+     "path": "backend/app/core/config.py",
+     "start_line": 59,
+     "end_line": 62
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/config.py:59-62",
+     "score": 0.7889
+    },
+    {
+     "location": "backend/app/core/config.py:51-55",
+     "score": 0.7044
+    },
+    {
+     "location": "backend/app/utils.py:34-57",
+     "score": 0.6836
+    },
+    {
+     "location": "backend/app/core/config.py:42-49",
+     "score": 0.6623
+    },
+    {
+     "location": "backend/app/api/routes/utils.py:11-26",
+     "score": 0.6442
+    },
+    {
+     "location": "packages/react-email/emails/test_email.tsx:11-35",
+     "score": 0.6432
+    },
+    {
+     "location": "backend/app/core/config.py:64-66",
+     "score": 0.6415
+    },
+    {
+     "location": "compose.override.yml:61-100",
+     "score": 0.6287
+    },
+    {
+     "location": "backend/app/core/config.py:68-77",
+     "score": 0.6221
+    },
+    {
+     "location": "frontend/tests/utils/mailpit.ts:3-5",
+     "score": 0.6211
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "retrieval": 57.4,
+    "embed_query": 51.5,
+    "vector_search": 5.8,
+    "generation": 1356.0
+   },
+   "used_llm": true,
+   "answer": "Sending emails is enabled when both `SMTP_HOST` and `EMAILS_FROM_EMAIL` are provided (non-empty), as determined by the `emails_enabled` computed property.",
+   "citations": [
+    "backend/app/core/config.py:59-62"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "c57",
+   "category": "config",
+   "question": "How are database migrations and initial data applied before the backend starts?",
+   "expected": [
+    {
+     "path": "backend/scripts/prestart.sh",
+     "start_line": 6,
+     "end_line": 10
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/initial_data.py:11-13",
+     "score": 0.7505
+    },
+    {
+     "location": "backend/app/core/db.py:15-33",
+     "score": 0.736
+    },
+    {
+     "location": "backend/scripts/prestart.sh:1-10",
+     "score": 0.735
+    },
+    {
+     "location": "backend/app/core/db.py:1-12",
+     "score": 0.7178
+    },
+    {
+     "location": "backend/app/initial_data.py:16-19",
+     "score": 0.7161
+    },
+    {
+     "location": "backend/app/initial_data.py:1-8",
+     "score": 0.7007
+    },
+    {
+     "location": "backend/app/alembic/env.py:58-80",
+     "score": 0.6988
+    },
+    {
+     "location": "backend/app/alembic/env.py:37-55",
+     "score": 0.6923
+    },
+    {
+     "location": "backend/README.md:91-130",
+     "score": 0.6845
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.6799
+    }
+   ],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.3333333333333333
+   },
+   "latency_ms": {
+    "retrieval": 100.3,
+    "embed_query": 79.2,
+    "vector_search": 21.0,
+    "generation": 1472.1
+   },
+   "used_llm": true,
+   "answer": "Database migrations are applied by running `alembic upgrade head`, and initial data is created by executing `python app/initial_data.py` as defined in `backend/scripts/prestart.sh`.",
+   "citations": [
+    "backend/scripts/prestart.sh:6-10"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  }
+ ]
+}

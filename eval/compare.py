@@ -17,9 +17,13 @@ COLUMNS: list[tuple[str, str]] = [
 ]
 
 
+def is_eval_run(payload: dict[str, Any]) -> bool:
+    return {"config", "split", "metrics", "timestamp", "question_count"} <= payload.keys()
+
+
 def load_results(results_dir: Path) -> list[dict[str, Any]]:
-    runs = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(results_dir.glob("*.json"))]
-    return sorted(runs, key=lambda run: run["timestamp"])
+    payloads = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(results_dir.glob("*.json"))]
+    return sorted((run for run in payloads if is_eval_run(run)), key=lambda run: run["timestamp"])
 
 
 def latest_per_config(runs: list[dict[str, Any]]) -> list[dict[str, Any]]:

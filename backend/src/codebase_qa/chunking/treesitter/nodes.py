@@ -13,7 +13,6 @@ MAX_SIGNATURE_CHARS = 200
 @dataclass(frozen=True)
 class Definition:
     kind: DefinitionKind
-    outer: Node
     inner: Node
     start_line: int
     end_line: int
@@ -107,7 +106,7 @@ def definitions_in(container: Node, spec: LanguageSpec) -> list[Definition]:
                 break
             first = children[cursor]
             cursor -= 1
-        found.append(Definition(kind, child, unwrap(child, spec), start_line(first), end_line(child)))
+        found.append(Definition(kind, unwrap(child, spec), start_line(first), end_line(child)))
     return found
 
 
