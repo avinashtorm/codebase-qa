@@ -24,7 +24,12 @@ jobs:
       - name: Lint
         run: ruff check .
       - name: Test
-        run: pytest -o addopts="" -q
+        run: |
+          set +e
+          pytest -o addopts="" -q -rfE 2>&1 | tee pytest.log
+          status=${PIPESTATUS[0]}
+          grep -E "^(FAILED|ERROR) " pytest.log | while read -r line; do echo "::error title=pytest::$line"; done
+          exit $status
 
   docker-build:
     runs-on: ubuntu-latest

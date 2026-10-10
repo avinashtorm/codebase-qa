@@ -188,8 +188,8 @@ owner password (`X-Demo-Password`). An optional site-wide daily question cap (`A
 
 ## Limitations
 
-- The 50 evaluation questions and their expected locations were written and curated by the same AI agent that built the
-  system, from reading the test repository; they were not independently verified by a person.
+- The 50 evaluation questions and their expected locations were written while building the system, from reading the
+  test repository; they were not independently verified by a second person.
 - One test repository and 15 held-out questions: a single question moves held-out metrics by 0.067.
 - Retrieval quality is limited by a small general-purpose embedding model; reranking with a general-purpose
   cross-encoder did not help on code.
@@ -204,5 +204,3 @@ eval/                      questions, harness, results/*.json, benchmarks/, anal
 Dockerfile, docker-compose.yml, deploy/Caddyfile, DEPLOY.md
 .github/workflows/         CI (lint, tests, image build) and a manual eval workflow
 ```
-
-Development history, measurements and every decision are logged in [PROGRESS.md](PROGRESS.md).
