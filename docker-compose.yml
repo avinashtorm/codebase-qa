@@ -62,7 +62,7 @@ services:
       - "443:443"
       - "443:443/udp"
     environment:
-      DOMAIN: ${DOMAIN:?set DOMAIN in .env, e.g. my-codebase-qa.eastus.cloudapp.azure.com}
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env, e.g. my-codebase-qa.indiasouthcentral.cloudapp.azure.com}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data

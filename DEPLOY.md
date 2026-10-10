@@ -15,12 +15,15 @@ Only Caddy is reachable from the internet. Caddy gets and renews the HTTPS certi
 
 ## What it costs
 
-Prices are Azure's public pay-as-you-go prices for Linux in **Central India** (from the Azure retail prices API,
-October 2026). The portal shows the exact price for your region when you pick the size.
+This deployment runs in **India South Central** (`indiasouthcentral`): Azure for Students only allowed certain regions,
+and the VM could not be created in Central India. Azure's public price list does not yet include B2als v2 for
+India South Central, so the VM row below uses the Central India price as a reference. The exact price for your VM is
+shown in the portal under **VM -> Availability + scale -> Size**. Disk and public IP prices below are the published
+India South Central prices (from the Azure retail prices API, October 2026).
 
 | Item | Choice | Price | Per month if always on |
 |---|---|---|---|
-| VM | **B2als v2** (2 vCPU, 4 GB RAM, x86, AMD) | $0.0246 / hour | about $17.96 |
+| VM | **B2als v2** (2 vCPU, 4 GB RAM, x86, AMD) | $0.0246 / hour in Central India (reference) | about $17.96 |
 | OS disk | 30 GiB Standard SSD (E4) | | about $2.64 |
 | Public IP | Standard, static | $0.005 / hour | about $3.65 |
 | Traffic | Outbound data | first 100 GB free | $0 for a demo |
@@ -45,8 +48,9 @@ Sizes with 1-2 GB (B1s, B1ms, B2ats v2) run out of memory. The steps below also 
 2. Check your remaining credit: search the portal for **Education**, open the **Education** hub and look at the
    credit shown on its **Overview** page. (The older Sponsorships balance page shows "no active sponsorship" for
    Azure for Students, which is expected.)
-3. Choose a region close to you. Student subscriptions sometimes only allow certain regions. If the portal later says a
-   size or region is "not available" or blocked by policy, pick another region from its list.
+3. Choose a region close to you. Student subscriptions only allow certain regions. If the portal says a size or region
+   is "not available" or blocked by policy, pick another region from its list. (This deployment ended up in
+   **India South Central**.)
 
 ## Step 2: Create the virtual machine
 
@@ -56,7 +60,7 @@ Sizes with 1-2 GB (B1s, B1ms, B2ats v2) run out of memory. The steps below also 
    - **Resource group:** click **Create new** and enter `codebase-qa-rg`. Everything for this project goes in it,
      so you can delete it all at once later.
    - **Virtual machine name:** `codebase-qa-vm`.
-   - **Region:** the region from step 1.
+   - **Region:** the region from step 1 (here: India South Central).
    - **Availability options:** No infrastructure redundancy required.
    - **Security type:** Standard.
    - **Image:** **Ubuntu Server 24.04 LTS - x64 Gen2**.
@@ -96,7 +100,7 @@ Caddy needs port 80 to prove to Let's Encrypt that it controls your domain, and 
 2. Go to **Settings -> Configuration**.
 3. Check that **Assignment** is **Static**.
 4. In **DNS name label** enter a unique lowercase name, for example `codebase-qa-avinash`, and click **Save**.
-5. Your domain is now shown under the label, for example `codebase-qa-avinash.eastus.cloudapp.azure.com`.
+5. Your domain is now shown under the label, for example `codebase-qa-avinash.indiasouthcentral.cloudapp.azure.com`.
    Write it down; this guide calls it `YOUR_DOMAIN`.
 6. Check it from PowerShell on Windows (it should print the VM's public IP):
    ```powershell
