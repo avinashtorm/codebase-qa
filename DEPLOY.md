@@ -127,7 +127,9 @@ If you later want to save credit (about $15-20 per month instead of about $24-34
 
 ## Step 6: Set a budget alert
 
-The goal is an email when you have used **$50 (50%)** and **$80 (80%)** of the $100 credit in total. A monthly
+The goal is an email when you have used **50%** and **80%** of the $100 credit in total. Prices in this guide are in
+USD, but **Cost Management shows costs in your billing currency** (INR for this deployment); roughly $1 = ₹95 at the
+credit's conversion (₹9,500 = $100), so the always-on estimate of $24-34 per month is about ₹2,300-3,200 per month. A monthly
 budget would reset every month and never reach those amounts at about $24-34 per month, so the budget below covers
 the whole year of the credit.
 
@@ -139,10 +141,12 @@ the whole year of the credit.
    - **Reset period:** **Annually**
    - **Creation date / Start date:** leave the default (the first day of the current month)
    - **Expiration date:** leave the default or set it about one year ahead
-   - **Amount:** `100`
+   - **Amount:** your credit in your **billing currency**. Budgets use the subscription's billing currency, not USD.
+     This deployment's subscription is billed in **INR**, so the amount is **₹9,500** (the $100 credit in rupees). If yours
+     is billed in USD, enter `100`.
 5. Click **Next**. Under **Alert conditions** add two rows:
-   - Type **Actual**, % of budget **50** (the portal shows $50)
-   - Type **Actual**, % of budget **80** (the portal shows $80)
+   - Type **Actual**, % of budget **50** (here ₹4,750; $50 for a USD subscription)
+   - Type **Actual**, % of budget **80** (here ₹7,600; $80 for a USD subscription)
 6. Under **Alert recipients (email)** enter your email address, choose your **Language**, and click **Create**.
 7. The budget appears in the list with its amount and current spend. Alert emails come from
    `azure-noreply@microsoft.com`; add it to your contacts so they don't go to spam.
