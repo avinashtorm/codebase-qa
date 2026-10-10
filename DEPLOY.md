@@ -31,8 +31,11 @@ India South Central prices (Azure retail prices API, October 2026). **Check the 
 | Public IP | Standard, static | $0.005 / hour | about $3.65 |
 | Traffic | Outbound data | first 100 GB free | $0 for a demo |
 
-- **Always on:** about **$24-34 per month**, so the $100 credit lasts about **3-4 months**.
-- **With auto-shutdown at night** (running about 12 hours a day): about **$15-20 per month**, roughly 5-6.5 months.
+- **This deployment runs 24/7 (no auto-shutdown)**, so a reviewer can open the link at any time. Total: about
+  **$24.25 per month** at the likely VM price ($18 VM + $2.64 disk + $3.65 IP), at most about **$33.75 per month**.
+  The $100 credit therefore lasts about **4 months** (at least about 3 months).
+- Turning on auto-shutdown at night (step 5) would cut this to about $15-20 per month, but the site would be offline
+  until someone starts the VM again.
 - Other x86 sizes with 4 GB in Central India cost more: B2s and B2ls v2 $0.0448/h (~$32.70/month),
   D2als v6 $0.0520/h (~$37.96/month). In East US, B2als v2 is $0.0376/h (~$27.45/month).
 - A stopped (deallocated) VM costs nothing for compute, but the disk and the public IP are still billed (about $6 per month).
@@ -80,7 +83,7 @@ Sizes with 1-2 GB (B1s, B1ms, B2ats v2) run out of memory. The steps below also 
    - Tick **Delete with VM**.
 4. **Networking** tab: keep the defaults (new virtual network, new public IP).
    Tick **Delete public IP and NIC when VM is deleted**.
-5. **Management** tab: you can enable **Auto-shutdown** here, or do it in step 5.
+5. **Management** tab: leave **Auto-shutdown** off (this deployment runs 24/7; see step 5).
 6. Click **Review + create**, wait for "Validation passed", then **Create**.
 7. A window asks you to **Download private key and create resource**. Click it and keep the downloaded
    `codebase-qa-key.pem` file. It is your only way to log in: never share it or put it in git.
@@ -110,24 +113,42 @@ Caddy needs port 80 to prove to Let's Encrypt that it controls your domain, and 
    Resolve-DnsName YOUR_DOMAIN
    ```
 
-## Step 5: Turn on auto-shutdown
+## Step 5: Auto-shutdown (skipped for this deployment)
 
+This deployment keeps the VM **always on** so the demo link works whenever a reviewer opens it. The budget alerts in
+step 6 are the safety net instead. Leave **Operations -> Auto-shutdown** set to Off.
+
+If you later want to save credit (about $15-20 per month instead of about $24-34):
 1. In the VM, open **Operations -> Auto-shutdown**.
-2. Set **Enabled** to On, choose a **Scheduled shutdown** time (for example 23:00) and your **Time zone**.
-3. Optionally enable the notification and enter your email address; you will be warned 30 minutes before shutdown.
-4. Click **Save**.
-
-To use the app again after a shutdown, open the VM and click **Start** in **Overview**. Docker starts with the VM and
-`restart: unless-stopped` brings all three containers back automatically, so you don't need to log in. Give it
-about a minute.
+2. Set **Enabled** to On, choose a **Scheduled shutdown** time and your **Time zone**, optionally add a notification
+   email, and click **Save**.
+3. To use the app after a shutdown, click **Start** in the VM **Overview**. Docker and `restart: unless-stopped` bring
+   the containers back automatically within about a minute. Auto-shutdown never starts the VM again by itself.
 
 ## Step 6: Set a budget alert
 
-1. Search the portal for **Cost Management + Billing**, open **Cost Management -> Budgets**, and click **Add**.
-2. **Scope:** your Azure for Students subscription.
-3. **Name:** `codebase-qa-budget`, **Reset period:** Monthly, **Amount:** for example `40`.
-4. Click **Next**. Add alert conditions of type **Actual** at **50%**, **80%** and **100%**, enter your email under
-   **Alert recipients**, and click **Create**.
+The goal is an email when you have used **$50 (50%)** and **$80 (80%)** of the $100 credit in total. A monthly
+budget would reset every month and never reach those amounts at about $24-34 per month, so the budget below covers
+the whole year of the credit.
+
+1. Search the portal for **Budgets** (or open **Cost Management + Billing -> Cost Management -> Budgets**).
+2. Check the **Scope** shown at the top: it must be your **Azure for Students** subscription. Click **Change scope** if not.
+3. Click **+ Add**.
+4. **Create a budget** page:
+   - **Name:** `codebase-qa-credit`
+   - **Reset period:** **Annually**
+   - **Creation date / Start date:** leave the default (the first day of the current month)
+   - **Expiration date:** leave the default or set it about one year ahead
+   - **Amount:** `100`
+5. Click **Next**. Under **Alert conditions** add two rows:
+   - Type **Actual**, % of budget **50** (the portal shows $50)
+   - Type **Actual**, % of budget **80** (the portal shows $80)
+6. Under **Alert recipients (email)** enter your email address, choose your **Language**, and click **Create**.
+7. The budget appears in the list with its amount and current spend. Alert emails come from
+   `azure-noreply@microsoft.com`; add it to your contacts so they don't go to spam.
+
+Budget alerts only send emails; they never stop the VM. Azure for Students itself switches resources off when the
+credit runs out, without charging you.
 
 If the portal says budgets are not supported for your subscription type, keep an eye on the remaining credit in the
 **Education** hub instead.
@@ -137,7 +158,7 @@ If the portal says budgets are not supported for your subscription type, keep an
 2. Set **Scope** to the resource group `codebase-qa-rg`.
 3. Choose the **Cost by resource** view and a date range of the last 7 days.
 4. The `codebase-qa-vm` row is the real VM cost. Multiply its daily cost by 30 for a monthly figure and compare it with
-   the estimate at the top of this guide. Cost data in Azure appears with a delay of up to a day.
+   the estimate at the top of this guide.
 
 ## Step 7: Connect to the VM over SSH from Windows
 
