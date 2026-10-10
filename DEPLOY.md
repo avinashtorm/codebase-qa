@@ -16,20 +16,23 @@ Only Caddy is reachable from the internet. Caddy gets and renews the HTTPS certi
 ## What it costs
 
 This deployment runs in **India South Central** (`indiasouthcentral`): Azure for Students only allowed certain regions,
-and the VM could not be created in Central India. Azure's public price list does not yet include B2als v2 for
-India South Central, so the VM row below uses the Central India price as a reference. The exact price for your VM is
-shown in the portal under **VM -> Availability + scale -> Size**. Disk and public IP prices below are the published
-India South Central prices (from the Azure retail prices API, October 2026).
+and the VM could not be created in Central India.
+
+**The VM price below is an estimate.** For India South Central the portal's Size list shows "Unavailable" instead of a
+price, and Azure's public price list has no B2als v2 entry for the region yet. The estimate uses the Central India price
+as the likely value and the East US price as a pessimistic upper bound. Disk and public IP prices are the published
+India South Central prices (Azure retail prices API, October 2026). **Check the real cost after a day** in
+**Cost Management -> Cost analysis** (step 6 shows where).
 
 | Item | Choice | Price | Per month if always on |
 |---|---|---|---|
-| VM | **B2als v2** (2 vCPU, 4 GB RAM, x86, AMD) | $0.0246 / hour in Central India (reference) | about $17.96 |
+| VM | **B2als v2** (2 vCPU, 4 GB RAM, x86, AMD) | estimate $0.0246 / hour (Central India), at most ~$0.0376 (East US) | about $18 (up to about $27.45) |
 | OS disk | 30 GiB Standard SSD (E4) | | about $2.64 |
 | Public IP | Standard, static | $0.005 / hour | about $3.65 |
 | Traffic | Outbound data | first 100 GB free | $0 for a demo |
 
-- **Always on:** about **$24.25 per month**, so the $100 credit lasts about **4 months**.
-- **With auto-shutdown at night** (running about 12 hours a day): about **$15.30 per month**, roughly 6.5 months.
+- **Always on:** about **$24-34 per month**, so the $100 credit lasts about **3-4 months**.
+- **With auto-shutdown at night** (running about 12 hours a day): about **$15-20 per month**, roughly 5-6.5 months.
 - Other x86 sizes with 4 GB in Central India cost more: B2s and B2ls v2 $0.0448/h (~$32.70/month),
   D2als v6 $0.0520/h (~$37.96/month). In East US, B2als v2 is $0.0376/h (~$27.45/month).
 - A stopped (deallocated) VM costs nothing for compute, but the disk and the public IP are still billed (about $6 per month).
@@ -127,7 +130,14 @@ about a minute.
    **Alert recipients**, and click **Create**.
 
 If the portal says budgets are not supported for your subscription type, keep an eye on the remaining credit in the
-**Education** hub instead. Cost data in Azure appears with a delay of up to a day.
+**Education** hub instead.
+
+**Check the real cost after about a day** (cost data arrives with a delay of up to 24 hours):
+1. Open **Cost Management + Billing -> Cost Management -> Cost analysis**.
+2. Set **Scope** to the resource group `codebase-qa-rg`.
+3. Choose the **Cost by resource** view and a date range of the last 7 days.
+4. The `codebase-qa-vm` row is the real VM cost. Multiply its daily cost by 30 for a monthly figure and compare it with
+   the estimate at the top of this guide. Cost data in Azure appears with a delay of up to a day.
 
 ## Step 7: Connect to the VM over SSH from Windows
 
