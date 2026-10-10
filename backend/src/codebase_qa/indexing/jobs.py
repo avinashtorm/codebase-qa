@@ -73,6 +73,18 @@ class JobManager:
             None,
         )
 
+    def completed(self, kind: str, repo_id: str, result: dict[str, Any]) -> Job:
+        job = Job(job_id=uuid.uuid4().hex, kind=kind, repo_id=repo_id, status="succeeded", progress="done")
+        job.result = result
+        job.finished_at = now_iso()
+        with self.lock:
+            self.jobs[job.job_id] = job
+            self.trim()
+        return job
+
+    def active_repo_ids(self) -> set[str]:
+        return {job.repo_id for job in self.jobs.values() if job.status in ("queued", "running")}
+
     def running_count(self) -> int:
         return sum(job.status in ("queued", "running") for job in self.jobs.values())
 

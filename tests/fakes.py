@@ -68,3 +68,7 @@ def wait_for_job(client: object, job_id: str, headers: dict[str, str] | None = N
             return job
         time.sleep(0.05)
     raise TimeoutError(f"job {job_id} did not finish")
+
+
+VISITOR_A = "a" * 32
+VISITOR_B = "b" * 32

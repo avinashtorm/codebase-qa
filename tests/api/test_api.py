@@ -6,9 +6,9 @@ from fastapi.testclient import TestClient
 
 from codebase_qa.api.app import create_app
 from codebase_qa.container import Container
-from codebase_qa.generation.gemini_generator import GenerationError
+from codebase_qa.generation.gemini_generator import GenerationError, QuotaExhaustedError
 from tests.conftest import FIXTURE_FILES
-from tests.fakes import fake_embedder, fake_generator, make_settings, wait_for_job
+from tests.fakes import VISITOR_A, fake_embedder, fake_generator, make_settings, wait_for_job
 
 RepoFactory = Callable[..., Path]
 
@@ -16,7 +16,7 @@ RepoFactory = Callable[..., Path]
 def build_client(tmp_path: Path, generator_factory: Callable = fake_generator, **overrides: object) -> TestClient:
     settings = make_settings(tmp_path / "data", **overrides)
     container = Container(settings, embedder_factory=fake_embedder, generator_factory=generator_factory)
-    return TestClient(create_app(container))
+    return TestClient(create_app(container), headers={"X-Visitor-Id": VISITOR_A})
 
 
 @pytest.fixture
@@ -94,3 +94,16 @@ def test_ask_returns_snippets_with_original_line_numbers(client: TestClient, mak
     assert citation["snippet"].splitlines() == expected
     assert citation["language"] == "python"
     assert len(body["commit_sha"]) == 40
+
+
+class QuotaGenerator:
+    def generate(self, question: str, context: list) -> None:
+        raise QuotaExhaustedError("daily quota exhausted for gemini")
+
+
+def test_exhausted_llm_quota_gives_a_friendly_message(tmp_path: Path, make_repo: RepoFactory) -> None:
+    with build_client(tmp_path, generator_factory=lambda _: QuotaGenerator()) as client:
+        index(client, make_repo().as_uri())
+        response = client.post("/ask", json={"repo_id": "origin", "question": "login"})
+    assert response.status_code == 503
+    assert "try again tomorrow" in response.json()["detail"]

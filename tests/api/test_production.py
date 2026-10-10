@@ -20,7 +20,8 @@ from codebase_qa.ingestion.github import (
     parse_github_url,
 )
 from codebase_qa.logging_config import JsonFormatter
-from tests.fakes import fake_embedder, fake_generator, make_settings, wait_for_job
+from tests.conftest import commit_all, git, write_files
+from tests.fakes import VISITOR_A, VISITOR_B, fake_embedder, fake_generator, make_settings, wait_for_job
 
 RepoFactory = Callable[..., Path]
 
@@ -28,7 +29,7 @@ RepoFactory = Callable[..., Path]
 def build_client(tmp_path: Path, **overrides: object) -> TestClient:
     settings = make_settings(tmp_path / "data", **overrides)
     container = Container(settings, embedder_factory=fake_embedder, generator_factory=fake_generator)
-    return TestClient(create_app(container))
+    return TestClient(create_app(container), headers={"X-Visitor-Id": VISITOR_A})
 
 
 @pytest.mark.parametrize(
@@ -95,17 +96,6 @@ def test_checkout_over_size_limit_fails_job_and_is_deleted(tmp_path: Path, make_
     assert not (tmp_path / "data" / "repos" / "origin").exists()
 
 
-def test_repo_count_is_capped(tmp_path: Path, make_repo: RepoFactory) -> None:
-    with build_client(tmp_path, max_repos=1) as client:
-        first = client.post("/repos", json={"url": make_repo().as_uri()}).json()
-        assert wait_for_job(client, first["job_id"])["status"] == "succeeded"
-        other = tmp_path / "other"
-        other.mkdir()
-        response = client.post("/repos", json={"url": other.as_uri()})
-        assert response.status_code == 409
-        again = client.post("/repos", json={"url": (tmp_path / "origin").as_uri()})
-        assert again.status_code == 202
-        assert wait_for_job(client, again.json()["job_id"])["status"] == "succeeded"
 
 
 def test_sliding_window_limiter() -> None:
@@ -119,49 +109,12 @@ def test_sliding_window_limiter() -> None:
     assert limiter.check("ip") is None
 
 
-def test_ask_is_rate_limited_per_ip(tmp_path: Path) -> None:
-    with build_client(tmp_path, ask_rate_limit_per_minute=2) as client:
-        statuses = [client.post("/ask", json={"repo_id": "x", "question": "q"}).status_code for _ in range(3)]
-        assert statuses == [404, 404, 429]
-        limited = client.post("/ask", json={"repo_id": "x", "question": "q"})
-        assert int(limited.headers["Retry-After"]) >= 1
-        other_ip = client.post(
-            "/ask", json={"repo_id": "x", "question": "q"}, headers={"X-Forwarded-For": "10.0.0.9"}
-        )
-        assert other_ip.status_code == 429
 
 
-def test_forwarded_ip_is_used_only_when_proxy_is_trusted(tmp_path: Path) -> None:
-    with build_client(tmp_path, ask_rate_limit_per_minute=1, trust_proxy=True) as client:
-        body = {"repo_id": "x", "question": "q"}
-        first = client.post("/ask", json=body, headers={"X-Forwarded-For": "1.1.1.1"})
-        second = client.post("/ask", json=body, headers={"X-Forwarded-For": "2.2.2.2"})
-        third = client.post("/ask", json=body, headers={"X-Forwarded-For": "1.1.1.1"})
-        assert (first.status_code, second.status_code, third.status_code) == (404, 404, 429)
 
 
-def test_index_endpoint_is_rate_limited(tmp_path: Path) -> None:
-    with build_client(tmp_path, index_rate_limit_per_hour=1) as client:
-        client.post("/repos", json={"url": "https://gitlab.com/a/b"})
-        assert client.post("/repos", json={"url": "https://gitlab.com/a/b"}).status_code == 429
 
 
-def test_asking_is_public_and_only_indexing_needs_the_owner_password(
-    tmp_path: Path, make_repo: RepoFactory
-) -> None:
-    with build_client(tmp_path, demo_password="s3cret") as client:
-        assert client.get("/health").json()["indexing_password_required"] is True
-        assert client.get("/repos").status_code == 200
-        assert client.post("/ask", json={"repo_id": "x", "question": "q"}).status_code == 404
-        url = {"url": make_repo().as_uri()}
-        assert client.post("/repos", json=url).status_code == 401
-        assert client.post("/repos", json=url, headers={"X-Demo-Password": "wrong"}).status_code == 401
-        accepted = client.post("/repos", json=url, headers={"X-Demo-Password": "s3cret"})
-        assert accepted.status_code == 202
-        assert client.get(f"/jobs/{accepted.json()['job_id']}").status_code == 200
-        assert wait_for_job(client, accepted.json()["job_id"])["status"] == "succeeded"
-        assert client.post("/repos/origin/reindex").status_code == 401
-        assert client.post("/ask", json={"repo_id": "origin", "question": "login"}).status_code == 200
 
 
 def test_daily_limiter_resets_on_a_new_day() -> None:
@@ -170,16 +123,6 @@ def test_daily_limiter_resets_on_a_new_day() -> None:
     assert [limiter.allow(), limiter.allow(), limiter.allow(), limiter.allow()] == [True, True, False, True]
 
 
-def test_ask_has_a_site_wide_daily_limit(tmp_path: Path) -> None:
-    with build_client(tmp_path, ask_daily_limit=2) as client:
-        body = {"repo_id": "x", "question": "q"}
-        statuses = [
-            client.post("/ask", json=body, headers={"X-Forwarded-For": f"10.0.0.{n}"}).status_code
-            for n in range(3)
-        ]
-        assert statuses == [404, 404, 429]
-        limited = client.post("/ask", json=body, headers={"X-Forwarded-For": "10.0.0.9"})
-        assert "daily question limit" in limited.json()["detail"]
 
 
 def test_jobs_track_status_and_unknown_jobs_404(tmp_path: Path, make_repo: RepoFactory) -> None:
@@ -224,13 +167,6 @@ def test_unhandled_errors_return_generic_500_without_traceback(tmp_path: Path) -
     assert body["request_id"] == response.headers["X-Request-ID"]
 
 
-def test_demo_repo_is_auto_indexed_on_startup(tmp_path: Path, make_repo: RepoFactory) -> None:
-    with build_client(tmp_path, demo_repo_url=make_repo().as_uri()) as client:
-        jobs = client.app.state.jobs
-        [job] = list(jobs.jobs.values())
-        assert wait_for_job(client, job.job_id)["status"] == "succeeded"
-    with build_client(tmp_path, demo_repo_url=(tmp_path / "origin").as_uri()) as client:
-        assert client.app.state.jobs.jobs == {}
 
 
 def test_json_log_formatter_includes_extra_fields() -> None:
@@ -238,3 +174,105 @@ def test_json_log_formatter_includes_extra_fields() -> None:
     record.request_id = "abc"
     payload = json.loads(JsonFormatter().format(record))
     assert payload["message"] == "request" and payload["request_id"] == "abc" and payload["level"] == "INFO"
+
+
+def second_repo(tmp_path: Path) -> Path:
+    repo = tmp_path / "second"
+    repo.mkdir()
+    git(repo, "init", "-q", "-b", "main")
+    git(repo, "config", "user.email", "test@example.com")
+    git(repo, "config", "user.name", "Test")
+    write_files(repo, {"lib/tool.py": "def tool() -> int:\n    return 1\n"})
+    commit_all(repo, "initial")
+    return repo
+
+
+def add(client: TestClient, url: str, visitor: str = VISITOR_A, **headers: str) -> dict:
+    response = client.post("/repos", json={"url": url}, headers={"X-Visitor-Id": visitor, **headers})
+    assert response.status_code == 202, response.text
+    return wait_for_job(client, response.json()["job_id"])
+
+
+def visible(client: TestClient, visitor: str) -> list[str]:
+    return [repo["repo_id"] for repo in client.get("/repos", headers={"X-Visitor-Id": visitor}).json()]
+
+
+def test_repositories_are_private_to_the_visitor_who_added_them(tmp_path: Path, make_repo: RepoFactory) -> None:
+    with build_client(tmp_path) as client:
+        url = make_repo().as_uri()
+        assert add(client, url)["status"] == "succeeded"
+        assert visible(client, VISITOR_A) == ["origin"]
+        assert visible(client, VISITOR_B) == []
+        question = {"repo_id": "origin", "question": "login"}
+        assert client.post("/ask", json=question, headers={"X-Visitor-Id": VISITOR_B}).status_code == 404
+        reused = client.post("/repos", json={"url": url}, headers={"X-Visitor-Id": VISITOR_B}).json()
+        assert reused["status"] == "succeeded" and reused["result"]["repo_id"] == "origin"
+        assert visible(client, VISITOR_B) == ["origin"]
+        assert client.post("/ask", json=question, headers={"X-Visitor-Id": VISITOR_B}).status_code == 200
+
+
+def test_adding_a_repository_needs_a_visitor_id(tmp_path: Path, make_repo: RepoFactory) -> None:
+    with build_client(tmp_path) as client:
+        response = client.post("/repos", json={"url": make_repo().as_uri()}, headers={"X-Visitor-Id": "nope"})
+        assert response.status_code == 400
+        assert client.get("/repos", headers={"X-Visitor-Id": ""}).json() == []
+
+
+def test_visitors_can_add_a_limited_number_of_repositories_per_day(tmp_path: Path, make_repo: RepoFactory) -> None:
+    with build_client(tmp_path, index_per_visitor_per_day=1) as client:
+        url = make_repo().as_uri()
+        assert add(client, url)["status"] == "succeeded"
+        assert client.post("/repos", json={"url": url}).json()["status"] == "succeeded"
+        limited = client.post("/repos", json={"url": second_repo(tmp_path).as_uri()})
+        assert limited.status_code == 429
+        assert "1 repositories per day" in limited.json()["detail"]
+
+
+def test_reindexing_needs_the_owner_password(tmp_path: Path, make_repo: RepoFactory) -> None:
+    with build_client(tmp_path, demo_password="s3cret") as client:
+        add(client, make_repo().as_uri())
+        assert client.get("/health").json()["reindex_password_required"] is True
+        assert client.post("/repos/origin/reindex").status_code == 401
+        accepted = client.post("/repos/origin/reindex", headers={"X-Demo-Password": "s3cret"})
+        assert accepted.status_code == 202
+
+
+def test_questions_are_limited_per_minute_and_per_day_for_each_visitor(
+    tmp_path: Path, make_repo: RepoFactory
+) -> None:
+    body = {"repo_id": "origin", "question": "login"}
+    with build_client(tmp_path, ask_rate_limit_per_minute=2) as client:
+        add(client, make_repo().as_uri())
+        statuses = [client.post("/ask", json=body).status_code for _ in range(3)]
+        assert statuses == [200, 200, 429]
+        assert int(client.post("/ask", json=body).headers["Retry-After"]) >= 1
+    with build_client(tmp_path / "daily", ask_per_visitor_per_day=2, trust_proxy=True) as client:
+        add(client, (tmp_path / "origin").as_uri())
+        first_ip = {"X-Forwarded-For": "1.1.1.1"}
+        statuses = [client.post("/ask", json=body, headers=first_ip).status_code for _ in range(3)]
+        assert statuses == [200, 200, 429]
+        assert "questions for today" in client.post("/ask", json=body, headers=first_ip).json()["detail"]
+        assert client.post("/ask", json=body, headers={"X-Forwarded-For": "2.2.2.2"}).status_code == 200
+
+
+def test_optional_site_wide_daily_question_cap(tmp_path: Path, make_repo: RepoFactory) -> None:
+    body = {"repo_id": "origin", "question": "login"}
+    with build_client(tmp_path, ask_daily_limit=2, trust_proxy=True) as client:
+        add(client, make_repo().as_uri())
+        statuses = [
+            client.post("/ask", json=body, headers={"X-Forwarded-For": f"10.0.0.{n}"}).status_code for n in range(3)
+        ]
+        assert statuses == [200, 200, 429]
+
+
+def test_demo_repo_is_auto_indexed_pinned_and_visible_to_everyone(
+    tmp_path: Path, make_repo: RepoFactory
+) -> None:
+    with build_client(tmp_path, demo_repo_url=make_repo().as_uri()) as client:
+        [job] = list(client.app.state.jobs.jobs.values())
+        assert wait_for_job(client, job.job_id)["status"] == "succeeded"
+        assert visible(client, VISITOR_B) == ["origin"]
+    with build_client(tmp_path, demo_repo_url=(tmp_path / "origin").as_uri()) as client:
+        assert client.app.state.jobs.jobs == {}
+        assert visible(client, VISITOR_A) == ["origin"]
+

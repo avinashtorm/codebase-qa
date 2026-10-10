@@ -29,10 +29,12 @@ class Settings(BaseSettings):
     top_k: int = 8
     clone_timeout_seconds: float = 120.0
     max_repo_size_mb: int = 200
-    max_repos: int = 5
+    max_visitor_repos: int = 15
+    repo_ttl_hours: float = 24.0
+    index_per_visitor_per_day: int = 5
     ask_rate_limit_per_minute: int = 10
-    ask_daily_limit: int = 200
-    index_rate_limit_per_hour: int = 10
+    ask_per_visitor_per_day: int = 30
+    ask_daily_limit: int = 0
     trust_proxy: bool = False
     allow_local_repos: bool = False
     github_token: str = ""
@@ -62,6 +64,10 @@ class Settings(BaseSettings):
     @property
     def registry_path(self) -> Path:
         return self.data_dir / "registry.json"
+
+    @property
+    def access_path(self) -> Path:
+        return self.data_dir / "access.json"
 
 
 @lru_cache

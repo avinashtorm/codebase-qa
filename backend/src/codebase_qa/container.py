@@ -1,9 +1,12 @@
 from collections.abc import Callable
+from datetime import timedelta
 from functools import cached_property
 
 from codebase_qa.chunking.factory import build_chunker
 from codebase_qa.config import Settings
+from codebase_qa.indexing.access import AccessStore
 from codebase_qa.indexing.indexer import Indexer
+from codebase_qa.indexing.janitor import RepoJanitor
 from codebase_qa.indexing.registry import RepoRecord, RepoRegistry
 from codebase_qa.interfaces import Embedder, Generator, Reranker, Retriever
 from codebase_qa.qa import QAPipeline
@@ -83,6 +86,26 @@ class Container:
             clone_timeout=self.settings.clone_timeout_seconds,
             max_repo_bytes=self.settings.max_repo_size_mb * 1024 * 1024,
         )
+
+    @cached_property
+    def access(self) -> AccessStore:
+        return AccessStore(self.settings.access_path)
+
+    @cached_property
+    def janitor(self) -> RepoJanitor:
+        return RepoJanitor(
+            registry=self.registry,
+            store=self.store,
+            access=self.access,
+            repos_dir=self.settings.repos_dir,
+            bm25_dir=self.settings.bm25_dir,
+            ttl=timedelta(hours=self.settings.repo_ttl_hours),
+            max_repos=self.settings.max_visitor_repos,
+        )
+
+    def visible_records(self, visitor: str | None) -> list[RepoRecord]:
+        visible = self.access.visible(visitor)
+        return [record for record in self.repo_records() if record.repo_id in visible]
 
     def repo_record(self, repo_id: str) -> RepoRecord | None:
         return self.registry.get(self.indexer.collection_for(repo_id))

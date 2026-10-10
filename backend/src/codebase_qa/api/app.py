@@ -1,5 +1,6 @@
 import hmac
 import logging
+import threading
 import time
 import uuid
 from collections.abc import AsyncIterator, Awaitable, Callable
@@ -10,7 +11,7 @@ import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 
-from codebase_qa.api.rate_limit import DailyLimiter, SlidingWindowLimiter, enforce
+from codebase_qa.api.rate_limit import DailyLimiter, SlidingWindowLimiter, client_ip, enforce, enforce_daily
 from codebase_qa.api.schemas import (
     AskRequest,
     AskResponse,
@@ -22,13 +23,17 @@ from codebase_qa.api.schemas import (
 )
 from codebase_qa.config import get_settings
 from codebase_qa.container import Container
-from codebase_qa.generation.gemini_generator import GenerationError
+from codebase_qa.generation.gemini_generator import GenerationError, QuotaExhaustedError
+from codebase_qa.indexing.access import is_valid_visitor
 from codebase_qa.indexing.jobs import Job, JobManager, Progress
+from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.ingestion.git import repo_id_from_url
 from codebase_qa.ingestion.github import InvalidRepoUrl, RepoTooLarge, check_remote_size, parse_github_url
 from codebase_qa.logging_config import configure_logging
 
 logger = logging.getLogger("codebase_qa.api")
+CLEANUP_INTERVAL_SECONDS = 600
+QUOTA_MESSAGE = "The AI model's free daily quota is used up. Please try again tomorrow."
 
 
 def get_container(request: Request) -> Container:
@@ -39,8 +44,14 @@ def get_jobs(request: Request) -> JobManager:
     return request.app.state.jobs
 
 
+def get_visitor(request: Request) -> str | None:
+    visitor = request.headers.get("x-visitor-id", "").strip().lower()
+    return visitor if is_valid_visitor(visitor) else None
+
+
 Services = Annotated[Container, Depends(get_container)]
 Jobs = Annotated[JobManager, Depends(get_jobs)]
+Visitor = Annotated[str | None, Depends(get_visitor)]
 
 
 def require_owner_password(request: Request) -> None:
@@ -49,20 +60,22 @@ def require_owner_password(request: Request) -> None:
         return
     supplied = request.headers.get("x-demo-password", "")
     if not hmac.compare_digest(supplied.encode(), expected.encode()):
-        raise HTTPException(status_code=401, detail="indexing requires the owner password")
+        raise HTTPException(status_code=401, detail="re-indexing requires the owner password")
+
+
+def visitor_ip(request: Request) -> str:
+    return client_ip(request, request.app.state.container.settings.trust_proxy)
 
 
 def limit_ask(request: Request) -> None:
-    enforce(request.app.state.ask_limiter, request, request.app.state.container.settings.trust_proxy)
-    if not request.app.state.daily_ask_limiter.allow():
-        raise HTTPException(
-            status_code=429,
-            detail="the demo has reached its daily question limit, please try again tomorrow",
-        )
-
-
-def limit_index(request: Request) -> None:
-    enforce(request.app.state.index_limiter, request, request.app.state.container.settings.trust_proxy)
+    settings = request.app.state.container.settings
+    enforce(request.app.state.ask_limiter, request, settings.trust_proxy)
+    enforce_daily(
+        request.app.state.ask_per_visitor,
+        visitor_ip(request),
+        f"You have used your {settings.ask_per_visitor_per_day} questions for today. Please come back tomorrow.",
+    )
+    enforce_daily(request.app.state.ask_site_wide, "all", "The demo has reached its daily question limit.")
 
 
 def validate_repo_url(url: str, services: Container) -> tuple[str, str]:
@@ -95,8 +108,16 @@ def reindex_action(services: Container, repo_id: str) -> Callable[[Progress], di
     return action
 
 
+def finished_index(jobs: JobManager, record: RepoRecord) -> JobOut:
+    return JobOut.from_job(jobs.completed("index", record.repo_id, RepoOut.from_record(record).model_dump()))
+
+
 def submit_index(services: Container, jobs: JobManager, url: str, repo_id: str) -> Job:
-    return jobs.active_for(repo_id) or jobs.submit("index", repo_id, index_action(services, url))
+    active = jobs.active_for(repo_id)
+    if active is not None:
+        return active
+    services.janitor.cleanup(keep=jobs.active_repo_ids() | {repo_id}, reserve=1)
+    return jobs.submit("index", repo_id, index_action(services, url))
 
 
 def auto_index_demo(services: Container, jobs: JobManager) -> None:
@@ -108,9 +129,19 @@ def auto_index_demo(services: Container, jobs: JobManager) -> None:
     except (InvalidRepoUrl, RepoTooLarge) as exc:
         logger.warning("demo repo not indexed", extra={"reason": str(exc)})
         return
+    services.access.pin(repo_id)
     if services.repo_record(repo_id) is None:
         logger.info("auto-indexing demo repo", extra={"repo_id": repo_id})
-        submit_index(services, jobs, canonical, repo_id)
+        jobs.submit("index", repo_id, index_action(services, canonical))
+
+
+def cleanup_loop(services: Container, jobs: JobManager, stop: threading.Event) -> None:
+    while not stop.is_set():
+        try:
+            services.janitor.cleanup(keep=jobs.active_repo_ids())
+        except Exception:
+            logger.exception("repo cleanup failed")
+        stop.wait(CLEANUP_INTERVAL_SECONDS)
 
 
 def create_app(container: Container | None = None) -> FastAPI:
@@ -121,15 +152,20 @@ def create_app(container: Container | None = None) -> FastAPI:
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         configure_logging(settings.log_level)
         auto_index_demo(services, app.state.jobs)
+        stop = threading.Event()
+        cleaner = threading.Thread(target=cleanup_loop, args=(services, app.state.jobs, stop), daemon=True)
+        cleaner.start()
         yield
+        stop.set()
         app.state.jobs.shutdown()
 
     app = FastAPI(title="Codebase Q&A", version="0.1.0", lifespan=lifespan)
     app.state.container = services
     app.state.jobs = JobManager()
     app.state.ask_limiter = SlidingWindowLimiter(settings.ask_rate_limit_per_minute, 60)
-    app.state.index_limiter = SlidingWindowLimiter(settings.index_rate_limit_per_hour, 3600)
-    app.state.daily_ask_limiter = DailyLimiter(settings.ask_daily_limit)
+    app.state.ask_per_visitor = DailyLimiter(settings.ask_per_visitor_per_day)
+    app.state.ask_site_wide = DailyLimiter(settings.ask_daily_limit)
+    app.state.index_per_visitor = DailyLimiter(settings.index_per_visitor_per_day)
     owner_only = [Depends(require_owner_password)]
 
     @app.middleware("http")
@@ -160,30 +196,47 @@ def create_app(container: Container | None = None) -> FastAPI:
             status="ok",
             repos=len(services.repo_records()),
             active_jobs=jobs.running_count(),
-            indexing_password_required=bool(services.settings.demo_password),
+            reindex_password_required=bool(services.settings.demo_password),
+            index_per_visitor_per_day=services.settings.index_per_visitor_per_day,
+            ask_per_visitor_per_day=services.settings.ask_per_visitor_per_day,
+            repo_ttl_hours=services.settings.repo_ttl_hours,
         )
 
-    @app.post("/repos", response_model=JobOut, status_code=202, dependencies=[*owner_only, Depends(limit_index)])
-    def index_repo(body: IndexRepoRequest, services: Services, jobs: Jobs) -> JobOut:
+    @app.post("/repos", response_model=JobOut, status_code=202)
+    def index_repo(
+        body: IndexRepoRequest, request: Request, services: Services, jobs: Jobs, visitor: Visitor
+    ) -> JobOut:
+        if visitor is None:
+            raise HTTPException(status_code=400, detail="missing or invalid X-Visitor-Id header")
         try:
             url, repo_id = validate_repo_url(body.url, services)
         except InvalidRepoUrl as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
         except RepoTooLarge as exc:
             raise HTTPException(status_code=413, detail=str(exc)) from exc
-        known = {record.repo_id for record in services.repo_records()}
-        if repo_id not in known and len(known) >= services.settings.max_repos:
-            raise HTTPException(status_code=409, detail=f"repository limit of {services.settings.max_repos} reached")
+        existing = services.repo_record(repo_id)
+        if existing is not None and services.access.can_see(repo_id, visitor):
+            services.access.touch(repo_id)
+            return finished_index(jobs, existing)
+        enforce_daily(
+            request.app.state.index_per_visitor,
+            visitor_ip(request),
+            f"You can add {services.settings.index_per_visitor_per_day} repositories per day. Please come back later.",
+        )
+        services.access.grant(repo_id, visitor)
+        if existing is not None:
+            return finished_index(jobs, existing)
         return JobOut.from_job(submit_index(services, jobs, url, repo_id))
 
     @app.get("/repos", response_model=list[RepoOut])
-    def list_repos(services: Services) -> list[RepoOut]:
-        return [RepoOut.from_record(record) for record in services.repo_records()]
+    def list_repos(services: Services, visitor: Visitor) -> list[RepoOut]:
+        return [RepoOut.from_record(record) for record in services.visible_records(visitor)]
 
     @app.post("/repos/{repo_id}/reindex", response_model=JobOut, status_code=202, dependencies=owner_only)
     def reindex_repo(repo_id: str, services: Services, jobs: Jobs) -> JobOut:
         if services.repo_record(repo_id) is None:
             raise HTTPException(status_code=404, detail=f"repo {repo_id} is not indexed")
+        services.access.touch(repo_id)
         job = jobs.active_for(repo_id) or jobs.submit("reindex", repo_id, reindex_action(services, repo_id))
         return JobOut.from_job(job)
 
@@ -194,13 +247,17 @@ def create_app(container: Container | None = None) -> FastAPI:
             raise HTTPException(status_code=404, detail="job not found")
         return JobOut.from_job(job)
 
-    @app.post("/ask", response_model=AskResponse, dependencies=[Depends(limit_ask)])
-    def ask(body: AskRequest, services: Services) -> AskResponse:
+    @app.post("/ask", response_model=AskResponse)
+    def ask(body: AskRequest, request: Request, services: Services, visitor: Visitor) -> AskResponse:
         record = services.repo_record(body.repo_id)
-        if record is None:
+        if record is None or not services.access.can_see(body.repo_id, visitor):
             raise HTTPException(status_code=404, detail=f"repo {body.repo_id} is not indexed")
+        limit_ask(request)
+        services.access.touch(body.repo_id)
         try:
             result = services.pipeline(record).ask(body.question)
+        except QuotaExhaustedError as exc:
+            raise HTTPException(status_code=503, detail=QUOTA_MESSAGE) from exc
         except GenerationError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
         return AskResponse.from_result(result, record.commit_sha)

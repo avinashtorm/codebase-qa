@@ -97,7 +97,7 @@ def test_hash_fallback_when_old_commit_is_unknown(tmp_path: Path, make_repo: Rep
 def test_reindex_endpoint_runs_as_job_and_reports_changes(tmp_path: Path, make_repo: RepoFactory) -> None:
     origin = make_repo()
     container = make_container(tmp_path / "data")
-    with TestClient(create_app(container)) as client:
+    with TestClient(create_app(container), headers={"X-Visitor-Id": "a" * 32}) as client:
         indexed = client.post("/repos", json={"url": origin.as_uri()}).json()
         wait_for_job(client, indexed["job_id"])
         change_origin(origin)

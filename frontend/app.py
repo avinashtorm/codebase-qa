@@ -1,5 +1,7 @@
 import os
+import re
 import time
+import uuid
 from typing import Any
 
 import streamlit as st
@@ -8,6 +10,7 @@ from code_view import citation_block, github_link, render_code
 
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 JOB_TIMEOUT_SECONDS = 900
+VISITOR_ID = re.compile(r"^[0-9a-f]{32}$")
 DEMO_EXAMPLES = (
     "Where is the JWT access token created?",
     "What happens when a normal user requests an item that belongs to someone else?",
@@ -31,8 +34,21 @@ def visitor_ip() -> str:
     return address if isinstance(address, str) else ""
 
 
+def visitor_id() -> str:
+    current = st.query_params.get("v", "")
+    if not VISITOR_ID.match(current):
+        current = uuid.uuid4().hex
+        st.query_params["v"] = current
+    return current
+
+
 def client() -> BackendClient:
-    return BackendClient(BACKEND_URL, st.session_state.get("owner_password", ""), visitor_ip())
+    return BackendClient(
+        BACKEND_URL,
+        st.session_state.get("owner_password", ""),
+        visitor_ip(),
+        visitor_id=visitor_id(),
+    )
 
 
 def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:
@@ -53,21 +69,30 @@ def owner_error(exc: BackendError) -> str:
     return "Wrong or missing owner password." if exc.status_code == 401 else str(exc)
 
 
-def owner_tools(health: dict[str, Any], repo: dict[str, Any] | None) -> None:
-    with st.sidebar.expander("Owner tools: index or re-index", expanded=repo is None):
-        if health["indexing_password_required"]:
-            st.text_input("Owner password", type="password", key="owner_password")
-            st.caption("Indexing uses server CPU, so only the owner can add repositories. Asking is open to everyone.")
-        url = st.text_input("GitHub URL", placeholder="https://github.com/owner/repo", key="index_url")
-        if st.button("Index repository", use_container_width=True, disabled=not url):
-            try:
+def add_repository(health: dict[str, Any]) -> None:
+    st.sidebar.subheader("Add your repository")
+    url = st.sidebar.text_input("Public GitHub URL", placeholder="https://github.com/owner/repo", key="index_url")
+    st.sidebar.caption(
+        f"Up to {health['index_per_visitor_per_day']} repositories per day. Your repositories are private to this "
+        f"browser link and are deleted {health['repo_ttl_hours']:.0f} hours after you last use them."
+    )
+    if st.sidebar.button("Index repository", use_container_width=True, disabled=not url):
+        try:
+            with st.sidebar:
                 job = wait_for_job(client().index(url.strip()), "Indexing")
-                if job["status"] == "succeeded":
-                    st.session_state["selected_repo"] = job["result"]["repo_id"]
-                    st.rerun()
-            except BackendError as exc:
-                st.error(owner_error(exc))
-        if repo is not None and st.button("Re-index selected repo (pull latest)", use_container_width=True):
+            if job["status"] == "succeeded":
+                st.session_state["selected_repo"] = job["result"]["repo_id"]
+                st.rerun()
+        except BackendError as exc:
+            st.sidebar.error(str(exc))
+
+
+def owner_tools(health: dict[str, Any], repo: dict[str, Any] | None) -> None:
+    if repo is None or not health["reindex_password_required"]:
+        return
+    with st.sidebar.expander("Owner tools: re-index", expanded=False):
+        st.text_input("Owner password", type="password", key="owner_password")
+        if st.button("Re-index selected repo (pull latest)", use_container_width=True):
             try:
                 job = wait_for_job(client().reindex(repo["repo_id"]), "Re-indexing")
                 if job["status"] == "succeeded":
@@ -76,7 +101,7 @@ def owner_tools(health: dict[str, Any], repo: dict[str, Any] | None) -> None:
             except BackendError as exc:
                 st.error(owner_error(exc))
         report = st.session_state.get("reindex_report")
-        if repo is not None and report and report["repo_id"] == repo["repo_id"]:
+        if report and report["repo_id"] == repo["repo_id"]:
             st.success(
                 f"{report['method']}: {report['files_changed']} files changed, "
                 f"+{report['chunks_added']} / -{report['chunks_removed']} chunks in {report['seconds']:.1f}s "
@@ -192,9 +217,10 @@ def main() -> None:
         return
     repo = repo_picker(repos)
     show_details = st.sidebar.toggle("Show retrieval details", value=False)
+    add_repository(health)
     owner_tools(health, repo)
     if repo is None:
-        st.info("No repository is indexed yet. The demo repository is indexed automatically a few minutes after start.")
+        st.info("Add a public GitHub repository in the sidebar to start asking questions about it.")
         return
     chat(repo, show_details)
 

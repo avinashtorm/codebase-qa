@@ -277,13 +277,15 @@ The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git 
 | `DOMAIN` | yes | The domain from step 4, without `https://` |
 | `GEMINI_API_KEY` | yes | Your Google AI Studio key |
 | `GEMINI_MODEL` | no | Defaults to `gemini-3.5-flash-lite` |
-| `DEMO_PASSWORD` | recommended | Owner password, needed only to index or re-index repositories. Asking questions is open to everyone |
-| `ASK_DAILY_LIMIT` | no | Site-wide questions per day, protects the free Gemini quota (default 200) |
-| `DEMO_REPO_URL` | no | Indexed automatically on first start |
-| `MAX_REPOS` | no | Max indexed repositories (default 5) |
+| `DEMO_PASSWORD` | recommended | Owner password, needed only to re-index a repository. Visitors add repositories and ask without it |
+| `INDEX_PER_VISITOR_PER_DAY` | no | Repositories a visitor (per IP) can add per day (default 5) |
+| `ASK_PER_VISITOR_PER_DAY` | no | Questions a visitor (per IP) can ask per day (default 30) |
+| `REPO_TTL_HOURS` | no | Visitor repositories are deleted this long after their last use (default 24) |
+| `MAX_VISITOR_REPOS` | no | Most visitor repositories kept at once; the oldest is removed first (default 15) |
+| `ASK_DAILY_LIMIT` | no | Optional site-wide questions per day; 0 turns it off (default 0) |
+| `DEMO_REPO_URL` | no | Indexed automatically on first start, visible to every visitor and never deleted |
 | `MAX_REPO_SIZE_MB` | no | Larger repositories are rejected (default 200) |
 | `ASK_RATE_LIMIT_PER_MINUTE` | no | Questions per visitor per minute (default 10) |
-| `INDEX_RATE_LIMIT_PER_HOUR` | no | Index requests per visitor per hour (default 10) |
 | `GITHUB_TOKEN` | no | Raises GitHub's API limit for the repo size check (a token with no scopes is enough) |
 
 ## Step 11: Start the stack
@@ -394,12 +396,13 @@ If you push the project to GitHub:
 
 - Only `https://github.com/<owner>/<repo>` URLs are accepted. Repositories are shallow-cloned with a timeout, without
   tags, hooks, symlinks, LFS downloads or the `ext` transport, and their code is never executed.
-- The repository size is checked before cloning (GitHub API) and after cloning (on disk), and the number of
-  repositories is capped.
+- The repository size is checked before cloning (GitHub API) and after cloning (on disk). Visitor repositories are
+  private to the visitor's link, deleted 24 hours after their last use, and capped at 15 stored (oldest removed first).
 - Indexing runs as a single background job at a time; progress is available at `GET /jobs/{id}`.
-- Per-visitor rate limits apply to `/ask` and `POST /repos`. The visitor IP is the last `X-Forwarded-For` hop, added by
-  Caddy and forwarded by Streamlit to the backend, which is not reachable from the internet.
-- Asking is public. The optional `DEMO_PASSWORD` is an owner password for indexing and re-indexing only. A site-wide
-  daily question cap (`ASK_DAILY_LIMIT`) and the LLM response cache (`LLM_CACHE=true` in compose) protect the free
-  Gemini quota. Errors never include stack traces or server
+- Per-visitor limits: 5 new repositories and 30 questions per day, 10 questions per minute. The visitor IP is the last
+  `X-Forwarded-For` hop, added by Caddy and forwarded by Streamlit to the backend, which is not reachable from the
+  internet.
+- No sign-up or password for visitors. The optional `DEMO_PASSWORD` is an owner password for re-indexing only. The LLM
+  response cache (`LLM_CACHE=true` in compose) makes repeated questions free; an optional site-wide daily question cap
+  (`ASK_DAILY_LIMIT`) is off by default. Errors never include stack traces or server
   paths.

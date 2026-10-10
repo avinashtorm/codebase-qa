@@ -65,7 +65,10 @@ class HealthOut(BaseModel):
     status: str
     repos: int
     active_jobs: int
-    indexing_password_required: bool
+    reindex_password_required: bool
+    index_per_visitor_per_day: int
+    ask_per_visitor_per_day: int
+    repo_ttl_hours: float
 
 
 class ReindexOut(BaseModel):

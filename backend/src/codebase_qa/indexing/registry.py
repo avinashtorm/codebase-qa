@@ -52,6 +52,12 @@ class RepoRegistry:
             records[key] = record
             self.write(records)
 
+    def delete(self, key: str) -> None:
+        with self.lock:
+            records = self.load_all()
+            if records.pop(key, None) is not None:
+                self.write(records)
+
     def write(self, records: dict[str, RepoRecord]) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         payload = {key: asdict(record) for key, record in records.items()}

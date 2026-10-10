@@ -36,17 +36,19 @@ class DailyLimiter:
         self.limit = limit
         self.today = today
         self.day = today()
-        self.count = 0
+        self.counts: dict[str, int] = {}
         self.lock = threading.Lock()
 
-    def allow(self) -> bool:
+    def allow(self, key: str = "all") -> bool:
+        if self.limit <= 0:
+            return True
         with self.lock:
             current = self.today()
             if current != self.day:
-                self.day, self.count = current, 0
-            if self.count >= self.limit:
+                self.day, self.counts = current, {}
+            if self.counts.get(key, 0) >= self.limit:
                 return False
-            self.count += 1
+            self.counts[key] = self.counts.get(key, 0) + 1
             return True
 
 
@@ -55,6 +57,11 @@ def client_ip(request: Request, trust_proxy: bool) -> str:
     if trust_proxy and forwarded:
         return forwarded.split(",")[0].strip()
     return request.client.host if request.client else "unknown"
+
+
+def enforce_daily(limiter: DailyLimiter, key: str, message: str) -> None:
+    if not limiter.allow(key):
+        raise HTTPException(status_code=429, detail=message)
 
 
 def enforce(limiter: SlidingWindowLimiter, request: Request, trust_proxy: bool) -> None:
