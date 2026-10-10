@@ -39,6 +39,7 @@ services:
       - --server.address=0.0.0.0
       - --server.headless=true
       - --browser.gatherUsageStats=false
+      - --client.showErrorDetails=none
     environment:
       BACKEND_URL: http://backend:8000
     expose:

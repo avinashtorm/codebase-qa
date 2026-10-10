@@ -21,7 +21,7 @@ def visitor_ip() -> str:
 
 
 def client() -> BackendClient:
-    return BackendClient(BACKEND_URL, st.session_state.get("password", ""), visitor_ip())
+    return BackendClient(BACKEND_URL, st.session_state.get("demo_password", ""), visitor_ip())
 
 
 def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:
@@ -41,11 +41,11 @@ def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:
 def password_gate(health: dict[str, Any]) -> bool:
     if not health["password_required"] or st.session_state.get("password_ok"):
         return True
-    with st.sidebar.form("password"):
+    with st.sidebar.form("password_form"):
         password = st.text_input("Demo password", type="password")
         submitted = st.form_submit_button("Unlock")
     if submitted:
-        st.session_state["password"] = password
+        st.session_state["demo_password"] = password
         try:
             client().repos()
             st.session_state["password_ok"] = True
