@@ -186,7 +186,10 @@ Windows 10/11 already include the `ssh` and `scp` commands. Use **PowerShell** (
    The first time, type `yes` to trust the server. The prompt changes to `azureuser@codebase-qa-vm:~$`;
    you are now typing commands on the VM. Type `exit` to leave.
 
-All commands in steps 8 and 10-13 that are not marked PowerShell run **on the VM**, inside this SSH session.
+**Where does each command run?** Code blocks marked `powershell` run on **your Windows PC** in a normal PowerShell
+window (prompt like `PS C:\Users\...>`). Code blocks marked `bash` run **on the VM**, inside the SSH session (prompt
+`azureuser@codebase-qa-vm:~$`). From step 9 on, keep two windows open: the SSH session and a local PowerShell.
+Bash commands typed into Windows PowerShell fail with errors like "The token '&&' is not a valid statement separator".
 
 ## Step 8: Prepare the VM and install Docker
 
@@ -236,7 +239,7 @@ No GitHub needed: you package the current commit on Windows and upload it.
    ```powershell
    scp -i "$HOME\.ssh\codebase-qa-key.pem" "$HOME\codebase-qa.tar.gz" azureuser@YOUR_DOMAIN:~/
    ```
-4. **On the VM**, unpack it:
+4. **On the VM** (in the SSH window with the `azureuser@codebase-qa-vm:~$` prompt, not in PowerShell), unpack it:
    ```bash
    mkdir -p ~/codebase-qa && tar -xzf ~/codebase-qa.tar.gz -C ~/codebase-qa
    ```
