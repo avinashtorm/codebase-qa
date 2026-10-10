@@ -11,6 +11,7 @@ from code_view import citation_block, github_link, render_code
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 JOB_TIMEOUT_SECONDS = 900
 VISITOR_ID = re.compile(r"^[0-9a-f]{32}$")
+SAMPLE_REPO_URL = "https://github.com/fastapi/full-stack-fastapi-template"
 DEMO_EXAMPLES = (
     "Where is the JWT access token created?",
     "What happens when a normal user requests an item that belongs to someone else?",
@@ -22,8 +23,26 @@ GENERIC_EXAMPLES = (
     "What happens when a request fails validation?",
 )
 EXAMPLES_BY_REPO = {"fastapi__full-stack-fastapi-template": DEMO_EXAMPLES}
+STYLE = """
+<style>
+.block-container {max-width: 920px; padding-top: 2.5rem;}
+[data-testid="stSidebar"] .block-container {padding-top: 1.5rem;}
+.app-brand {font-size: 1.15rem; font-weight: 700; letter-spacing: 0.2px; margin-bottom: 0.1rem;}
+.app-tagline {color: #8B949E; font-size: 0.8rem; margin-bottom: 1.2rem;}
+.section-label {color: #8B949E; font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.08em; margin: 1.4rem 0 0.4rem 0;}
+.hero-title {font-size: 2.1rem; font-weight: 700; margin-bottom: 0.2rem;}
+.hero-subtitle {color: #8B949E; font-size: 1.02rem; margin-bottom: 1.6rem;}
+.feature {border: 1px solid #30363D; border-radius: 10px; padding: 0.9rem 1rem; height: 100%;}
+.feature b {display: block; margin-bottom: 0.25rem;}
+.feature span {color: #8B949E; font-size: 0.86rem;}
+.repo-title {font-size: 1.5rem; font-weight: 700; margin-bottom: 0;}
+.repo-meta {color: #8B949E; font-size: 0.85rem; margin-bottom: 1rem;}
+.muted {color: #8B949E; font-size: 0.8rem;}
+</style>
+"""
 
-st.set_page_config(page_title="Codebase Q&A", page_icon=":mag:", layout="wide")
+st.set_page_config(page_title="Codebase Q&A", page_icon=":material/manage_search:", layout="wide")
 
 
 def visitor_ip() -> str:
@@ -51,6 +70,11 @@ def client() -> BackendClient:
     )
 
 
+def repo_name(repo: dict[str, Any]) -> str:
+    match = re.match(r"https://github\.com/([^/]+/[^/]+?)(?:\.git)?/?$", repo["url"])
+    return match.group(1) if match else repo["repo_id"]
+
+
 def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:
     deadline = time.monotonic() + JOB_TIMEOUT_SECONDS
     with st.status(label, expanded=True) as status:
@@ -65,77 +89,132 @@ def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:
     return job
 
 
-def owner_error(exc: BackendError) -> str:
-    return "Wrong or missing owner password." if exc.status_code == 401 else str(exc)
+def select_repo(repo_id: str | None) -> None:
+    st.session_state["active_repo"] = repo_id
 
 
-def add_repository(health: dict[str, Any]) -> None:
-    st.sidebar.subheader("Add your repository")
-    url = st.sidebar.text_input("Public GitHub URL", placeholder="https://github.com/owner/repo", key="index_url")
-    st.sidebar.caption(
-        f"Up to {health['index_per_visitor_per_day']} repositories per day. Your repositories are private to this "
-        f"browser link and are deleted {health['repo_ttl_hours']:.0f} hours after you last use them."
-    )
-    if st.sidebar.button("Index repository", use_container_width=True, disabled=not url):
-        try:
-            with st.sidebar:
-                job = wait_for_job(client().index(url.strip()), "Indexing")
-            if job["status"] == "succeeded":
-                st.session_state["selected_repo"] = job["result"]["repo_id"]
-                st.rerun()
-        except BackendError as exc:
-            st.sidebar.error(str(exc))
-
-
-def owner_tools(health: dict[str, Any], repo: dict[str, Any] | None) -> None:
-    if repo is None or not health["reindex_password_required"]:
-        return
-    with st.sidebar.expander("Owner tools: re-index", expanded=False):
-        st.text_input("Owner password", type="password", key="owner_password")
-        if st.button("Re-index selected repo (pull latest)", use_container_width=True):
-            try:
-                job = wait_for_job(client().reindex(repo["repo_id"]), "Re-indexing")
-                if job["status"] == "succeeded":
-                    st.session_state["reindex_report"] = job["result"]
-                    st.rerun()
-            except BackendError as exc:
-                st.error(owner_error(exc))
-        report = st.session_state.get("reindex_report")
-        if report and report["repo_id"] == repo["repo_id"]:
-            st.success(
-                f"{report['method']}: {report['files_changed']} files changed, "
-                f"+{report['chunks_added']} / -{report['chunks_removed']} chunks in {report['seconds']:.1f}s "
-                f"({report['old_sha'][:7]} -> {report['new_sha'][:7]})"
+def sidebar(health: dict[str, Any], repos: list[dict[str, Any]], active: dict[str, Any] | None) -> bool:
+    with st.sidebar:
+        st.markdown('<div class="app-brand">Codebase Q&A</div>', unsafe_allow_html=True)
+        st.markdown('<div class="app-tagline">Cited answers about any GitHub repository</div>', unsafe_allow_html=True)
+        st.button(
+            "New repository",
+            icon=":material/add:",
+            type="primary" if active is None else "secondary",
+            use_container_width=True,
+            on_click=select_repo,
+            args=(None,),
+        )
+        st.markdown('<div class="section-label">Your repositories</div>', unsafe_allow_html=True)
+        if not repos:
+            st.markdown('<div class="muted">Repositories you index appear here.</div>', unsafe_allow_html=True)
+        for repo in repos:
+            is_active = active is not None and repo["repo_id"] == active["repo_id"]
+            st.button(
+                repo_name(repo),
+                key=f"repo_{repo['repo_id']}",
+                icon=":material/folder_open:" if is_active else ":material/folder:",
+                type="secondary" if is_active else "tertiary",
+                use_container_width=True,
+                on_click=select_repo,
+                args=(repo["repo_id"],),
             )
+        st.markdown('<div class="section-label">Settings</div>', unsafe_allow_html=True)
+        show_details = st.toggle("Show retrieval details", value=False)
+        repos_per_day = health["index_per_visitor_per_day"]
+        questions_per_day = health["ask_per_visitor_per_day"]
+        hours = f'{health["repo_ttl_hours"]:.0f}'
+        note = (
+            f"Up to {repos_per_day} repositories and {questions_per_day} questions per day. Your repositories are "
+            f"private to this link and are deleted {hours} hours after you last use them."
+        )
+        st.markdown(f'<div class="muted" style="margin-top:1.4rem">{note}</div>', unsafe_allow_html=True)
+    return show_details
 
 
-def repo_picker(repos: list[dict[str, Any]]) -> dict[str, Any] | None:
-    if not repos:
-        st.sidebar.info("No repositories indexed yet.")
-        return None
-    ids = [repo["repo_id"] for repo in repos]
-    shas = {repo["repo_id"]: repo["commit_sha"][:7] for repo in repos}
-    preferred = st.session_state.get("selected_repo")
-    index = ids.index(preferred) if preferred in ids else 0
-    chosen = st.sidebar.selectbox(
-        "Repository",
-        ids,
-        index=index,
-        format_func=lambda repo_id: f"{repo_id} @ {shas[repo_id]}",
+def feature(title: str, text: str) -> str:
+    return f'<div class="feature"><b>{title}</b><span>{text}</span></div>'
+
+
+def fill_sample() -> None:
+    st.session_state["repo_url"] = SAMPLE_REPO_URL
+
+
+def landing() -> None:
+    st.markdown('<div class="hero-title">Ask questions about any codebase</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="hero-subtitle">Paste a public GitHub repository. It is indexed in a few minutes, then every '
+        "answer cites the exact files and line ranges it comes from.</div>",
+        unsafe_allow_html=True,
     )
-    st.session_state["selected_repo"] = chosen
-    repo = next(repo for repo in repos if repo["repo_id"] == chosen)
-    st.sidebar.caption(
-        f"[{repo['url']}]({repo['url']}) - {repo['file_count']} files, {repo['chunk_count']} chunks, "
-        f"indexed {repo['indexed_at']}"
+    with st.form("index_form", border=False):
+        url = st.text_input(
+            "GitHub repository URL",
+            placeholder="https://github.com/owner/repository",
+            key="repo_url",
+            label_visibility="collapsed",
+        )
+        submitted = st.form_submit_button("Index repository", type="primary", icon=":material/bolt:")
+    st.button("No repository in mind? Use a sample repository", type="tertiary", on_click=fill_sample)
+    if submitted:
+        index_repository(url.strip())
+    st.write("")
+    columns = st.columns(3)
+    features = [
+        ("Exact citations", "Every claim links to path:start-end, checked against the retrieved code."),
+        ("Code-aware search", "Functions and classes are indexed whole, not cut at random lines."),
+        ("Private by default", "Only you see your repositories; they are removed after 24 idle hours."),
+    ]
+    for column, (title, text) in zip(columns, features, strict=True):
+        column.markdown(feature(title, text), unsafe_allow_html=True)
+
+
+def index_repository(url: str) -> None:
+    if not url:
+        st.warning("Paste a GitHub repository URL first, for example https://github.com/owner/repository.")
+        return
+    try:
+        job = wait_for_job(client().index(url), "Indexing repository")
+    except BackendError as exc:
+        st.error(str(exc))
+        return
+    if job["status"] == "succeeded":
+        select_repo(job["result"]["repo_id"])
+        st.rerun()
+
+
+def owner_tools(active: dict[str, Any]) -> None:
+    if st.query_params.get("owner") != "1":
+        return
+    with st.sidebar.expander("Owner tools", icon=":material/admin_panel_settings:"):
+        st.text_input("Owner password", type="password", key="owner_password")
+        if st.button("Re-index this repository", use_container_width=True):
+            try:
+                job = wait_for_job(client().reindex(active["repo_id"]), "Re-indexing")
+                if job["status"] == "succeeded":
+                    report = job["result"]
+                    st.success(
+                        f"{report['method']}: {report['files_changed']} files changed, "
+                        f"+{report['chunks_added']} / -{report['chunks_removed']} chunks in {report['seconds']:.1f}s"
+                    )
+            except BackendError as exc:
+                st.error("Wrong or missing owner password." if exc.status_code == 401 else str(exc))
+
+
+def repo_header(repo: dict[str, Any]) -> None:
+    st.markdown(f'<div class="repo-title">{repo_name(repo)}</div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="repo-meta"><a href="{repo["url"]}" target="_blank">GitHub</a> &middot; commit '
+        f'<code>{repo["commit_sha"][:7]}</code> &middot; {repo["file_count"]} files &middot; '
+        f'{repo["chunk_count"]} code chunks</div>',
+        unsafe_allow_html=True,
     )
-    return repo
 
 
 def render_citations(response: dict[str, Any], repo: dict[str, Any]) -> None:
     for citation in response["citations"]:
         title = f"{citation['path']}:{citation['start_line']}-{citation['end_line']}"
-        with st.expander(title):
+        with st.expander(title, icon=":material/code:"):
             block = citation_block(citation, response["context"])
             st.html(render_code(block, citation["language"], citation["path"]))
             link = github_link(
@@ -145,7 +224,7 @@ def render_citations(response: dict[str, Any], repo: dict[str, Any]) -> None:
 
 
 def render_details(response: dict[str, Any]) -> None:
-    with st.expander("Retrieval details"):
+    with st.expander("Retrieval details", icon=":material/query_stats:"):
         st.markdown("**Per-stage latency (ms)**")
         st.dataframe([{"stage": stage, "ms": ms} for stage, ms in response["timings_ms"].items()], hide_index=True)
         st.markdown("**Retrieved chunks**")
@@ -168,9 +247,9 @@ def render_assistant(message: dict[str, Any], repo: dict[str, Any], show_details
 
 
 def example_buttons(repo_id: str) -> None:
-    st.markdown("**Try an example question:**")
+    st.markdown('<div class="section-label">Try asking</div>', unsafe_allow_html=True)
     for number, question in enumerate(EXAMPLES_BY_REPO.get(repo_id, GENERIC_EXAMPLES)):
-        if st.button(question, key=f"example_{number}"):
+        if st.button(question, key=f"example_{number}", icon=":material/arrow_forward:"):
             st.session_state["pending_question"] = question
             st.rerun()
 
@@ -183,7 +262,7 @@ def chat(repo: dict[str, Any], show_details: bool) -> None:
                 render_assistant(message, repo, show_details)
             else:
                 st.markdown(message["content"])
-    typed = st.chat_input(f"Ask about {repo['repo_id']}")
+    typed = st.chat_input(f"Ask a question about {repo_name(repo)}")
     question = typed or st.session_state.pop("pending_question", None)
     if not question:
         if not history:
@@ -204,25 +283,22 @@ def chat(repo: dict[str, Any], show_details: bool) -> None:
 
 
 def main() -> None:
-    st.title("Codebase Q&A")
-    st.caption(
-        "Ask questions about a GitHub repository in plain English. Answers cite exact files and line ranges, "
-        "and each citation opens the code at the indexed commit."
-    )
+    st.markdown(STYLE, unsafe_allow_html=True)
     try:
         health = client().health()
         repos = client().repos()
     except BackendError as exc:
         st.error(f"Cannot reach the backend at {BACKEND_URL}: {exc}")
         return
-    repo = repo_picker(repos)
-    show_details = st.sidebar.toggle("Show retrieval details", value=False)
-    add_repository(health)
-    owner_tools(health, repo)
-    if repo is None:
-        st.info("Add a public GitHub repository in the sidebar to start asking questions about it.")
+    by_id = {repo["repo_id"]: repo for repo in repos}
+    active = by_id.get(st.session_state.get("active_repo") or "")
+    show_details = sidebar(health, repos, active)
+    if active is None:
+        landing()
         return
-    chat(repo, show_details)
+    owner_tools(active)
+    repo_header(active)
+    chat(active, show_details)
 
 
 main()

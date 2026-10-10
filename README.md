@@ -4,9 +4,9 @@ Ask questions about a GitHub repository in plain English, such as *"Where is aut
 *"What happens when a password reset token is invalid?"*, and get an answer that cites the exact files and line ranges,
 with the cited code shown and linked to GitHub at the indexed commit.
 
-**Live demo:** <https://codebase-qa-avinash.indiasouthcentral.cloudapp.azure.com>. Open it, pick an example question
-or type your own, or paste a link to any public GitHub repository and ask about that. No sign-up or password needed.
-Repositories you add are private to your browser link and are deleted 24 hours after you last use them. It runs on a
+**Live demo:** <https://codebase-qa-avinash.indiasouthcentral.cloudapp.azure.com>. Paste a link to any public GitHub
+repository (or click "Use a sample repository"), wait for it to be indexed, then ask questions about it. No sign-up or
+password needed. Repositories you add are private to your browser link and are deleted 24 hours after you last use them. It runs on a
 single Azure VM with Docker Compose and Caddy; see [DEPLOY.md](DEPLOY.md).
 
 ## What it does
@@ -163,7 +163,8 @@ Other tools: `eval.calibrate` (refusal threshold), `eval.benchmark_reindex` (inc
 No sign-up: the UI sends a random visitor id (`X-Visitor-Id`, kept in the page URL) that scopes which repositories a
 visitor sees. Each visitor can add 5 repositories per day and ask 30 questions per day (10 per minute); daily limits
 count per IP so a new link does not reset them. Visitor repositories are deleted 24 hours after their last use, at most
-15 are stored (oldest removed first), and the demo repository is pinned. Only `POST /repos/{id}/reindex` needs the
+15 are stored (oldest removed first). The sample repository is pre-indexed and never deleted, so adding it is instant,
+but like every repository it only appears for visitors who add it. Only `POST /repos/{id}/reindex` needs the
 owner password (`X-Demo-Password`). An optional site-wide daily question cap (`ASK_DAILY_LIMIT`) is off by default.
 
 ## Design decisions

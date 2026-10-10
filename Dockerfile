@@ -33,6 +33,7 @@ RUN python -c "from sentence_transformers import CrossEncoder, SentenceTransform
     && chown -R user:user /opt/models /app/data
 
 COPY frontend ./frontend
+COPY .streamlit ./.streamlit
 
 ENV HF_HUB_OFFLINE=1
 USER user

@@ -24,7 +24,7 @@ class RepoAccess:
     last_used_at: str = ""
 
     def visible_to(self, visitor: str | None) -> bool:
-        return self.pinned or (visitor is not None and visitor in self.owners)
+        return visitor is not None and visitor in self.owners
 
 
 class AccessStore:

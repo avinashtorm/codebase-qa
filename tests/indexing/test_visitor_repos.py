@@ -63,13 +63,14 @@ def test_visitor_ids_must_be_32_hex_characters() -> None:
     assert not is_valid_visitor("Z" * 32)
 
 
-def test_access_store_tracks_owners_and_pinned_repos(tmp_path: Path) -> None:
+def test_access_store_shows_repos_only_to_their_owners(tmp_path: Path) -> None:
     access = AccessStore(tmp_path / "access.json")
     access.grant("mine", VISITOR_A)
     access.pin("demo")
-    assert access.visible(VISITOR_A) == {"mine", "demo"}
-    assert access.visible(VISITOR_B) == {"demo"}
-    assert access.visible(None) == {"demo"}
+    assert access.visible(VISITOR_A) == {"mine"}
+    assert access.visible(VISITOR_B) == set()
+    assert access.visible(None) == set()
+    assert access.load()["demo"].pinned
     access.grant("mine", VISITOR_B)
     assert access.can_see("mine", VISITOR_B)
     access.remove("mine")

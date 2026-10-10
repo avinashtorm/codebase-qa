@@ -283,7 +283,7 @@ The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git 
 | `REPO_TTL_HOURS` | no | Visitor repositories are deleted this long after their last use (default 24) |
 | `MAX_VISITOR_REPOS` | no | Most visitor repositories kept at once; the oldest is removed first (default 15) |
 | `ASK_DAILY_LIMIT` | no | Optional site-wide questions per day; 0 turns it off (default 0) |
-| `DEMO_REPO_URL` | no | Indexed automatically on first start, visible to every visitor and never deleted |
+| `DEMO_REPO_URL` | no | Pre-indexed on first start and never deleted, so visitors who add it (the sample button) get it instantly |
 | `MAX_REPO_SIZE_MB` | no | Larger repositories are rejected (default 200) |
 | `ASK_RATE_LIMIT_PER_MINUTE` | no | Questions per visitor per minute (default 10) |
 | `GITHUB_TOKEN` | no | Raises GitHub's API limit for the repo size check (a token with no scopes is enough) |

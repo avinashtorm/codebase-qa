@@ -265,14 +265,17 @@ def test_optional_site_wide_daily_question_cap(tmp_path: Path, make_repo: RepoFa
         assert statuses == [200, 200, 429]
 
 
-def test_demo_repo_is_auto_indexed_pinned_and_visible_to_everyone(
+def test_demo_repo_is_pre_indexed_but_only_listed_after_a_visitor_adds_it(
     tmp_path: Path, make_repo: RepoFactory
 ) -> None:
-    with build_client(tmp_path, demo_repo_url=make_repo().as_uri()) as client:
+    url = make_repo().as_uri()
+    with build_client(tmp_path, demo_repo_url=url) as client:
         [job] = list(client.app.state.jobs.jobs.values())
         assert wait_for_job(client, job.job_id)["status"] == "succeeded"
-        assert visible(client, VISITOR_B) == ["origin"]
-    with build_client(tmp_path, demo_repo_url=(tmp_path / "origin").as_uri()) as client:
+        assert visible(client, VISITOR_B) == []
+    with build_client(tmp_path, demo_repo_url=url) as client:
         assert client.app.state.jobs.jobs == {}
-        assert visible(client, VISITOR_A) == ["origin"]
+        instant = client.post("/repos", json={"url": url}, headers={"X-Visitor-Id": VISITOR_B}).json()
+        assert instant["status"] == "succeeded"
+        assert visible(client, VISITOR_B) == ["origin"]
 
