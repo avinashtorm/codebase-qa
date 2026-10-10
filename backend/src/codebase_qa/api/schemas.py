@@ -65,7 +65,7 @@ class HealthOut(BaseModel):
     status: str
     repos: int
     active_jobs: int
-    password_required: bool
+    indexing_password_required: bool
 
 
 class ReindexOut(BaseModel):

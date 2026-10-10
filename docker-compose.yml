@@ -15,6 +15,7 @@ services:
     environment:
       DATA_DIR: /app/data
       TRUST_PROXY: "true"
+      LLM_CACHE: "true"
     volumes:
       - app-data:/app/data
     expose:

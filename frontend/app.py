@@ -8,6 +8,17 @@ from code_view import citation_block, github_link, render_code
 
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 JOB_TIMEOUT_SECONDS = 900
+DEMO_EXAMPLES = (
+    "Where is the JWT access token created?",
+    "What happens when a user tries to log in with a wrong password?",
+    "How does listing items differ between superusers and normal users?",
+)
+GENERIC_EXAMPLES = (
+    "Where is authentication handled?",
+    "How is the database connection configured?",
+    "What happens when a request fails validation?",
+)
+EXAMPLES_BY_REPO = {"fastapi__full-stack-fastapi-template": DEMO_EXAMPLES}
 
 st.set_page_config(page_title="Codebase Q&A", page_icon=":mag:", layout="wide")
 
@@ -21,7 +32,7 @@ def visitor_ip() -> str:
 
 
 def client() -> BackendClient:
-    return BackendClient(BACKEND_URL, st.session_state.get("demo_password", ""), visitor_ip())
+    return BackendClient(BACKEND_URL, st.session_state.get("owner_password", ""), visitor_ip())
 
 
 def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:
@@ -38,35 +49,39 @@ def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:
     return job
 
 
-def password_gate(health: dict[str, Any]) -> bool:
-    if not health["password_required"] or st.session_state.get("password_ok"):
-        return True
-    with st.sidebar.form("password_form"):
-        password = st.text_input("Demo password", type="password")
-        submitted = st.form_submit_button("Unlock")
-    if submitted:
-        st.session_state["demo_password"] = password
-        try:
-            client().repos()
-            st.session_state["password_ok"] = True
-            st.rerun()
-        except BackendError:
-            st.sidebar.error("Wrong password.")
-    st.info("This demo is password protected. Enter the password in the sidebar.")
-    return False
+def owner_error(exc: BackendError) -> str:
+    return "Wrong or missing owner password." if exc.status_code == 401 else str(exc)
 
 
-def index_section() -> None:
-    st.sidebar.subheader("Index a repository")
-    url = st.sidebar.text_input("GitHub URL", placeholder="https://github.com/owner/repo")
-    if st.sidebar.button("Index", use_container_width=True, disabled=not url):
-        try:
-            job = wait_for_job(client().index(url.strip()), "Indexing")
-            if job["status"] == "succeeded":
-                st.session_state["selected_repo"] = job["result"]["repo_id"]
-                st.rerun()
-        except BackendError as exc:
-            st.sidebar.error(str(exc))
+def owner_tools(health: dict[str, Any], repo: dict[str, Any] | None) -> None:
+    with st.sidebar.expander("Owner tools: index or re-index", expanded=repo is None):
+        if health["indexing_password_required"]:
+            st.text_input("Owner password", type="password", key="owner_password")
+            st.caption("Indexing uses server CPU, so only the owner can add repositories. Asking is open to everyone.")
+        url = st.text_input("GitHub URL", placeholder="https://github.com/owner/repo", key="index_url")
+        if st.button("Index repository", use_container_width=True, disabled=not url):
+            try:
+                job = wait_for_job(client().index(url.strip()), "Indexing")
+                if job["status"] == "succeeded":
+                    st.session_state["selected_repo"] = job["result"]["repo_id"]
+                    st.rerun()
+            except BackendError as exc:
+                st.error(owner_error(exc))
+        if repo is not None and st.button("Re-index selected repo (pull latest)", use_container_width=True):
+            try:
+                job = wait_for_job(client().reindex(repo["repo_id"]), "Re-indexing")
+                if job["status"] == "succeeded":
+                    st.session_state["reindex_report"] = job["result"]
+                    st.rerun()
+            except BackendError as exc:
+                st.error(owner_error(exc))
+        report = st.session_state.get("reindex_report")
+        if repo is not None and report and report["repo_id"] == repo["repo_id"]:
+            st.success(
+                f"{report['method']}: {report['files_changed']} files changed, "
+                f"+{report['chunks_added']} / -{report['chunks_removed']} chunks in {report['seconds']:.1f}s "
+                f"({report['old_sha'][:7]} -> {report['new_sha'][:7]})"
+            )
 
 
 def repo_picker(repos: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -84,26 +99,12 @@ def repo_picker(repos: list[dict[str, Any]]) -> dict[str, Any] | None:
         format_func=lambda repo_id: f"{repo_id} @ {shas[repo_id]}",
     )
     st.session_state["selected_repo"] = chosen
-    return next(repo for repo in repos if repo["repo_id"] == chosen)
-
-
-def reindex_section(repo: dict[str, Any]) -> None:
-    st.sidebar.caption(f"{repo['file_count']} files, {repo['chunk_count']} chunks, indexed {repo['indexed_at']}")
-    if st.sidebar.button("Re-index (pull latest)", use_container_width=True):
-        try:
-            job = wait_for_job(client().reindex(repo["repo_id"]), "Re-indexing")
-            if job["status"] == "succeeded":
-                st.session_state["reindex_report"] = job["result"]
-                st.rerun()
-        except BackendError as exc:
-            st.sidebar.error(str(exc))
-    report = st.session_state.get("reindex_report")
-    if report and report["repo_id"] == repo["repo_id"]:
-        st.sidebar.success(
-            f"{report['method']}: {report['files_changed']} files changed, "
-            f"+{report['chunks_added']} / -{report['chunks_removed']} chunks in {report['seconds']:.1f}s "
-            f"({report['old_sha'][:7]} -> {report['new_sha'][:7]})"
-        )
+    repo = next(repo for repo in repos if repo["repo_id"] == chosen)
+    st.sidebar.caption(
+        f"[{repo['url']}]({repo['url']}) - {repo['file_count']} files, {repo['chunk_count']} chunks, "
+        f"indexed {repo['indexed_at']}"
+    )
+    return repo
 
 
 def render_citations(response: dict[str, Any], repo: dict[str, Any]) -> None:
@@ -141,6 +142,14 @@ def render_assistant(message: dict[str, Any], repo: dict[str, Any], show_details
             render_details(response)
 
 
+def example_buttons(repo_id: str) -> None:
+    st.markdown("**Try an example question:**")
+    for number, question in enumerate(EXAMPLES_BY_REPO.get(repo_id, GENERIC_EXAMPLES)):
+        if st.button(question, key=f"example_{number}"):
+            st.session_state["pending_question"] = question
+            st.rerun()
+
+
 def chat(repo: dict[str, Any], show_details: bool) -> None:
     history: list[dict[str, Any]] = st.session_state.setdefault("history", {}).setdefault(repo["repo_id"], [])
     for message in history:
@@ -149,8 +158,11 @@ def chat(repo: dict[str, Any], show_details: bool) -> None:
                 render_assistant(message, repo, show_details)
             else:
                 st.markdown(message["content"])
-    question = st.chat_input(f"Ask about {repo['repo_id']}")
+    typed = st.chat_input(f"Ask about {repo['repo_id']}")
+    question = typed or st.session_state.pop("pending_question", None)
     if not question:
+        if not history:
+            example_buttons(repo["repo_id"])
         return
     history.append({"role": "user", "content": question})
     with st.chat_message("user"):
@@ -161,33 +173,29 @@ def chat(repo: dict[str, Any], show_details: bool) -> None:
                 response = client().ask(repo["repo_id"], question)
             message = {"role": "assistant", "content": response["answer"], "response": response}
         except BackendError as exc:
-            message = {"role": "assistant", "content": f"Error: {exc}"}
+            message = {"role": "assistant", "content": f"Sorry, that didn't work: {exc}"}
         history.append(message)
         render_assistant(message, repo, show_details)
 
 
 def main() -> None:
     st.title("Codebase Q&A")
-    st.caption("Ask questions about a GitHub repository. Answers cite exact files and line ranges.")
+    st.caption(
+        "Ask questions about a GitHub repository in plain English. Answers cite exact files and line ranges, "
+        "and each citation opens the code at the indexed commit."
+    )
     try:
         health = client().health()
+        repos = client().repos()
     except BackendError as exc:
         st.error(f"Cannot reach the backend at {BACKEND_URL}: {exc}")
         return
-    if not password_gate(health):
-        return
-    index_section()
-    try:
-        repos = client().repos()
-    except BackendError as exc:
-        st.error(str(exc))
-        return
     repo = repo_picker(repos)
     show_details = st.sidebar.toggle("Show retrieval details", value=False)
+    owner_tools(health, repo)
     if repo is None:
-        st.info("Index a repository from the sidebar to start asking questions.")
+        st.info("No repository is indexed yet. The demo repository is indexed automatically a few minutes after start.")
         return
-    reindex_section(repo)
     chat(repo, show_details)
 
 

@@ -4,8 +4,9 @@ Ask questions about a GitHub repository in plain English, such as *"Where is aut
 *"What happens when a password reset token is invalid?"*, and get an answer that cites the exact files and line ranges,
 with the cited code shown and linked to GitHub at the indexed commit.
 
-**Live demo:** <https://codebase-qa-avinash.indiasouthcentral.cloudapp.azure.com> (password protected to keep the
-free-tier LLM quota safe; ask me for the password). It runs on a single Azure VM with Docker Compose and Caddy; see
+**Live demo:** <https://codebase-qa-avinash.indiasouthcentral.cloudapp.azure.com>. Open it, pick an example question
+or type your own about the indexed repository; no sign-up or password needed. Indexing new repositories is reserved for
+the owner because it uses server CPU. It runs on a single Azure VM with Docker Compose and Caddy; see
 [DEPLOY.md](DEPLOY.md).
 
 ## What it does
@@ -152,15 +153,16 @@ Other tools: `eval.calibrate` (refusal threshold), `eval.benchmark_reindex` (inc
 
 | Method and path | Purpose |
 |---|---|
-| `GET /health` | Status, number of repos, active jobs, whether a password is required |
+| `GET /health` | Status, number of repos, active jobs, whether indexing needs the owner password |
 | `POST /repos` `{"url"}` | Validate a GitHub URL and start an indexing job (202 + job) |
 | `GET /repos` | Indexed repositories with commit, file and chunk counts |
 | `POST /repos/{id}/reindex` | Start an incremental re-index job; its result is the change report |
 | `GET /jobs/{id}` | Job status, progress text, result or error |
 | `POST /ask` `{"repo_id", "question"}` | Answer, validated citations with code snippets, retrieved chunks with scores, per-stage latency |
 
-All endpoints except `/health` require the `X-Demo-Password` header when `DEMO_PASSWORD` is set. `/ask` and
-`POST /repos` are rate limited per visitor.
+Asking and reading are public. When `DEMO_PASSWORD` is set, `POST /repos` and `POST /repos/{id}/reindex` require it in
+the `X-Demo-Password` header (owner only). `/ask` is limited per visitor (10 per minute) and site-wide per day
+(`ASK_DAILY_LIMIT`, default 200) to protect the free LLM quota; `POST /repos` is limited per visitor per hour.
 
 ## Design decisions
 
@@ -178,7 +180,8 @@ All endpoints except `/health` require the `X-Demo-Password` header when `DEMO_P
 | **FastAPI backend, Streamlit frontend over HTTP only** | Clear API boundary, testable backend, quick UI; the frontend never touches indexes directly | Streamlit reruns the script on each interaction; fine for a demo UI |
 | **Single-worker background jobs, JSON registry** | No extra infrastructure; serializing indexing avoids concurrent writes | Jobs live in memory and are lost on restart; a queue and a database would be needed at scale |
 | **Docker Compose + Caddy on one Azure VM** | Free with student credit, automatic HTTPS on a free `cloudapp.azure.com` name, models baked into the image | One machine, no autoscaling; Hugging Face Spaces was the first plan but Docker Spaces now need a paid plan |
-| **Hardening** | GitHub-only URLs, size and repo caps, no hooks/symlinks/LFS when cloning, repo code never executed, per-visitor rate limits, optional password, no stack traces in responses | Rate limits are in memory per process |
+| **Open demo, owner-only indexing** | Visitors can ask immediately; a password would stop most reviewers. Indexing (CPU, disk, a 5-repo cap) needs the owner password; a per-visitor limit, a site-wide daily question cap and the LLM response cache protect the free Gemini quota | Anyone can spend part of the daily question budget; when it runs out, the demo says to come back tomorrow |
+| **Hardening** | GitHub-only URLs, size and repo caps, no hooks/symlinks/LFS when cloning, repo code never executed, rate limits, no stack traces in responses | Rate limits are in memory per process |
 
 ## Limitations
 

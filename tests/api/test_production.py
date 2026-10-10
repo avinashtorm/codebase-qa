@@ -1,6 +1,7 @@
 import json
 import logging
 from collections.abc import Callable
+from datetime import date
 from pathlib import Path
 
 import httpx
@@ -8,7 +9,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from codebase_qa.api.app import create_app
-from codebase_qa.api.rate_limit import SlidingWindowLimiter
+from codebase_qa.api.rate_limit import DailyLimiter, SlidingWindowLimiter
 from codebase_qa.container import Container
 from codebase_qa.indexing.jobs import JobManager
 from codebase_qa.ingestion.github import (
@@ -145,12 +146,40 @@ def test_index_endpoint_is_rate_limited(tmp_path: Path) -> None:
         assert client.post("/repos", json={"url": "https://gitlab.com/a/b"}).status_code == 429
 
 
-def test_demo_password_protects_everything_but_health(tmp_path: Path) -> None:
+def test_asking_is_public_and_only_indexing_needs_the_owner_password(
+    tmp_path: Path, make_repo: RepoFactory
+) -> None:
     with build_client(tmp_path, demo_password="s3cret") as client:
-        assert client.get("/health").json()["password_required"] is True
-        assert client.get("/repos").status_code == 401
-        assert client.get("/repos", headers={"X-Demo-Password": "wrong"}).status_code == 401
-        assert client.get("/repos", headers={"X-Demo-Password": "s3cret"}).status_code == 200
+        assert client.get("/health").json()["indexing_password_required"] is True
+        assert client.get("/repos").status_code == 200
+        assert client.post("/ask", json={"repo_id": "x", "question": "q"}).status_code == 404
+        url = {"url": make_repo().as_uri()}
+        assert client.post("/repos", json=url).status_code == 401
+        assert client.post("/repos", json=url, headers={"X-Demo-Password": "wrong"}).status_code == 401
+        accepted = client.post("/repos", json=url, headers={"X-Demo-Password": "s3cret"})
+        assert accepted.status_code == 202
+        assert client.get(f"/jobs/{accepted.json()['job_id']}").status_code == 200
+        assert wait_for_job(client, accepted.json()["job_id"])["status"] == "succeeded"
+        assert client.post("/repos/origin/reindex").status_code == 401
+        assert client.post("/ask", json={"repo_id": "origin", "question": "login"}).status_code == 200
+
+
+def test_daily_limiter_resets_on_a_new_day() -> None:
+    days = iter([date(2026, 1, 1), date(2026, 1, 1), date(2026, 1, 1), date(2026, 1, 1), date(2026, 1, 2)])
+    limiter = DailyLimiter(limit=2, today=lambda: next(days))
+    assert [limiter.allow(), limiter.allow(), limiter.allow(), limiter.allow()] == [True, True, False, True]
+
+
+def test_ask_has_a_site_wide_daily_limit(tmp_path: Path) -> None:
+    with build_client(tmp_path, ask_daily_limit=2) as client:
+        body = {"repo_id": "x", "question": "q"}
+        statuses = [
+            client.post("/ask", json=body, headers={"X-Forwarded-For": f"10.0.0.{n}"}).status_code
+            for n in range(3)
+        ]
+        assert statuses == [404, 404, 429]
+        limited = client.post("/ask", json=body, headers={"X-Forwarded-For": "10.0.0.9"})
+        assert "daily question limit" in limited.json()["detail"]
 
 
 def test_jobs_track_status_and_unknown_jobs_404(tmp_path: Path, make_repo: RepoFactory) -> None:

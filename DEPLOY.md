@@ -263,7 +263,7 @@ The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git 
    DOMAIN=YOUR_DOMAIN
    GEMINI_API_KEY=your-gemini-api-key
    GEMINI_MODEL=gemini-3.5-flash-lite
-   DEMO_PASSWORD=choose-a-password-for-reviewers
+   DEMO_PASSWORD=choose-an-owner-password
    DEMO_REPO_URL=https://github.com/fastapi/full-stack-fastapi-template
    ```
 3. Save with **Ctrl+O**, then **Enter**, and exit with **Ctrl+X**.
@@ -277,7 +277,8 @@ The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git 
 | `DOMAIN` | yes | The domain from step 4, without `https://` |
 | `GEMINI_API_KEY` | yes | Your Google AI Studio key |
 | `GEMINI_MODEL` | no | Defaults to `gemini-3.5-flash-lite` |
-| `DEMO_PASSWORD` | recommended | Visitors must enter it before indexing or asking |
+| `DEMO_PASSWORD` | recommended | Owner password, needed only to index or re-index repositories. Asking questions is open to everyone |
+| `ASK_DAILY_LIMIT` | no | Site-wide questions per day, protects the free Gemini quota (default 200) |
 | `DEMO_REPO_URL` | no | Indexed automatically on first start |
 | `MAX_REPOS` | no | Max indexed repositories (default 5) |
 | `MAX_REPO_SIZE_MB` | no | Larger repositories are rejected (default 200) |
@@ -300,7 +301,7 @@ The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git 
    Wait until `backend` and `frontend` show `(healthy)` and `caddy` shows `Up`.
 3. Open `https://YOUR_DOMAIN` in your browser. The first visit can take up to a minute while Caddy obtains the
    certificate.
-4. Enter the demo password in the sidebar. The demo repository indexes in the background (about 3-5 minutes); the
+4. No password is needed to ask questions. The demo repository indexes in the background (about 3-5 minutes); the
    progress is visible in the backend logs (step 12). Once it appears in the **Repository** picker, ask a question.
 
 ## Step 12: Check logs and health
@@ -396,5 +397,7 @@ If you push the project to GitHub:
 - Indexing runs as a single background job at a time; progress is available at `GET /jobs/{id}`.
 - Per-visitor rate limits apply to `/ask` and `POST /repos`. The visitor IP is the last `X-Forwarded-For` hop, added by
   Caddy and forwarded by Streamlit to the backend, which is not reachable from the internet.
-- The optional demo password protects every endpoint except `/health`. Errors never include stack traces or server
+- Asking is public. The optional `DEMO_PASSWORD` is an owner password for indexing and re-indexing only. A site-wide
+  daily question cap (`ASK_DAILY_LIMIT`) and the LLM response cache (`LLM_CACHE=true` in compose) protect the free
+  Gemini quota. Errors never include stack traces or server
   paths.

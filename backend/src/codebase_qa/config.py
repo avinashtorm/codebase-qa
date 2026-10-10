@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     max_repo_size_mb: int = 200
     max_repos: int = 5
     ask_rate_limit_per_minute: int = 10
+    ask_daily_limit: int = 200
     index_rate_limit_per_hour: int = 10
     trust_proxy: bool = False
     allow_local_repos: bool = False

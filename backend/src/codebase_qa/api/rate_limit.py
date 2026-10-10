@@ -2,6 +2,7 @@ import threading
 import time
 from collections import deque
 from collections.abc import Callable
+from datetime import UTC, date, datetime
 
 from fastapi import HTTPException, Request
 
@@ -24,6 +25,29 @@ class SlidingWindowLimiter:
                 return self.window - (now - hits[0])
             hits.append(now)
             return None
+
+
+def utc_today() -> date:
+    return datetime.now(UTC).date()
+
+
+class DailyLimiter:
+    def __init__(self, limit: int, today: Callable[[], date] = utc_today) -> None:
+        self.limit = limit
+        self.today = today
+        self.day = today()
+        self.count = 0
+        self.lock = threading.Lock()
+
+    def allow(self) -> bool:
+        with self.lock:
+            current = self.today()
+            if current != self.day:
+                self.day, self.count = current, 0
+            if self.count >= self.limit:
+                return False
+            self.count += 1
+            return True
 
 
 def client_ip(request: Request, trust_proxy: bool) -> str:

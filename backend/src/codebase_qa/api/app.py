@@ -10,7 +10,7 @@ import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 
-from codebase_qa.api.rate_limit import SlidingWindowLimiter, enforce
+from codebase_qa.api.rate_limit import DailyLimiter, SlidingWindowLimiter, enforce
 from codebase_qa.api.schemas import (
     AskRequest,
     AskResponse,
@@ -43,17 +43,22 @@ Services = Annotated[Container, Depends(get_container)]
 Jobs = Annotated[JobManager, Depends(get_jobs)]
 
 
-def require_password(request: Request) -> None:
+def require_owner_password(request: Request) -> None:
     expected = request.app.state.container.settings.demo_password
     if not expected:
         return
     supplied = request.headers.get("x-demo-password", "")
     if not hmac.compare_digest(supplied.encode(), expected.encode()):
-        raise HTTPException(status_code=401, detail="a valid demo password is required")
+        raise HTTPException(status_code=401, detail="indexing requires the owner password")
 
 
 def limit_ask(request: Request) -> None:
     enforce(request.app.state.ask_limiter, request, request.app.state.container.settings.trust_proxy)
+    if not request.app.state.daily_ask_limiter.allow():
+        raise HTTPException(
+            status_code=429,
+            detail="the demo has reached its daily question limit, please try again tomorrow",
+        )
 
 
 def limit_index(request: Request) -> None:
@@ -124,7 +129,8 @@ def create_app(container: Container | None = None) -> FastAPI:
     app.state.jobs = JobManager()
     app.state.ask_limiter = SlidingWindowLimiter(settings.ask_rate_limit_per_minute, 60)
     app.state.index_limiter = SlidingWindowLimiter(settings.index_rate_limit_per_hour, 3600)
-    protected = [Depends(require_password)]
+    app.state.daily_ask_limiter = DailyLimiter(settings.ask_daily_limit)
+    owner_only = [Depends(require_owner_password)]
 
     @app.middleware("http")
     async def log_requests(request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
@@ -154,10 +160,10 @@ def create_app(container: Container | None = None) -> FastAPI:
             status="ok",
             repos=len(services.repo_records()),
             active_jobs=jobs.running_count(),
-            password_required=bool(services.settings.demo_password),
+            indexing_password_required=bool(services.settings.demo_password),
         )
 
-    @app.post("/repos", response_model=JobOut, status_code=202, dependencies=[*protected, Depends(limit_index)])
+    @app.post("/repos", response_model=JobOut, status_code=202, dependencies=[*owner_only, Depends(limit_index)])
     def index_repo(body: IndexRepoRequest, services: Services, jobs: Jobs) -> JobOut:
         try:
             url, repo_id = validate_repo_url(body.url, services)
@@ -170,25 +176,25 @@ def create_app(container: Container | None = None) -> FastAPI:
             raise HTTPException(status_code=409, detail=f"repository limit of {services.settings.max_repos} reached")
         return JobOut.from_job(submit_index(services, jobs, url, repo_id))
 
-    @app.get("/repos", response_model=list[RepoOut], dependencies=protected)
+    @app.get("/repos", response_model=list[RepoOut])
     def list_repos(services: Services) -> list[RepoOut]:
         return [RepoOut.from_record(record) for record in services.repo_records()]
 
-    @app.post("/repos/{repo_id}/reindex", response_model=JobOut, status_code=202, dependencies=protected)
+    @app.post("/repos/{repo_id}/reindex", response_model=JobOut, status_code=202, dependencies=owner_only)
     def reindex_repo(repo_id: str, services: Services, jobs: Jobs) -> JobOut:
         if services.repo_record(repo_id) is None:
             raise HTTPException(status_code=404, detail=f"repo {repo_id} is not indexed")
         job = jobs.active_for(repo_id) or jobs.submit("reindex", repo_id, reindex_action(services, repo_id))
         return JobOut.from_job(job)
 
-    @app.get("/jobs/{job_id}", response_model=JobOut, dependencies=protected)
+    @app.get("/jobs/{job_id}", response_model=JobOut)
     def get_job(job_id: str, jobs: Jobs) -> JobOut:
         job = jobs.get(job_id)
         if job is None:
             raise HTTPException(status_code=404, detail="job not found")
         return JobOut.from_job(job)
 
-    @app.post("/ask", response_model=AskResponse, dependencies=[*protected, Depends(limit_ask)])
+    @app.post("/ask", response_model=AskResponse, dependencies=[Depends(limit_ask)])
     def ask(body: AskRequest, services: Services) -> AskResponse:
         record = services.repo_record(body.repo_id)
         if record is None:
