@@ -10,7 +10,7 @@ BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 JOB_TIMEOUT_SECONDS = 900
 DEMO_EXAMPLES = (
     "Where is the JWT access token created?",
-    "What happens when a user tries to log in with a wrong password?",
+    "What happens when a normal user requests an item that belongs to someone else?",
     "How does listing items differ between superusers and normal users?",
 )
 GENERIC_EXAMPLES = (
