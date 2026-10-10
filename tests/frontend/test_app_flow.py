@@ -45,8 +45,9 @@ def backend_url(tmp_path: Path, repo_url: str) -> Iterator[str]:
 
 
 @pytest.fixture
-def page(backend_url: str, monkeypatch: pytest.MonkeyPatch) -> AppTest:
+def page(backend_url: str, repo_url: str, monkeypatch: pytest.MonkeyPatch) -> AppTest:
     monkeypatch.setenv("BACKEND_URL", backend_url)
+    monkeypatch.setenv("SAMPLE_REPO_URL", repo_url)
     return AppTest.from_file(APP, default_timeout=60).run()
 
 
@@ -55,29 +56,34 @@ def button(app: AppTest, label: str):
 
 
 def index(page: AppTest, url: str) -> AppTest:
-    page.text_input(key="repo_url").input(url)
-    button(page, "Index repository").click().run()
+    page.chat_input(key="repo_url").set_value(url).run()
     return page
+
+
+def on_landing(page: AppTest) -> bool:
+    return [item.key for item in page.chat_input] == ["repo_url"]
 
 
 def test_landing_page_asks_for_a_repository_and_selects_nothing(page: AppTest) -> None:
     assert not page.exception
     assert len(page.query_params["v"]) == 32
-    assert page.text_input(key="repo_url").value == ""
-    assert not page.chat_input
+    assert on_landing(page)
+    assert "GitHub URL" in page.chat_input(key="repo_url").placeholder
+    assert not any("Press Enter" in item.value for item in page.markdown)
     assert any("Repositories you index appear here" in item.value for item in page.sidebar.markdown)
 
 
-def test_sample_button_only_fills_the_url(page: AppTest) -> None:
-    button(page, "No repository in mind? Use a sample repository").click().run()
-    assert page.text_input(key="repo_url").value == "https://github.com/fastapi/full-stack-fastapi-template"
-    assert not page.chat_input
+def test_sample_button_indexes_the_sample_repository(page: AppTest) -> None:
+    button(page, "No repository in mind? Try a sample repository").click().run()
+    assert not page.exception
+    assert not on_landing(page)
+    assert any(item.label == "origin" for item in page.sidebar.button)
 
 
 def test_visitor_indexes_a_repository_then_asks_about_it(page: AppTest, repo_url: str) -> None:
     index(page, repo_url)
     assert not page.exception
-    assert len(page.chat_input) == 1
+    assert not on_landing(page)
     assert any(item.label == "origin" for item in page.sidebar.button)
     page.button(key="example_0").click().run()
     assert not page.exception
@@ -89,8 +95,7 @@ def test_visitor_indexes_a_repository_then_asks_about_it(page: AppTest, repo_url
 def test_new_repository_button_returns_to_the_landing_page(page: AppTest, repo_url: str) -> None:
     index(page, repo_url)
     button(page, "New repository").click().run()
-    assert not page.chat_input
-    assert page.text_input(key="repo_url") is not None
+    assert on_landing(page)
 
 
 def test_owner_tools_are_hidden_unless_requested(page: AppTest, repo_url: str) -> None:

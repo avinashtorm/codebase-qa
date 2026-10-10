@@ -11,7 +11,7 @@ from code_view import citation_block, github_link, render_code
 BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 JOB_TIMEOUT_SECONDS = 900
 VISITOR_ID = re.compile(r"^[0-9a-f]{32}$")
-SAMPLE_REPO_URL = "https://github.com/fastapi/full-stack-fastapi-template"
+SAMPLE_REPO_URL = os.environ.get("SAMPLE_REPO_URL", "https://github.com/fastapi/full-stack-fastapi-template")
 DEMO_EXAMPLES = (
     "Where is the JWT access token created?",
     "What happens when a normal user requests an item that belongs to someone else?",
@@ -136,10 +136,6 @@ def feature(title: str, text: str) -> str:
     return f'<div class="feature"><b>{title}</b><span>{text}</span></div>'
 
 
-def fill_sample() -> None:
-    st.session_state["repo_url"] = SAMPLE_REPO_URL
-
-
 def landing() -> None:
     st.markdown('<div class="hero-title">Ask questions about any codebase</div>', unsafe_allow_html=True)
     st.markdown(
@@ -147,17 +143,13 @@ def landing() -> None:
         "answer cites the exact files and line ranges it comes from.</div>",
         unsafe_allow_html=True,
     )
-    with st.form("index_form", border=False):
-        url = st.text_input(
-            "GitHub repository URL",
-            placeholder="https://github.com/owner/repository",
-            key="repo_url",
-            label_visibility="collapsed",
-        )
-        submitted = st.form_submit_button("Index repository", type="primary", icon=":material/bolt:")
-    st.button("No repository in mind? Use a sample repository", type="tertiary", on_click=fill_sample)
-    if submitted:
+    with st.container():
+        url = st.chat_input("Paste a public GitHub URL, e.g. https://github.com/owner/repository", key="repo_url")
+    sample = st.button("No repository in mind? Try a sample repository", type="tertiary")
+    if url:
         index_repository(url.strip())
+    elif sample:
+        index_repository(SAMPLE_REPO_URL)
     st.write("")
     columns = st.columns(3)
     features = [

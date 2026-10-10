@@ -5,7 +5,7 @@ Ask questions about a GitHub repository in plain English, such as *"Where is aut
 with the cited code shown and linked to GitHub at the indexed commit.
 
 **Live demo:** <https://codebase-qa-avinash.indiasouthcentral.cloudapp.azure.com>. Paste a link to any public GitHub
-repository (or click "Use a sample repository"), wait for it to be indexed, then ask questions about it. No sign-up or
+repository (or click "Try a sample repository"), wait for it to be indexed, then ask questions about it. No sign-up or
 password needed. Repositories you add are private to your browser link and are deleted 24 hours after you last use them. It runs on a
 single Azure VM with Docker Compose and Caddy; see [DEPLOY.md](DEPLOY.md).
 
