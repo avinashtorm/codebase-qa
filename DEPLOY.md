@@ -336,6 +336,7 @@ All commands run on the VM in `~/codebase-qa`.
 | "Cannot reach the backend" in the page | Backend still starting or crashed | `docker compose ps`, `docker compose logs backend` |
 | Answers fail with status 429 | Gemini free-tier daily quota used up | Wait for the reset, or set another `GEMINI_MODEL` in `.env` and run `docker compose up -d` |
 | Build stops with "Killed" | Out of memory | Make sure swap from step 8 is on (`free -h`), then build again |
+| Build fails with "no space left on device" | Old images and build cache filled the 30 GB disk | `docker image prune -af && docker builder prune -af`, check `df -h /`, then build again. The running site keeps working while you do this |
 
 ## Step 13: Update to a new version
 
@@ -360,9 +361,10 @@ All commands run on the VM in `~/codebase-qa`.
    ```bash
    docker compose up -d --build
    ```
-4. Remove old image layers to free disk space:
+4. Remove old images and build cache to free disk space. The VM disk is only 30 GB and every rebuild leaves several
+   GB of cache behind; skipping this step fills the disk after a few updates ("no space left on device"):
    ```bash
-   docker image prune -f
+   docker image prune -af && docker builder prune -af
    ```
 
 ## Step 14: Stop or remove everything
