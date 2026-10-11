@@ -48,3 +48,18 @@
 {"id": "c56", "question": "Which environment variables does the backend container need in docker compose?", "category": "config", "expected_locations": [{"path": "compose.yml", "start_line": 55, "end_line": 65}], "held_out": false}
 {"id": "c57", "question": "How are database migrations and initial data applied before the backend starts?", "category": "config", "expected_locations": [{"path": "backend/scripts/prestart.sh", "start_line": 6, "end_line": 10}], "held_out": true}
 {"id": "c58", "question": "How is the backend container health check configured in docker compose?", "category": "config", "expected_locations": [{"path": "compose.yml", "start_line": 67, "end_line": 71}], "held_out": false}
+{"id": "o01", "question": "What does this repository do?", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "o02", "question": "What is the tech stack of this project?", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "o03", "question": "How is the project structured into folders?", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "o04", "question": "What are the main components of the backend?", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "o05", "question": "How is the frontend organized?", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "o06", "question": "Give me an overview of how authentication works across the backend and frontend.", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "o07", "question": "What is the architecture of the Docker Compose deployment setup?", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "o08", "question": "Which database and ORM does the project use?", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "o09", "question": "Where should I start reading to understand the backend?", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "o10", "question": "What testing tools and test suites does the project include?", "category": "overview", "expected_locations": [], "held_out": false}
+{"id": "u01", "question": "How does the app process Stripe payments for paid plans?", "category": "unanswerable", "expected_locations": [], "held_out": false}
+{"id": "u02", "question": "Where are real-time WebSocket notifications pushed to connected clients?", "category": "unanswerable", "expected_locations": [], "held_out": false}
+{"id": "u03", "question": "How is the Redis cache invalidated when an item is updated?", "category": "unanswerable", "expected_locations": [], "held_out": false}
+{"id": "u04", "question": "How are two-factor authentication TOTP codes verified at login?", "category": "unanswerable", "expected_locations": [], "held_out": false}
+{"id": "u05", "question": "Where is the GraphQL schema for items defined?", "category": "unanswerable", "expected_locations": [], "held_out": false}

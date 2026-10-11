@@ -3,7 +3,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
-CATEGORIES = ("where-is", "how-does", "what-happens-when", "config", "follow-up")
+CODE_CATEGORIES = ("where-is", "how-does", "what-happens-when", "config", "follow-up")
+OPEN_CATEGORIES = ("overview", "unanswerable")
+CATEGORIES = CODE_CATEGORIES + OPEN_CATEGORIES
 Split = Literal["dev", "held_out", "all"]
 
 
@@ -28,8 +30,10 @@ def parse_question(data: dict) -> EvalQuestion:
     if data["category"] not in CATEGORIES:
         raise ValueError(f"{data['id']}: unknown category {data['category']}")
     locations = [Location(**location) for location in data["expected_locations"]]
-    if not locations:
+    if not locations and data["category"] in CODE_CATEGORIES:
         raise ValueError(f"{data['id']}: expected_locations is empty")
+    if locations and data["category"] == "unanswerable":
+        raise ValueError(f"{data['id']}: unanswerable questions have no expected locations")
     for location in locations:
         if location.start_line < 1 or location.end_line < location.start_line:
             raise ValueError(f"{data['id']}: invalid line range in {location}")

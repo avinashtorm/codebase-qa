@@ -11,15 +11,18 @@ from codebase_qa.models import Chunk, Citation, RetrievedChunk
 from codebase_qa.routing.router import QuestionRouter
 from codebase_qa.routing.rules import rule_route
 from codebase_qa.routing.tool import FALLBACK_ANSWER, ToolAnswerer
+from eval.dataset import CODE_CATEGORIES
 from tests.fakes import FakeLLM, fake_embedder, fake_generator, make_settings
 from tests.overview.test_overview import FILES
 
 RepoFactory = Callable[..., Path]
-DEV_QUESTIONS = [
-    json.loads(line)["question"]
+DEV_ROWS = [
+    json.loads(line)
     for line in (Path(__file__).resolve().parents[2] / "eval" / "questions.jsonl").read_text("utf-8").splitlines()
-    if line.strip() and not json.loads(line).get("held_out")
+    if line.strip()
 ]
+DEV_QUESTIONS = [row["question"] for row in DEV_ROWS if not row.get("held_out") and row["category"] in CODE_CATEGORIES]
+OVERVIEW_QUESTIONS = [row["question"] for row in DEV_ROWS if row["category"] == "overview"]
 
 
 @pytest.mark.parametrize(
@@ -123,3 +126,8 @@ def test_routing_can_be_disabled(tmp_path: Path, make_repo: RepoFactory) -> None
     container = build(tmp_path, FakeLLM(), routing=False)
     record = container.indexer.index(make_repo(FILES).as_uri())
     assert container.pipeline(record).ask("What can you do?").route == "code"
+
+
+def test_most_overview_eval_questions_route_to_overview() -> None:
+    routes = [rule_route(question) for question in OVERVIEW_QUESTIONS]
+    assert routes.count("overview") >= 6 and "tool" not in routes

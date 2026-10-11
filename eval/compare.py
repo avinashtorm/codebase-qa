@@ -12,6 +12,9 @@ COLUMNS: list[tuple[str, str]] = [
     ("mrr", "MRR"),
     ("citation_precision", "Cite prec"),
     ("citation_any_correct", "Cite any"),
+    ("refusal_accuracy", "Refusal acc"),
+    ("faithfulness_mean", "Faithful"),
+    ("relevance_mean", "Relevant"),
     ("retrieval_ms_mean", "Retr ms"),
     ("generation_ms_mean", "Gen ms"),
 ]

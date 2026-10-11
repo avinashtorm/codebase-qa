@@ -9,13 +9,17 @@ from typing import Any
 from codebase_qa.config import Settings
 from codebase_qa.container import Container
 from codebase_qa.generation.llm import GenerationError
+from codebase_qa.generation.refusal import is_unknown
 from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.ingestion.git import repo_id_from_url
-from codebase_qa.models import RetrievedChunk
+from codebase_qa.interfaces import LLM
+from codebase_qa.models import Chunk, RetrievedChunk
 from codebase_qa.retrieval.filters import NO_FILTER, SearchFilter
 from codebase_qa.routing.followup import Turn
+from eval.aggregate import aggregate, by_category
 from eval.dataset import EvalQuestion, load_questions
-from eval.metrics import average, score_citations, score_retrieval
+from eval.judge import judge
+from eval.metrics import score_citations, score_retrieval
 
 EVAL_DIR = Path(__file__).parent
 DEFAULT_QUESTIONS = EVAL_DIR / "questions.jsonl"
@@ -42,12 +46,19 @@ def describe(item: RetrievedChunk) -> dict[str, Any]:
     return {"location": chunk.location, "score": round(item.score, 4)}
 
 
+def retrieval_scores(spans: list[Chunk], question: EvalQuestion) -> dict[str, float] | None:
+    if not question.expected_locations:
+        return None
+    return asdict(score_retrieval(spans, question.expected_locations))
+
+
 def evaluate_question(
     container: Container,
     record: RepoRecord,
     question: EvalQuestion,
     with_answers: bool,
     oracle: bool = False,
+    judge_llm: LLM | None = None,
 ) -> dict[str, Any]:
     pipeline = container.pipeline(record, oracle_filter(question) if oracle else NO_FILTER)
     history = [Turn(turn["role"], turn["content"]) for turn in question.history]
@@ -65,7 +76,7 @@ def evaluate_question(
         "expected": [asdict(location) for location in question.expected_locations],
         "retrieved": [describe(item) for item in ranked],
         "overview": [describe(item) for item in retrieval.overview],
-        "retrieval": asdict(score_retrieval(spans, question.expected_locations)),
+        "retrieval": retrieval_scores(spans, question),
         "latency_ms": dict(retrieval.timings_ms),
     }
     if with_answers:
@@ -81,50 +92,13 @@ def evaluate_question(
         result["answer"] = answer.answer
         result["citations"] = [citation.location for citation in answer.citations]
         result["invalid_citations"] = answer.invalid_citations
-        result["citation_scores"] = asdict(score_citations(answer.citations, question.expected_locations))
+        result["declined"] = answered.refused or is_unknown(answer)
+        if question.expected_locations:
+            result["citation_scores"] = asdict(score_citations(answer.citations, question.expected_locations))
+        if judge_llm is not None:
+            verdict = judge(judge_llm, question.question, answer.answer, answered.context)
+            result["judge"] = asdict(verdict) if verdict is not None else None
     return result
-
-
-def aggregate(rows: list[dict[str, Any]]) -> dict[str, float]:
-    metrics = {
-        name: average([row["retrieval"][name] for row in rows])
-        for name in ("hit_at_1", "hit_at_5", "recall_at_10", "mrr")
-    }
-    answered = [row for row in rows if "citation_scores" in row]
-    if answered:
-        metrics["citation_precision"] = average([row["citation_scores"]["precision"] for row in answered])
-        metrics["citation_any_correct"] = average([row["citation_scores"]["any_correct"] for row in answered])
-        metrics["invalid_citations"] = sum(row["invalid_citations"] for row in answered)
-        metrics["refused"] = sum(row.get("refused", not row["used_llm"]) for row in answered)
-        for level in ("high", "medium", "low"):
-            bucket = [row for row in answered if row.get("confidence") == level]
-            metrics[f"confidence_{level}"] = len(bucket)
-            if bucket:
-                correct = [row["citation_scores"]["any_correct"] for row in bucket]
-                metrics[f"confidence_{level}_correct"] = average(correct)
-        checked = [row["self_check"] for row in answered if row.get("self_check", {}).get("ran")]
-        if checked:
-            metrics["self_checked"] = len(checked)
-            metrics["answers_with_unsupported"] = sum(bool(check["unsupported"]) for check in checked)
-            claims = sum(check["supported"] + len(check["unsupported"]) for check in checked)
-            metrics["unsupported_claim_rate"] = round(sum(len(c["unsupported"]) for c in checked) / max(claims, 1), 4)
-    for route in ("code", "overview", "tool"):
-        metrics[f"route_{route}"] = sum(row.get("route") == route for row in rows)
-    stages = sorted({stage for row in rows for stage in row["latency_ms"]})
-    for stage in stages:
-        values = [row["latency_ms"][stage] for row in rows if stage in row["latency_ms"]]
-        if values:
-            metrics[f"{stage}_ms_mean"] = round(sum(values) / len(values), 1)
-    return metrics
-
-
-def by_category(rows: list[dict[str, Any]]) -> dict[str, dict[str, float]]:
-    categories = sorted({row["category"] for row in rows})
-    return {
-        category: {"count": sum(r["category"] == category for r in rows)}
-        | aggregate([r for r in rows if r["category"] == category])
-        for category in categories
-    }
 
 
 def save_results(payload: dict[str, Any], results_dir: Path) -> Path:
@@ -145,12 +119,14 @@ def run(args: argparse.Namespace, container: Container | None = None) -> Path:
     for index, question in enumerate(questions, start=1):
         with_answers = args.answers and generation_error is None
         try:
-            rows.append(evaluate_question(container, record, question, with_answers, args.oracle_filter))
+            judge_llm = container.llm if args.judge and with_answers else None
+            rows.append(evaluate_question(container, record, question, with_answers, args.oracle_filter, judge_llm))
         except GenerationError as exc:
             generation_error = str(exc)
             print(f"generation stopped: {generation_error}")
             rows.append(evaluate_question(container, record, question, False, args.oracle_filter))
-        print(f"[{index}/{len(questions)}] {question.id} hit@5={rows[-1]['retrieval']['hit_at_5']:.0f}")
+        scores = rows[-1]["retrieval"]
+        print(f"[{index}/{len(questions)}] {question.id} hit@5={scores['hit_at_5']:.0f}" if scores else question.id)
         if with_answers and args.delay:
             time.sleep(args.delay)
     payload = {
@@ -230,6 +206,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--delay", type=float, default=0.0, help="seconds between LLM calls")
     parser.add_argument("--llm-model", default=None, help="override GEMINI_MODEL for this run")
     parser.add_argument("--no-routing", action="store_true", help="send every question down the code path")
+    parser.add_argument("--judge", action="store_true", help="grade answers with the LLM judge (needs --answers)")
     parser.add_argument("--oracle-filter", action="store_true", help="restrict each question to its answer's folder")
     parser.add_argument("--set", action="append", default=[], metavar="KEY=VALUE", help="override any setting")
     parser.add_argument("--questions", type=Path, default=DEFAULT_QUESTIONS)
