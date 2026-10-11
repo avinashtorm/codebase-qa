@@ -1,9 +1,11 @@
 import json
+from collections.abc import Callable
 
 from pydantic import BaseModel, Field, ValidationError
 
 from codebase_qa.generation.citations import extract_citations
 from codebase_qa.generation.prompt import build_user_prompt, system_prompt_for
+from codebase_qa.generation.streaming import AnswerDeltas
 from codebase_qa.interfaces import LLM
 from codebase_qa.models import Citation, GeneratedAnswer, RetrievedChunk
 
@@ -36,3 +38,11 @@ class LLMGenerator:
         prompt = build_user_prompt(question, context)
         response = self.llm.complete(system_prompt_for(context), prompt, AnswerSchema)
         return parse_answer(response.text)
+
+    def generate_stream(
+        self, question: str, context: list[RetrievedChunk], on_delta: Callable[[str], None]
+    ) -> GeneratedAnswer:
+        deltas = AnswerDeltas(on_delta)
+        for chunk in self.llm.stream(system_prompt_for(context), build_user_prompt(question, context), AnswerSchema):
+            deltas.feed(chunk)
+        return parse_answer(deltas.raw)

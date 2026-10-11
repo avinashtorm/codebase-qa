@@ -1,4 +1,4 @@
-from codebase_qa.generation.selfcheck import SelfChecker, evidence
+from codebase_qa.generation.selfcheck import UNVERIFIED_NOTE, SelfChecker, evidence
 from codebase_qa.models import Chunk, Citation, GeneratedAnswer, RetrievedChunk
 from codebase_qa.qa import QAPipeline
 from tests.fakes import FakeLLM
@@ -38,10 +38,16 @@ def test_unsupported_claims_are_removed_with_a_note() -> None:
 
 
 def test_flag_mode_keeps_text_and_lists_claims() -> None:
-    payload = verdict(("It also sends an SMS.", False), revised="x")
+    payload = verdict(("Login checks the password.", True), ("It also sends an SMS.", False), revised="x")
     answer, check = checker(payload, "flag")[0].check("q", ANSWER, CONTEXT)
     assert answer.answer.startswith(ANSWER.answer) and "- It also sends an SMS." in answer.answer
     assert check.action == "flag"
+
+
+def test_answer_with_no_supported_claim_gets_a_warning_not_a_list() -> None:
+    payload = verdict(("Login checks the password.", False), ("It also sends an SMS.", False), revised="")
+    answer, check = checker(payload, "flag")[0].check("q", ANSWER, CONTEXT)
+    assert answer.answer == ANSWER.answer + "\n\n" + UNVERIFIED_NOTE and check.action == "warn"
 
 
 def test_skipped_without_citations_or_on_bad_output() -> None:
@@ -65,7 +71,7 @@ class OneRetriever:
 
 
 def test_pipeline_runs_self_check() -> None:
-    payload = verdict(("It also sends an SMS.", False), revised="Login checks the password.")
+    payload = verdict(("Login checks.", True), ("It also sends an SMS.", False), revised="Login checks the password.")
     pipeline = QAPipeline(OneRetriever(), FixedGenerator(), self_checker=checker(payload)[0])
     result = pipeline.ask("How does login work?")
     assert result.self_check.unsupported == ["It also sends an SMS."]

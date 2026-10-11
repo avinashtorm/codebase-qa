@@ -314,6 +314,26 @@ def recent_turns(history: list[dict[str, Any]], limit: int = 6) -> list[dict[str
     ]
 
 
+def stream_response(
+    repo_id: str, question: str, previous: list[dict[str, str]], filters: dict[str, Any]
+) -> dict[str, Any]:
+    placeholder = st.empty()
+    placeholder.markdown('<span class="muted">Searching the code...</span>', unsafe_allow_html=True)
+    text = ""
+    try:
+        for event in client().ask_stream(repo_id, question, previous, filters):
+            if event["type"] == "delta":
+                text += event["text"]
+                placeholder.markdown(text + " ▌")
+            elif event["type"] == "error":
+                raise BackendError(event["detail"])
+            elif event["type"] == "final":
+                return event["response"]
+        raise BackendError("the answer stream ended unexpectedly")
+    finally:
+        placeholder.empty()
+
+
 def chat(repo: dict[str, Any], show_details: bool, filters: dict[str, Any]) -> None:
     history: list[dict[str, Any]] = st.session_state.setdefault("history", {}).setdefault(repo["repo_id"], [])
     for position, message in enumerate(history):
@@ -334,8 +354,7 @@ def chat(repo: dict[str, Any], show_details: bool, filters: dict[str, Any]) -> N
         st.markdown(question)
     with st.chat_message("assistant"):
         try:
-            with st.spinner("Searching the code..."):
-                response = client().ask(repo["repo_id"], question, previous, filters)
+            response = stream_response(repo["repo_id"], question, previous, filters)
             message = {"role": "assistant", "content": response["answer"], "response": response}
         except BackendError as exc:
             message = {"role": "assistant", "content": f"Sorry, that didn't work: {exc}"}

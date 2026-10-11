@@ -124,6 +124,7 @@ answers.
 | 8 | Self-check pass (claims verified against the code blocks that contain each citation; unsupported claims removed) | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | 0 of 32 cited dev answers had unsupported claims; a planted false claim was removed in 2/2 spot checks while true claims stayed; +1 LLM call (~1.5 s). Checking only the narrowed cited lines wrongly flagged 8 answers (true claims cited too narrowly), so evidence is the whole containing block |
 | 9 | Confidence badge (high / medium / low from citation rank, search score, dropped citations and self-check) | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | answers with a correct citation by badge: **high 15/16 (94%)**, medium 13/15 (87%), **low 1/4 (25%)** |
 | 10 | Metadata filters (folder and language from the sidebar) | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | unchanged without a filter; with the answer's top-level folder selected ("oracle" filter): Hit@5 **0.857**, Recall@10 **0.862**, MRR 0.694 |
+| 11 | Streaming answers (`POST /ask/stream`, NDJSON) with validation after the stream | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | same generation call and JSON schema, so quality is unchanged; first text after ~2.3 s instead of the full ~4.6 s answer, citations and badge when the stream completes |
 
 ## Running it locally
 
@@ -181,6 +182,7 @@ Other tools: `eval.calibrate` (refusal threshold), `eval.benchmark_reindex` (inc
 | `GET /repos` | Repositories visible to this visitor (the demo repo plus their own) with commit, file and chunk counts |
 | `POST /repos/{id}/reindex` | Start an incremental re-index job; its result is the change report |
 | `GET /jobs/{id}` | Job status, progress text, result or error |
+| `POST /ask/stream` | Same request as `/ask`; streams `{"type": "delta", "text"}` lines as the answer is generated, then one `final` line with the full `/ask` response (validated citations, self-check, confidence) or an `error` line |
 | `GET /repos/{id}/scope` | Folders (two levels) and languages with file counts, for the search-scope filters |
 | `POST /ask` `{"repo_id", "question"}` | Answer, validated citations with code snippets, retrieved chunks with scores, per-stage latency |
 

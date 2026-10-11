@@ -1,4 +1,5 @@
-from typing import Protocol
+from collections.abc import Callable, Iterator
+from typing import Protocol, runtime_checkable
 
 from pydantic import BaseModel
 
@@ -33,7 +34,16 @@ class Generator(Protocol):
     def generate(self, question: str, context: list[RetrievedChunk]) -> GeneratedAnswer: ...
 
 
+@runtime_checkable
+class StreamingGenerator(Generator, Protocol):
+    def generate_stream(
+        self, question: str, context: list[RetrievedChunk], on_delta: Callable[[str], None]
+    ) -> GeneratedAnswer: ...
+
+
 class LLM(Protocol):
     model: str
 
     def complete(self, system: str, prompt: str, schema: type[BaseModel] | None = None) -> LLMResponse: ...
+
+    def stream(self, system: str, prompt: str, schema: type[BaseModel] | None = None) -> Iterator[str]: ...

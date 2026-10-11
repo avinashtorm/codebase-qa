@@ -1,3 +1,5 @@
+import json
+from collections.abc import Iterator
 from typing import Any
 
 import httpx
@@ -7,6 +9,22 @@ class BackendError(RuntimeError):
     def __init__(self, message: str, status_code: int | None = None) -> None:
         super().__init__(message)
         self.status_code = status_code
+
+
+def error_detail(response: httpx.Response) -> str:
+    try:
+        return str(response.json().get("detail", response.text))
+    except ValueError:
+        return response.text
+
+
+def ask_payload(
+    repo_id: str, question: str, history: list[dict[str, str]] | None, filters: dict[str, Any] | None
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {"repo_id": repo_id, "question": question, "history": history or []}
+    if filters and (filters.get("folder") or filters.get("languages")):
+        payload["filters"] = filters
+    return payload
 
 
 class BackendClient:
@@ -31,11 +49,7 @@ class BackendClient:
         except httpx.HTTPError as exc:
             raise BackendError(f"backend is not reachable ({type(exc).__name__})") from exc
         if response.status_code >= 400:
-            try:
-                detail = response.json().get("detail", response.text)
-            except ValueError:
-                detail = response.text
-            raise BackendError(str(detail), response.status_code)
+            raise BackendError(error_detail(response), response.status_code)
         return response.json()
 
     def health(self) -> dict[str, Any]:
@@ -60,10 +74,26 @@ class BackendClient:
         history: list[dict[str, str]] | None = None,
         filters: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        payload: dict[str, Any] = {"repo_id": repo_id, "question": question, "history": history or []}
-        if filters and (filters.get("folder") or filters.get("languages")):
-            payload["filters"] = filters
-        return self.request("POST", "/ask", json=payload)
+        return self.request("POST", "/ask", json=ask_payload(repo_id, question, history, filters))
+
+    def ask_stream(
+        self,
+        repo_id: str,
+        question: str,
+        history: list[dict[str, str]] | None = None,
+        filters: dict[str, Any] | None = None,
+    ) -> Iterator[dict[str, Any]]:
+        payload = ask_payload(repo_id, question, history, filters)
+        try:
+            with self.http.stream("POST", "/ask/stream", json=payload) as response:
+                if response.status_code >= 400:
+                    response.read()
+                    raise BackendError(error_detail(response), response.status_code)
+                for line in response.iter_lines():
+                    if line.strip():
+                        yield json.loads(line)
+        except httpx.HTTPError as exc:
+            raise BackendError(f"backend is not reachable ({type(exc).__name__})") from exc
 
     def scope(self, repo_id: str) -> dict[str, Any]:
         return self.request("GET", f"/repos/{repo_id}/scope")

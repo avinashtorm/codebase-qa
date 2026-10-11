@@ -3,7 +3,7 @@ import json
 import math
 import re
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 
 from pydantic import BaseModel
 
@@ -67,6 +67,11 @@ class FakeLLM:
         payload = handler(prompt) if handler else ""
         text = payload if isinstance(payload, str) else json.dumps(payload)
         return LLMResponse(text=text, input_tokens=len(prompt) // 4, output_tokens=len(text) // 4)
+
+    def stream(self, system: str, prompt: str, schema: type[BaseModel] | None = None) -> Iterator[str]:
+        text = self.complete(system, prompt, schema).text
+        for start in range(0, len(text), 7):
+            yield text[start : start + 7]
 
     def calls_for(self, schema_name: str) -> list[str]:
         return [prompt for name, _, prompt in self.calls if name == schema_name]

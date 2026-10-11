@@ -1,15 +1,17 @@
 import hmac
+import json
 import logging
+import queue
 import threading
 import time
 import uuid
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable, Iterator
 from contextlib import asynccontextmanager
 from typing import Annotated, Any
 
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from codebase_qa.api.rate_limit import DailyLimiter, SlidingWindowLimiter, client_ip, enforce, enforce_daily
 from codebase_qa.api.schemas import (
@@ -258,11 +260,7 @@ def create_app(container: Container | None = None) -> FastAPI:
 
     @app.post("/ask", response_model=AskResponse)
     def ask(body: AskRequest, request: Request, services: Services, visitor: Visitor) -> AskResponse:
-        record = services.repo_record(body.repo_id)
-        if record is None or not services.access.can_see(body.repo_id, visitor):
-            raise HTTPException(status_code=404, detail=f"repo {body.repo_id} is not indexed")
-        limit_ask(request)
-        services.access.touch(body.repo_id)
+        record = authorize_ask(body, request, services, visitor)
         try:
             result = services.pipeline(record, body.filters.to_filter()).ask(body.question, body.turns())
         except QuotaExhaustedError as exc:
@@ -271,7 +269,50 @@ def create_app(container: Container | None = None) -> FastAPI:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
         return AskResponse.from_result(result, record.commit_sha)
 
+    @app.post("/ask/stream")
+    def ask_stream(body: AskRequest, request: Request, services: Services, visitor: Visitor) -> StreamingResponse:
+        record = authorize_ask(body, request, services, visitor)
+        events: queue.Queue[dict[str, Any] | None] = queue.Queue()
+        worker = threading.Thread(target=stream_answer, args=(services, record, body, events), daemon=True)
+        worker.start()
+
+        def lines() -> Iterator[str]:
+            while (event := events.get()) is not None:
+                yield json.dumps(event) + "\n"
+
+        return StreamingResponse(lines(), media_type="application/x-ndjson")
+
     return app
+
+
+def authorize_ask(body: AskRequest, request: Request, services: Container, visitor: str | None) -> RepoRecord:
+    record = services.repo_record(body.repo_id)
+    if record is None or not services.access.can_see(body.repo_id, visitor):
+        raise HTTPException(status_code=404, detail=f"repo {body.repo_id} is not indexed")
+    limit_ask(request)
+    services.access.touch(body.repo_id)
+    return record
+
+
+def stream_answer(
+    services: Container, record: RepoRecord, body: AskRequest, events: "queue.Queue[dict[str, Any] | None]"
+) -> None:
+    try:
+        pipeline = services.pipeline(record, body.filters.to_filter())
+        result = pipeline.ask(
+            body.question, body.turns(), on_delta=lambda text: events.put({"type": "delta", "text": text})
+        )
+        response = AskResponse.from_result(result, record.commit_sha)
+        events.put({"type": "final", "response": response.model_dump()})
+    except QuotaExhaustedError:
+        events.put({"type": "error", "detail": QUOTA_MESSAGE})
+    except GenerationError as exc:
+        events.put({"type": "error", "detail": str(exc)})
+    except Exception:
+        logger.exception("streamed answer failed", extra={"repo_id": record.repo_id})
+        events.put({"type": "error", "detail": "internal error"})
+    finally:
+        events.put(None)
 
 
 app = create_app()

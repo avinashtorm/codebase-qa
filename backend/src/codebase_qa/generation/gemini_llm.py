@@ -1,6 +1,6 @@
 import json
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from typing import Any
 
 from google import genai
@@ -47,6 +47,7 @@ class GeminiLLM:
         self.backoff_seconds = backoff_seconds
         self.sleep = sleep
         self.cache = cache
+        self.last_usage: LLMResponse | None = None
 
     def cache_key(self, system: str, prompt: str, schema: type[BaseModel] | None) -> str:
         return ResponseCache.key(
@@ -69,6 +70,47 @@ class GeminiLLM:
                 key, response.text, input_tokens=response.input_tokens, output_tokens=response.output_tokens
             )
         return response
+
+    def stream(self, system: str, prompt: str, schema: type[BaseModel] | None = None) -> Iterator[str]:
+        key = self.cache_key(system, prompt, schema)
+        cached = self.cache.get(key) if self.cache else None
+        if cached is not None:
+            yield cached
+            return
+        parts: list[str] = []
+        usage = (0, 0)
+        for chunk in self.open_stream(system, prompt, schema):
+            usage = token_counts(chunk) if token_counts(chunk) != (0, 0) else usage
+            text = chunk.text or ""
+            if text:
+                parts.append(text)
+                yield text
+        self.last_usage = LLMResponse("".join(parts), usage[0], usage[1])
+        if self.cache:
+            self.cache.put(key, "".join(parts), input_tokens=usage[0], output_tokens=usage[1])
+
+    def open_stream(self, system: str, prompt: str, schema: type[BaseModel] | None) -> Iterator[Any]:
+        config = self.config(system, schema)
+        for attempt in range(1, self.max_attempts + 1):
+            try:
+                stream = self.client.models.generate_content_stream(model=self.model, contents=prompt, config=config)
+                iterator = iter(stream)
+                first = next(iterator, None)
+            except errors.APIError as exc:
+                if is_daily_quota(exc):
+                    raise QuotaExhaustedError(f"daily quota exhausted for {self.model}") from exc
+                if exc.code not in RETRYABLE_STATUS_CODES or attempt == self.max_attempts:
+                    raise GenerationError(f"language model request failed with status {exc.code}") from exc
+                self.sleep(self.backoff_seconds * 2 ** (attempt - 1))
+                continue
+            if first is not None:
+                yield first
+            try:
+                yield from iterator
+            except errors.APIError as exc:
+                raise GenerationError(f"language model stream failed with status {exc.code}") from exc
+            return
+        raise GenerationError("language model request failed")
 
     def config(self, system: str, schema: type[BaseModel] | None) -> types.GenerateContentConfig:
         if schema is None:

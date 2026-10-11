@@ -5,7 +5,8 @@ from codebase_qa.generation.confidence import Confidence, ConfidencePolicy, asse
 from codebase_qa.generation.grounding import is_low_relevance, validate_citations
 from codebase_qa.generation.refusal import NOT_FOUND_LEAD, closest_files, helpful_text, is_unknown, pick_suggestions
 from codebase_qa.generation.selfcheck import SKIPPED, SelfCheck, SelfChecker
-from codebase_qa.interfaces import Generator, Retriever
+from codebase_qa.generation.streaming import Delta
+from codebase_qa.interfaces import Generator, Retriever, StreamingGenerator
 from codebase_qa.models import GeneratedAnswer, RetrievedChunk
 from codebase_qa.routing.followup import FollowUpRewriter, Rewrite, Turn
 from codebase_qa.routing.router import QuestionRouter, RouteDecision
@@ -101,21 +102,23 @@ class QAPipeline:
         code_slots = max(self.top_k - len(retrieval.overview), 0)
         return retrieval.overview + retrieval.code[:code_slots]
 
-    def ask(self, question: str, history: list[Turn] | None = None) -> AskResult:
-        return self.answer(question, self.retrieve(question, self.top_k, history))
+    def ask(self, question: str, history: list[Turn] | None = None, on_delta: Delta | None = None) -> AskResult:
+        return self.answer(question, self.retrieve(question, self.top_k, history), on_delta)
 
-    def answer(self, question: str, retrieval: Retrieval) -> AskResult:
-        result = self.respond(retrieval.question or question, retrieval)
+    def answer(self, question: str, retrieval: Retrieval, on_delta: Delta | None = None) -> AskResult:
+        result = self.respond(retrieval.question or question, retrieval, on_delta)
         if result.route == "tool":
             level = Confidence("high", ["answered from the assistant's own description"])
         else:
             level = assess(result.answer, result.context, result.refused, result.self_check, self.confidence_policy)
         return replace(result, question=retrieval.question or question, confidence=level)
 
-    def respond(self, question: str, retrieval: Retrieval) -> AskResult:
+    def respond(self, question: str, retrieval: Retrieval, on_delta: Delta | None = None) -> AskResult:
         timings = dict(retrieval.timings_ms)
         if retrieval.route == "tool":
             answered = timed(timings, "generation", lambda: self.tool.answer(question))
+            if on_delta is not None:
+                on_delta(answered.answer)
             return AskResult(answer=answered, context=[], timings_ms=timings, route="tool")
         context = self.context_for(retrieval)
         if retrieval.route == "code" and is_low_relevance(context, self.refusal_thresholds):
@@ -123,7 +126,7 @@ class QAPipeline:
         builder = self.context_builder
         if builder is not None:
             context = timed(timings, "context", lambda: builder.build(context))
-        generated = timed(timings, "generation", lambda: self.generator.generate(question, context))
+        generated = timed(timings, "generation", lambda: self.generate(question, context, on_delta))
         valid, invalid = validate_citations(generated.citations, context)
         grounded = replace(generated, citations=valid, invalid_citations=generated.invalid_citations + invalid)
         if is_unknown(grounded):
@@ -135,6 +138,12 @@ class QAPipeline:
         return AskResult(
             answer=grounded, context=context, timings_ms=timings, route=retrieval.route, self_check=check
         )
+
+    def generate(self, question: str, context: list[RetrievedChunk], on_delta: Delta | None) -> GeneratedAnswer:
+        generator = self.generator
+        if on_delta is not None and isinstance(generator, StreamingGenerator):
+            return generator.generate_stream(question, context, on_delta)
+        return generator.generate(question, context)
 
     def helpful(
         self,

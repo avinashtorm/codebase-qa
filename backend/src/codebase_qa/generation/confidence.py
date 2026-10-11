@@ -52,6 +52,8 @@ def assess(
         return Confidence("low", ["no matching code was found"])
     if not answer.citations:
         return Confidence("low", ["the answer has no verified citation"])
+    if check.ran and check.unsupported and check.supported == 0:
+        return Confidence("low", ["the self-check found no claim supported by the cited lines"])
     score = top_vector_score(context)
     if score is not None and score < policy.low_score:
         return Confidence("low", [f"weak search match ({score:.2f})"])

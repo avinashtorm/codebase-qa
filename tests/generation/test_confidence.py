@@ -31,6 +31,7 @@ def test_high_when_top_ranked_citation_and_clean_self_check() -> None:
 def test_low_for_refusals_missing_citations_and_weak_matches() -> None:
     assert assess(answer("a.py"), CONTEXT, True, CLEAN).level == "low"
     assert assess(answer(), CONTEXT, False, CLEAN).level == "low"
+    assert assess(answer("a.py"), CONTEXT, False, SelfCheck(True, 0, ["x", "y"], "warn")).level == "low"
     weak = [item("a.py", 1, 0.61)]
     assert assess(answer("a.py"), weak, False, CLEAN, ConfidencePolicy(low_score=0.63)).level == "low"
 

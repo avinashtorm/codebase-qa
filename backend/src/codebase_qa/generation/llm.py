@@ -1,3 +1,4 @@
+from collections.abc import Iterator
 from dataclasses import dataclass
 
 from pydantic import BaseModel
@@ -23,4 +24,7 @@ class OfflineLLM:
     model = "offline"
 
     def complete(self, system: str, prompt: str, schema: type[BaseModel] | None = None) -> LLMResponse:
+        raise GenerationError("no language model is configured")
+
+    def stream(self, system: str, prompt: str, schema: type[BaseModel] | None = None) -> Iterator[str]:
         raise GenerationError("no language model is configured")
