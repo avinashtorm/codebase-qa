@@ -2,6 +2,7 @@ from dataclasses import dataclass, field, replace
 
 from codebase_qa.context.builder import ContextBuilder
 from codebase_qa.generation.confidence import Confidence, ConfidencePolicy, assess
+from codebase_qa.generation.fallback import DEGRADING_ERRORS, fallback_answer
 from codebase_qa.generation.grounding import is_low_relevance, validate_citations
 from codebase_qa.generation.refusal import NOT_FOUND_LEAD, closest_files, helpful_text, is_unknown, pick_suggestions
 from codebase_qa.generation.selfcheck import SKIPPED, SelfCheck, SelfChecker
@@ -37,6 +38,7 @@ class AskResult:
     question: str = ""
     self_check: SelfCheck = SKIPPED
     confidence: Confidence = Confidence("low")
+    degraded: str = ""
 
 
 class QAPipeline:
@@ -107,6 +109,8 @@ class QAPipeline:
 
     def answer(self, question: str, retrieval: Retrieval, on_delta: Delta | None = None) -> AskResult:
         result = self.respond(retrieval.question or question, retrieval, on_delta)
+        if result.degraded:
+            return replace(result, question=retrieval.question or question)
         if result.route == "tool":
             level = Confidence("high", ["answered from the assistant's own description"])
         else:
@@ -126,7 +130,19 @@ class QAPipeline:
         builder = self.context_builder
         if builder is not None:
             context = timed(timings, "context", lambda: builder.build(context))
-        generated = timed(timings, "generation", lambda: self.generate(question, context, on_delta))
+        try:
+            generated = timed(timings, "generation", lambda: self.generate(question, context, on_delta))
+        except DEGRADING_ERRORS as exc:
+            fallback = fallback_answer(exc, context)
+            confidence = Confidence("low", ["the AI model was not available; showing the best search matches"])
+            return AskResult(
+                answer=fallback,
+                context=context,
+                timings_ms=timings,
+                route=retrieval.route,
+                degraded=type(exc).__name__,
+                confidence=confidence,
+            )
         valid, invalid = validate_citations(generated.citations, context)
         grounded = replace(generated, citations=valid, invalid_citations=generated.invalid_citations + invalid)
         if is_unknown(grounded):

@@ -22,6 +22,7 @@ class RepoJanitor:
         ttl: timedelta,
         max_repos: int,
         overview_dir: Path | None = None,
+        on_delete: Callable[[str], object] | None = None,
         clock: Callable[[], datetime] = utc_now,
     ) -> None:
         self.registry = registry
@@ -33,6 +34,7 @@ class RepoJanitor:
         self.max_repos = max_repos
         self.clock = clock
         self.overview_dir = overview_dir
+        self.on_delete = on_delete
 
     def last_used(self) -> dict[str, datetime]:
         entries = self.access.load()
@@ -73,6 +75,8 @@ class RepoJanitor:
                 self.registry.delete(key)
         remove_tree(self.repos_dir / repo_id)
         self.access.remove(repo_id)
+        if self.on_delete is not None:
+            self.on_delete(repo_id)
 
 
 def parse(stamp: str) -> datetime:

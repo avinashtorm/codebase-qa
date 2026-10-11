@@ -101,9 +101,11 @@ class QuotaGenerator:
         raise QuotaExhaustedError("daily quota exhausted for gemini")
 
 
-def test_exhausted_llm_quota_gives_a_friendly_message(tmp_path: Path, make_repo: RepoFactory) -> None:
+def test_exhausted_llm_quota_falls_back_to_best_matches(tmp_path: Path, make_repo: RepoFactory) -> None:
     with build_client(tmp_path, generator_factory=lambda _: QuotaGenerator()) as client:
         index(client, make_repo().as_uri())
-        response = client.post("/ask", json={"repo_id": "origin", "question": "login"})
-    assert response.status_code == 503
-    assert "try again tomorrow" in response.json()["detail"]
+        body = client.post("/ask", json={"repo_id": "origin", "question": "AuthService login"}).json()
+        again = client.post("/ask", json={"repo_id": "origin", "question": "AuthService login"}).json()
+    assert body["degraded"] == "QuotaExhaustedError" and "daily quota is used up" in body["answer"]
+    assert body["citations"] and body["confidence"] == "low" and body["used_llm"] is False
+    assert again["cached"] is False

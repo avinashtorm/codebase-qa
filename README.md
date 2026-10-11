@@ -126,6 +126,14 @@ answers.
 | 10 | Metadata filters (folder and language from the sidebar) | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | unchanged without a filter; with the answer's top-level folder selected ("oracle" filter): Hit@5 **0.857**, Recall@10 **0.862**, MRR 0.694 |
 | 11 | Streaming answers (`POST /ask/stream`, NDJSON) with validation after the stream | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | same generation call and JSON schema, so quality is unchanged; first text after ~2.3 s instead of the full ~4.6 s answer, citations and badge when the stream completes |
 
+**Production features (Part D)** do not change retrieval or answers; measured effects:
+
+| Step | Change | Measurement |
+|---|---|---|
+| 14 | Observability (per-stage latency, tokens, estimated cost in SQLite, `/stats` page) | every question logged; no metric change |
+| 15 | Embedding cache by content hash + answer cache per repo/commit/question | full re-index of the test repo **134.4 s -> 6.8 s** with a warm embedding cache (1,087/1,087 chunks reused); repeated question **7.1 s -> 61 ms**; caches cleared on re-index and repo deletion |
+| 16 | Typed LLM failures, backoff on 429/5xx/network errors, graceful fallback | quota, rate-limit or outage during answering returns a friendly message plus the best-matching code locations (low confidence) instead of an error; not cached |
+
 **Before and after each part** (50 dev questions: the 35 code questions plus 10 overview and 5 unanswerable;
 `gemini-3.1-flash-lite` as generator and judge, see the note below). Retrieval and citation metrics use the 35 questions
 with expected locations; refusal accuracy uses all 50 (refuse exactly the unanswerable ones); faithfulness (1-5) is

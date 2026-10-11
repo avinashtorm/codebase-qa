@@ -1,17 +1,37 @@
 import json
 import time
 from collections.abc import Callable, Iterator
-from typing import Any
+from typing import Any, TypeVar
 
+import httpx
 from google import genai
 from google.genai import errors, types
 from pydantic import BaseModel
 
 from codebase_qa.generation.cache import ResponseCache
-from codebase_qa.generation.llm import GenerationError, LLMResponse, QuotaExhaustedError
+from codebase_qa.generation.llm import (
+    GenerationError,
+    LLMResponse,
+    LLMUnavailableError,
+    QuotaExhaustedError,
+    RateLimitedError,
+)
 
 RETRYABLE_STATUS_CODES = frozenset({429, 500, 503})
 CACHE_VERSION = "llm-v2"
+
+
+TRANSIENT_ERRORS = (httpx.HTTPError, ConnectionError, TimeoutError)
+T = TypeVar("T")
+
+
+def classify(exc: errors.APIError) -> GenerationError:
+    message = f"language model request failed with status {exc.code}"
+    if exc.code == 429:
+        return RateLimitedError(message)
+    if exc.code in RETRYABLE_STATUS_CODES:
+        return LLMUnavailableError(message)
+    return GenerationError(message)
 
 
 def is_daily_quota(exc: errors.APIError) -> bool:
@@ -94,26 +114,36 @@ class GeminiLLM:
 
     def open_stream(self, system: str, prompt: str, schema: type[BaseModel] | None) -> Iterator[Any]:
         config = self.config(system, schema)
+
+        def start() -> tuple[Iterator[Any], Any]:
+            stream = self.client.models.generate_content_stream(model=self.model, contents=prompt, config=config)
+            iterator = iter(stream)
+            return iterator, next(iterator, None)
+
+        iterator, first = self.with_retries(start)
+        if first is not None:
+            yield first
+        try:
+            yield from iterator
+        except errors.APIError as exc:
+            raise classify(exc) from exc
+        except TRANSIENT_ERRORS as exc:
+            raise LLMUnavailableError(f"language model stream was interrupted ({type(exc).__name__})") from exc
+
+    def with_retries(self, call: Callable[[], T]) -> T:
         for attempt in range(1, self.max_attempts + 1):
             try:
-                stream = self.client.models.generate_content_stream(model=self.model, contents=prompt, config=config)
-                iterator = iter(stream)
-                first = next(iterator, None)
+                return call()
             except errors.APIError as exc:
                 if is_daily_quota(exc):
                     raise QuotaExhaustedError(f"daily quota exhausted for {self.model}") from exc
                 if exc.code not in RETRYABLE_STATUS_CODES or attempt == self.max_attempts:
-                    raise GenerationError(f"language model request failed with status {exc.code}") from exc
-                self.sleep(self.backoff_seconds * 2 ** (attempt - 1))
-                continue
-            if first is not None:
-                yield first
-            try:
-                yield from iterator
-            except errors.APIError as exc:
-                raise GenerationError(f"language model stream failed with status {exc.code}") from exc
-            return
-        raise GenerationError("language model request failed")
+                    raise classify(exc) from exc
+            except TRANSIENT_ERRORS as exc:
+                if attempt == self.max_attempts:
+                    raise LLMUnavailableError(f"language model is unreachable ({type(exc).__name__})") from exc
+            self.sleep(self.backoff_seconds * 2 ** (attempt - 1))
+        raise LLMUnavailableError("language model request failed")
 
     def config(self, system: str, schema: type[BaseModel] | None) -> types.GenerateContentConfig:
         if schema is None:
@@ -127,15 +157,10 @@ class GeminiLLM:
 
     def request(self, system: str, prompt: str, schema: type[BaseModel] | None) -> LLMResponse:
         config = self.config(system, schema)
-        for attempt in range(1, self.max_attempts + 1):
-            try:
-                response = self.client.models.generate_content(model=self.model, contents=prompt, config=config)
-                input_tokens, output_tokens = token_counts(response)
-                return LLMResponse(response.text or "", input_tokens, output_tokens)
-            except errors.APIError as exc:
-                if is_daily_quota(exc):
-                    raise QuotaExhaustedError(f"daily quota exhausted for {self.model}") from exc
-                if exc.code not in RETRYABLE_STATUS_CODES or attempt == self.max_attempts:
-                    raise GenerationError(f"language model request failed with status {exc.code}") from exc
-                self.sleep(self.backoff_seconds * 2 ** (attempt - 1))
-        raise GenerationError("language model request failed")
+
+        def call() -> LLMResponse:
+            response = self.client.models.generate_content(model=self.model, contents=prompt, config=config)
+            input_tokens, output_tokens = token_counts(response)
+            return LLMResponse(response.text or "", input_tokens, output_tokens)
+
+        return self.with_retries(call)

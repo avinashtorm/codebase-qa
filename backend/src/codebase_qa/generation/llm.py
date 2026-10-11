@@ -12,6 +12,14 @@ class QuotaExhaustedError(GenerationError):
     pass
 
 
+class RateLimitedError(GenerationError):
+    pass
+
+
+class LLMUnavailableError(GenerationError):
+    pass
+
+
 @dataclass(frozen=True)
 class LLMResponse:
     text: str

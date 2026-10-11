@@ -3,10 +3,12 @@ from datetime import timedelta
 from functools import cached_property
 from pathlib import Path
 
+from codebase_qa.caching.answers import AnswerCache
 from codebase_qa.chunking.factory import build_chunker
 from codebase_qa.config import Settings
 from codebase_qa.context.builder import ContextBuilder
 from codebase_qa.context.catalog import ChunkCatalog, LineReader
+from codebase_qa.embedding.cache import CachingEmbedder, EmbeddingStore
 from codebase_qa.generation.confidence import ConfidencePolicy
 from codebase_qa.generation.generator import LLMGenerator
 from codebase_qa.generation.llm import OfflineLLM
@@ -82,7 +84,14 @@ class Container:
 
     @cached_property
     def embedder(self) -> Embedder:
-        return self.embedder_factory(self.settings)
+        inner = self.embedder_factory(self.settings)
+        if not self.settings.embedding_cache:
+            return inner
+        return CachingEmbedder(inner, EmbeddingStore(self.settings.embedding_cache_path), self.settings.embedding_model)
+
+    @cached_property
+    def answer_cache(self) -> AnswerCache:
+        return AnswerCache(self.settings.answer_cache_path)
 
     @cached_property
     def llm(self) -> LLM:
@@ -167,6 +176,7 @@ class Container:
             ttl=timedelta(hours=self.settings.repo_ttl_hours),
             max_repos=self.settings.max_visitor_repos,
             overview_dir=self.settings.overview_dir,
+            on_delete=self.answer_cache.invalidate,
         )
 
     def visible_records(self, visitor: str | None) -> list[RepoRecord]:

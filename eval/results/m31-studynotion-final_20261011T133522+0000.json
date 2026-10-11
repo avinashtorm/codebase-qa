@@ -1,0 +1,2343 @@
+{
+ "config": "m31-studynotion-final",
+ "timestamp": "2026-10-11T13:35:22+00:00",
+ "split": "all",
+ "question_count": 20,
+ "with_answers": true,
+ "answered_count": 16,
+ "generation_error": null,
+ "settings": {
+  "chunker": "treesitter",
+  "retrieval_mode": "vector",
+  "rerank": false,
+  "rerank_candidates": 30,
+  "rerank_fusion": false,
+  "overview": true,
+  "routing": true,
+  "routing_llm": true,
+  "followup_rewrite": true,
+  "query_expansion": false,
+  "expansion_original_weight": 4,
+  "expansion_skip_above": 0.0,
+  "parent_context": false,
+  "call_context": true,
+  "self_check": true,
+  "hygiene": true,
+  "downweight_factor": 0.9,
+  "downweight_tests": true,
+  "reranker_model": null,
+  "top_k": 8,
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "llm": "gemini-3.1-flash-lite",
+  "repo_commit": "4279c14e814372708fb675e72738c31a3653fdee"
+ },
+ "metrics": {
+  "hit_at_1": 0.6875,
+  "hit_at_5": 0.9375,
+  "recall_at_10": 0.9688,
+  "mrr": 0.7937,
+  "invalid_citations": 0,
+  "citation_precision": 0.7396,
+  "citation_any_correct": 0.9375,
+  "refused": 2,
+  "refusal_accuracy": 1.0,
+  "answered_when_answerable": 1.0,
+  "refused_when_unanswerable": 1.0,
+  "judged": 20,
+  "faithfulness_mean": 5,
+  "faithful_rate": 1.0,
+  "relevance_mean": 5,
+  "relevant_rate": 1.0,
+  "confidence_high": 9,
+  "confidence_high_correct": 1.0,
+  "confidence_medium": 8,
+  "confidence_medium_correct": 0.8333,
+  "confidence_low": 3,
+  "confidence_low_correct": 1.0,
+  "self_checked": 18,
+  "answers_with_unsupported": 2,
+  "unsupported_claim_rate": 0.0364,
+  "route_code": 18,
+  "route_overview": 2,
+  "route_tool": 0,
+  "context_ms_mean": 3.6,
+  "downweight_ms_mean": 5.3,
+  "embed_query_ms_mean": 157.2,
+  "generation_ms_mean": 2769.4,
+  "overview_embed_ms_mean": 143.0,
+  "overview_search_ms_mean": 14.9,
+  "retrieval_ms_mean": 181.0,
+  "rewrite_ms_mean": 0.0,
+  "routing_ms_mean": 0.4,
+  "self_check_ms_mean": 3994.4,
+  "vector_search_ms_mean": 18.0
+ },
+ "by_category": {
+  "config": {
+   "count": 1,
+   "hit_at_1": 1.0,
+   "hit_at_5": 1.0,
+   "recall_at_10": 1.0,
+   "mrr": 1.0,
+   "invalid_citations": 0,
+   "citation_precision": 1.0,
+   "citation_any_correct": 1.0,
+   "refused": 0,
+   "refusal_accuracy": 1.0,
+   "answered_when_answerable": 1.0,
+   "judged": 1,
+   "faithfulness_mean": 5,
+   "faithful_rate": 1.0,
+   "relevance_mean": 5,
+   "relevant_rate": 1.0,
+   "confidence_high": 1,
+   "confidence_high_correct": 1.0,
+   "confidence_medium": 0,
+   "confidence_low": 0,
+   "self_checked": 1,
+   "answers_with_unsupported": 0,
+   "unsupported_claim_rate": 0.0,
+   "route_code": 1,
+   "route_overview": 0,
+   "route_tool": 0,
+   "context_ms_mean": 2.8,
+   "downweight_ms_mean": 3.5,
+   "embed_query_ms_mean": 155.0,
+   "generation_ms_mean": 2003.1,
+   "retrieval_ms_mean": 174.6,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.3,
+   "self_check_ms_mean": 1563.6,
+   "vector_search_ms_mean": 15.8
+  },
+  "how-does": {
+   "count": 6,
+   "hit_at_1": 0.6667,
+   "hit_at_5": 0.8333,
+   "recall_at_10": 0.9167,
+   "mrr": 0.7778,
+   "invalid_citations": 0,
+   "citation_precision": 0.8056,
+   "citation_any_correct": 1.0,
+   "refused": 0,
+   "refusal_accuracy": 1.0,
+   "answered_when_answerable": 1.0,
+   "judged": 6,
+   "faithfulness_mean": 5,
+   "faithful_rate": 1.0,
+   "relevance_mean": 5,
+   "relevant_rate": 1.0,
+   "confidence_high": 4,
+   "confidence_high_correct": 1.0,
+   "confidence_medium": 2,
+   "confidence_medium_correct": 1.0,
+   "confidence_low": 0,
+   "self_checked": 6,
+   "answers_with_unsupported": 1,
+   "unsupported_claim_rate": 0.0556,
+   "route_code": 6,
+   "route_overview": 0,
+   "route_tool": 0,
+   "context_ms_mean": 3.1,
+   "downweight_ms_mean": 4.4,
+   "embed_query_ms_mean": 150.4,
+   "generation_ms_mean": 2137.3,
+   "retrieval_ms_mean": 173.1,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.3,
+   "self_check_ms_mean": 1688.1,
+   "vector_search_ms_mean": 17.6
+  },
+  "overview": {
+   "count": 2,
+   "invalid_citations": 0,
+   "refused": 0,
+   "refusal_accuracy": 1.0,
+   "answered_when_answerable": 1.0,
+   "judged": 2,
+   "faithfulness_mean": 5,
+   "faithful_rate": 1.0,
+   "relevance_mean": 5,
+   "relevant_rate": 1.0,
+   "confidence_high": 0,
+   "confidence_medium": 2,
+   "confidence_low": 0,
+   "self_checked": 2,
+   "answers_with_unsupported": 1,
+   "unsupported_claim_rate": 0.0909,
+   "route_code": 0,
+   "route_overview": 2,
+   "route_tool": 0,
+   "context_ms_mean": 5.2,
+   "downweight_ms_mean": 3.3,
+   "embed_query_ms_mean": 165.0,
+   "generation_ms_mean": 2806.5,
+   "overview_embed_ms_mean": 143.0,
+   "overview_search_ms_mean": 14.9,
+   "retrieval_ms_mean": 189.3,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.5,
+   "self_check_ms_mean": 21090.7,
+   "vector_search_ms_mean": 20.7
+  },
+  "unanswerable": {
+   "count": 2,
+   "invalid_citations": 0,
+   "refused": 2,
+   "refusal_accuracy": 1.0,
+   "refused_when_unanswerable": 1.0,
+   "judged": 2,
+   "confidence_high": 0,
+   "confidence_medium": 0,
+   "confidence_low": 2,
+   "route_code": 2,
+   "route_overview": 0,
+   "route_tool": 0,
+   "context_ms_mean": 5.0,
+   "downweight_ms_mean": 4.2,
+   "embed_query_ms_mean": 142.9,
+   "generation_ms_mean": 5125.6,
+   "retrieval_ms_mean": 167.0,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.3,
+   "vector_search_ms_mean": 19.5
+  },
+  "what-happens-when": {
+   "count": 4,
+   "hit_at_1": 0.5,
+   "hit_at_5": 1.0,
+   "recall_at_10": 1.0,
+   "mrr": 0.7083,
+   "invalid_citations": 0,
+   "citation_precision": 0.4583,
+   "citation_any_correct": 0.75,
+   "refused": 0,
+   "refusal_accuracy": 1.0,
+   "answered_when_answerable": 1.0,
+   "judged": 4,
+   "faithfulness_mean": 5,
+   "faithful_rate": 1.0,
+   "relevance_mean": 5,
+   "relevant_rate": 1.0,
+   "confidence_high": 0,
+   "confidence_medium": 3,
+   "confidence_medium_correct": 0.6667,
+   "confidence_low": 1,
+   "confidence_low_correct": 1.0,
+   "self_checked": 4,
+   "answers_with_unsupported": 0,
+   "unsupported_claim_rate": 0.0,
+   "route_code": 4,
+   "route_overview": 0,
+   "route_tool": 0,
+   "context_ms_mean": 3.0,
+   "downweight_ms_mean": 3.4,
+   "embed_query_ms_mean": 170.2,
+   "generation_ms_mean": 3652.5,
+   "retrieval_ms_mean": 192.3,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.4,
+   "self_check_ms_mean": 2450.2,
+   "vector_search_ms_mean": 18.1
+  },
+  "where-is": {
+   "count": 5,
+   "hit_at_1": 0.8,
+   "hit_at_5": 1.0,
+   "recall_at_10": 1.0,
+   "mrr": 0.84,
+   "invalid_citations": 0,
+   "citation_precision": 0.8333,
+   "citation_any_correct": 1.0,
+   "refused": 0,
+   "refusal_accuracy": 1.0,
+   "answered_when_answerable": 1.0,
+   "judged": 5,
+   "faithfulness_mean": 5,
+   "faithful_rate": 1.0,
+   "relevance_mean": 5,
+   "relevant_rate": 1.0,
+   "confidence_high": 4,
+   "confidence_high_correct": 1.0,
+   "confidence_medium": 1,
+   "confidence_medium_correct": 1.0,
+   "confidence_low": 0,
+   "self_checked": 5,
+   "answers_with_unsupported": 0,
+   "unsupported_claim_rate": 0.0,
+   "route_code": 5,
+   "route_overview": 0,
+   "route_tool": 0,
+   "context_ms_mean": 3.5,
+   "downweight_ms_mean": 9.4,
+   "embed_query_ms_mean": 158.0,
+   "generation_ms_mean": 2017.2,
+   "retrieval_ms_mean": 185.0,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.4,
+   "self_check_ms_mean": 1644.9,
+   "vector_search_ms_mean": 17.0
+  }
+ },
+ "questions": [
+  {
+   "id": "s01",
+   "category": "where-is",
+   "question": "Where is the JWT from a request verified on the server?",
+   "standalone_question": "Where is the JWT from a request verified on the server?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/middleware/auth.js",
+     "start_line": 9,
+     "end_line": 44
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/middleware/auth.js:1-60",
+     "score": 0.7651
+    },
+    {
+     "location": "server/controllers/Auth.js:121-180",
+     "score": 0.7404
+    },
+    {
+     "location": "server/middleware/auth.js:61-98",
+     "score": 0.7086
+    },
+    {
+     "location": "server/controllers/Auth.js:1-60",
+     "score": 0.7035
+    },
+    {
+     "location": "src/pages/VerifyEmail.jsx:49-108",
+     "score": 0.6951
+    },
+    {
+     "location": "server/controllers/Auth.js:181-240",
+     "score": 0.6939
+    },
+    {
+     "location": "server/controllers/Auth.js:61-120",
+     "score": 0.6932
+    },
+    {
+     "location": "server/routes/Payments.js:1-21",
+     "score": 0.6908
+    },
+    {
+     "location": "src/pages/VerifyEmail.jsx:110-110",
+     "score": 0.687
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:99-123",
+     "score": 0.6734
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.2,
+    "routing": 0.7,
+    "retrieval": 188.0,
+    "embed_query": 139.2,
+    "vector_search": 18.5,
+    "downweight": 28.4,
+    "context": 5.3,
+    "generation": 2105.8,
+    "self_check": 2025.1
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 2,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "high",
+   "answer": "The JWT from a request is verified in the `auth` middleware function located in `server/middleware/auth.js`. This function extracts the token from the request cookies, body, or authorization header and uses `jwt.verify` with the secret key stored in the environment variables to validate it.",
+   "citations": [
+    "server/middleware/auth.js:9-30"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the file and function responsible for JWT verification and accurately describes the process.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s02",
+   "category": "where-is",
+   "question": "Where is the JWT signed when a user logs in?",
+   "standalone_question": "Where is the JWT signed when a user logs in?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/Auth.js",
+     "start_line": 143,
+     "end_line": 150
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/Auth.js:121-180",
+     "score": 0.7316
+    },
+    {
+     "location": "server/middleware/auth.js:1-60",
+     "score": 0.7214
+    },
+    {
+     "location": "server/controllers/Auth.js:1-60",
+     "score": 0.6887
+    },
+    {
+     "location": "server/middleware/auth.js:61-98",
+     "score": 0.6704
+    },
+    {
+     "location": "src/pages/Login.jsx:4-14",
+     "score": 0.6695
+    },
+    {
+     "location": "src/pages/Login.jsx:16-16",
+     "score": 0.6679
+    },
+    {
+     "location": "server/controllers/Auth.js:181-240",
+     "score": 0.6647
+    },
+    {
+     "location": "src/components/core/Auth/SignupForm.jsx:195-195",
+     "score": 0.6644
+    },
+    {
+     "location": "src/components/core/Auth/LoginForm.jsx:90-90",
+     "score": 0.6632
+    },
+    {
+     "location": "server/controllers/Auth.js:61-120",
+     "score": 0.6593
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 173.2,
+    "embed_query": 149.5,
+    "vector_search": 18.0,
+    "downweight": 5.4,
+    "context": 2.8,
+    "generation": 1658.8,
+    "self_check": 2117.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 1,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "high",
+   "answer": "When a user logs in, the JWT is signed within the `login` controller function using `jwt.sign` with the user's email, ID, and role, along with the `JWT_SECRET` environment variable.",
+   "citations": [
+    "server/controllers/Auth.js:143-150"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies the location and method of JWT signing based on the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s03",
+   "category": "how-does",
+   "question": "How is the signup OTP generated and stored?",
+   "standalone_question": "How is the signup OTP generated and stored?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/Auth.js",
+     "start_line": 182,
+     "end_line": 226
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/Auth.js:181-240",
+     "score": 0.7483
+    },
+    {
+     "location": "server/mail/templates/emailVerificationTemplate.js:62-86",
+     "score": 0.7155
+    },
+    {
+     "location": "server/controllers/Auth.js:61-120",
+     "score": 0.7098
+    },
+    {
+     "location": "server/models/OTP.js:40-53",
+     "score": 0.7081
+    },
+    {
+     "location": "server/controllers/Auth.js:1-60",
+     "score": 0.7078
+    },
+    {
+     "location": "src/components/core/Auth/SignupForm.jsx:12-70",
+     "score": 0.6996
+    },
+    {
+     "location": "src/services/operations/authAPI.js:45-84",
+     "score": 0.6968
+    },
+    {
+     "location": "src/pages/Signup.jsx:1-2",
+     "score": 0.6932
+    },
+    {
+     "location": "server/models/OTP.js:1-18",
+     "score": 0.6931
+    },
+    {
+     "location": "src/pages/Signup.jsx:4-14",
+     "score": 0.692
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 181.2,
+    "embed_query": 160.2,
+    "vector_search": 15.8,
+    "downweight": 4.1,
+    "context": 2.8,
+    "generation": 2047.9,
+    "self_check": 1560.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 3,
+    "unsupported": [
+     "A post-save hook on the `OTPSchema` then triggers the `sendVerificationEmail` function to send the OTP to the user's email."
+    ],
+    "action": "remove"
+   },
+   "confidence": "medium",
+   "answer": "The OTP is generated in the `sendotp` controller using the `otp-generator` library, which creates a 6-digit numeric code. The system ensures the OTP is unique by checking the database and regenerating it if a collision occurs. Once generated, the OTP is stored in the database using the `OTP` model.\n\n_Self-check removed 1 statement the cited code did not support._",
+   "citations": [
+    "server/controllers/Auth.js:197-220",
+    "server/models/OTP.js:40-48",
+    "server/models/OTP.js:20-38"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 3,
+    "correct_citations": 1,
+    "precision": 0.3333333333333333,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the generation and storage process based on the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s05",
+   "category": "config",
+   "question": "How long is an OTP valid before it is deleted?",
+   "standalone_question": "How long is an OTP valid before it is deleted?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/models/OTP.js",
+     "start_line": 13,
+     "end_line": 17
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/models/OTP.js:1-18",
+     "score": 0.7181
+    },
+    {
+     "location": "server/controllers/Auth.js:61-120",
+     "score": 0.6779
+    },
+    {
+     "location": "server/controllers/Auth.js:181-240",
+     "score": 0.673
+    },
+    {
+     "location": "server/models/OTP.js:40-53",
+     "score": 0.6335
+    },
+    {
+     "location": "server/mail/templates/emailVerificationTemplate.js:62-86",
+     "score": 0.6255
+    },
+    {
+     "location": "server/controllers/Auth.js:1-60",
+     "score": 0.617
+    },
+    {
+     "location": "server/models/OTP.js:20-38",
+     "score": 0.6113
+    },
+    {
+     "location": "server/mail/templates/emailVerificationTemplate.js:2-61",
+     "score": 0.6104
+    },
+    {
+     "location": "src/pages/VerifyEmail.jsx:10-48",
+     "score": 0.605
+    },
+    {
+     "location": "src/pages/VerifyEmail.jsx:1-8",
+     "score": 0.5918
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 174.6,
+    "embed_query": 155.0,
+    "vector_search": 15.8,
+    "downweight": 3.5,
+    "context": 2.8,
+    "generation": 2003.1,
+    "self_check": 1563.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 1,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "high",
+   "answer": "An OTP is valid for 5 minutes before the document is automatically deleted from the database.",
+   "citations": [
+    "server/models/OTP.js:15-15"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately reflects the TTL configuration defined in the Mongoose schema.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s07",
+   "category": "what-happens-when",
+   "question": "What happens when a user logs in with a wrong password?",
+   "standalone_question": "What happens when a user logs in with a wrong password?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/Auth.js",
+     "start_line": 166,
+     "end_line": 171
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/Auth.js:241-291",
+     "score": 0.6684
+    },
+    {
+     "location": "server/controllers/resetPassword.js:1-60",
+     "score": 0.6459
+    },
+    {
+     "location": "server/controllers/Auth.js:121-180",
+     "score": 0.6413
+    },
+    {
+     "location": "server/controllers/resetPassword.js:61-90",
+     "score": 0.6412
+    },
+    {
+     "location": "src/pages/ForgotPassword.jsx:8-67",
+     "score": 0.635
+    },
+    {
+     "location": "src/services/operations/authAPI.js:145-171",
+     "score": 0.6344
+    },
+    {
+     "location": "src/components/core/Auth/LoginForm.jsx:8-31",
+     "score": 0.6243
+    },
+    {
+     "location": "src/components/core/Auth/LoginForm.jsx:32-88",
+     "score": 0.622
+    },
+    {
+     "location": "server/mail/templates/passwordUpdate.js:61-75",
+     "score": 0.6188
+    },
+    {
+     "location": "src/pages/UpdatePassword.jsx:37-96",
+     "score": 0.6159
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.3333333333333333
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 224.4,
+    "embed_query": 201.5,
+    "vector_search": 18.0,
+    "downweight": 3.5,
+    "context": 2.9,
+    "generation": 2639.3,
+    "self_check": 3391.8
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 2,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When a user attempts to log in with an incorrect password, the server compares the provided password with the stored password using `bcrypt.compare`. If the comparison fails, the server returns a 401 (Unauthorized) status code with the message \"Password is incorrect\".",
+   "citations": [
+    "server/controllers/Auth.js:158-163"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the server-side behavior when a password comparison fails during login, as shown in the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s08",
+   "category": "how-does",
+   "question": "How is a Razorpay order created for the courses in the cart?",
+   "standalone_question": "How is a Razorpay order created for the courses in the cart?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/payments.js",
+     "start_line": 14,
+     "end_line": 72
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:39-97",
+     "score": 0.7595
+    },
+    {
+     "location": "server/controllers/payments.js:1-60",
+     "score": 0.752
+    },
+    {
+     "location": "server/controllers/payments.js:61-120",
+     "score": 0.7284
+    },
+    {
+     "location": "server/config/razorpay.js:1-6",
+     "score": 0.7088
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:15-28",
+     "score": 0.6577
+    },
+    {
+     "location": "src/components/core/Course/CourseDetailsCard.jsx:117-125",
+     "score": 0.651
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:125-143",
+     "score": 0.6507
+    },
+    {
+     "location": "src/components/core/Course/CourseDetailsCard.jsx:57-116",
+     "score": 0.6492
+    },
+    {
+     "location": "server/controllers/Course.js:61-120",
+     "score": 0.6447
+    },
+    {
+     "location": "src/components/core/Course/CourseDetailsCard.jsx:19-56",
+     "score": 0.6387
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 197.5,
+    "embed_query": 172.8,
+    "vector_search": 18.2,
+    "downweight": 5.0,
+    "context": 2.1,
+    "generation": 3040.4,
+    "self_check": 1623.5
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 3,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "high",
+   "answer": "A Razorpay order is created by calling the `capturePayment` controller on the server. This function iterates through the list of course IDs provided in the request body, verifies that each course exists and that the user is not already enrolled, and calculates the total amount. It then uses the `instance.orders.create` method from the Razorpay SDK to initiate the order with the calculated amount and currency.",
+   "citations": [
+    "server/controllers/payments.js:13-58"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the process of creating a Razorpay order based on the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s09",
+   "category": "how-does",
+   "question": "How is the Razorpay payment signature verified?",
+   "standalone_question": "How is the Razorpay payment signature verified?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/payments.js",
+     "start_line": 93,
+     "end_line": 105
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/payments.js:61-120",
+     "score": 0.7808
+    },
+    {
+     "location": "server/config/razorpay.js:1-6",
+     "score": 0.6987
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:39-97",
+     "score": 0.6979
+    },
+    {
+     "location": "server/controllers/payments.js:1-60",
+     "score": 0.6978
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:125-143",
+     "score": 0.6876
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:99-123",
+     "score": 0.6573
+    },
+    {
+     "location": "src/pages/VerifyEmail.jsx:49-108",
+     "score": 0.6284
+    },
+    {
+     "location": "server/routes/Payments.js:1-21",
+     "score": 0.6216
+    },
+    {
+     "location": "src/pages/VerifyEmail.jsx:10-48",
+     "score": 0.621
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:15-28",
+     "score": 0.6113
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 159.5,
+    "embed_query": 136.7,
+    "vector_search": 16.6,
+    "downweight": 5.9,
+    "context": 1.5,
+    "generation": 1759.6,
+    "self_check": 1621.4
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 4,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "high",
+   "answer": "The Razorpay payment signature is verified in the `verifyPayment` controller on the server. It constructs a string by concatenating the `razorpay_order_id` and `razorpay_payment_id` with a pipe separator (`|`). This string is then hashed using the HMAC SHA256 algorithm with the `RAZORPAY_SECRET` environment variable as the key. Finally, the resulting hex digest is compared against the `razorpay_signature` provided in the request body.",
+   "citations": [
+    "server/controllers/payments.js:77-93"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the verification process implemented in the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s10",
+   "category": "what-happens-when",
+   "question": "What happens to a student after a payment is verified?",
+   "standalone_question": "What happens to a student after a payment is verified?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/payments.js",
+     "start_line": 142,
+     "end_line": 199
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:99-123",
+     "score": 0.6713
+    },
+    {
+     "location": "server/controllers/payments.js:141-199",
+     "score": 0.6243
+    },
+    {
+     "location": "server/mail/templates/paymentSuccessEmail.js:61-85",
+     "score": 0.6193
+    },
+    {
+     "location": "server/controllers/payments.js:1-60",
+     "score": 0.6069
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:39-97",
+     "score": 0.6004
+    },
+    {
+     "location": "server/controllers/payments.js:61-120",
+     "score": 0.5971
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:125-143",
+     "score": 0.5925
+    },
+    {
+     "location": "src/pages/CourseDetails.jsx:79-127",
+     "score": 0.5846
+    },
+    {
+     "location": "src/components/core/Course/CourseDetailsCard.jsx:57-116",
+     "score": 0.5821
+    },
+    {
+     "location": "src/components/core/Course/CourseDetailsCard.jsx:19-56",
+     "score": 0.5818
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 179.2,
+    "embed_query": 159.8,
+    "vector_search": 16.5,
+    "downweight": 2.6,
+    "context": 2.8,
+    "generation": 1893.2,
+    "self_check": 2679.3
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 5,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "After a payment is successfully verified, the `enrollStudents` function is called. This function performs the following actions for each course purchased: \n1. Updates the course document to add the student's ID to the `studentsEnroled` list.\n2. Creates a `CourseProgress` document for the student and the course.\n3. Updates the student's user document to include the course ID and the ID of the newly created `CourseProgress` document.\n4. Sends an email notification to the student confirming their successful enrollment.",
+   "citations": [
+    "server/controllers/payments.js:105-106",
+    "server/controllers/payments.js:141-199"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the backend process triggered after payment verification based on the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s11",
+   "category": "where-is",
+   "question": "Where is the password reset token generated and emailed?",
+   "standalone_question": "Where is the password reset token generated and emailed?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/resetPassword.js",
+     "start_line": 5,
+     "end_line": 48
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/resetPassword.js:1-60",
+     "score": 0.7413
+    },
+    {
+     "location": "src/services/operations/authAPI.js:119-143",
+     "score": 0.7358
+    },
+    {
+     "location": "server/controllers/resetPassword.js:61-90",
+     "score": 0.7232
+    },
+    {
+     "location": "src/pages/ForgotPassword.jsx:8-67",
+     "score": 0.705
+    },
+    {
+     "location": "server/mail/templates/passwordUpdate.js:61-75",
+     "score": 0.7021
+    },
+    {
+     "location": "server/controllers/Auth.js:241-291",
+     "score": 0.6792
+    },
+    {
+     "location": "src/services/operations/authAPI.js:145-171",
+     "score": 0.6688
+    },
+    {
+     "location": "server/mail/templates/passwordUpdate.js:1-60",
+     "score": 0.6641
+    },
+    {
+     "location": "server/controllers/Auth.js:121-180",
+     "score": 0.6623
+    },
+    {
+     "location": "src/components/core/Auth/LoginForm.jsx:32-88",
+     "score": 0.6417
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 179.6,
+    "embed_query": 160.6,
+    "vector_search": 14.4,
+    "downweight": 4.4,
+    "context": 3.0,
+    "generation": 1567.6,
+    "self_check": 1504.1
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 3,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "high",
+   "answer": "The password reset token is generated and emailed in the `resetPasswordToken` function located in `server/controllers/resetPassword.js`. The token is created using `crypto.randomBytes(20).toString(\"hex\")` and then sent via email using the `mailSender` utility.",
+   "citations": [
+    "server/controllers/resetPassword.js:4-35",
+    "server/utils/mailSender.js:3-26"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the function and file responsible for generating and emailing the password reset token.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s14",
+   "category": "where-is",
+   "question": "Where is the course thumbnail uploaded when a course is created?",
+   "standalone_question": "Where is the course thumbnail uploaded when a course is created?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/Course.js",
+     "start_line": 75,
+     "end_line": 93
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/Course.js:61-120",
+     "score": 0.7542
+    },
+    {
+     "location": "server/controllers/Course.js:121-180",
+     "score": 0.7532
+    },
+    {
+     "location": "server/controllers/Course.js:1-60",
+     "score": 0.7087
+    },
+    {
+     "location": "src/components/core/Course/CourseDetailsCard.jsx:57-116",
+     "score": 0.7086
+    },
+    {
+     "location": "src/components/core/Dashboard/AddCourse/index.jsx:3-38",
+     "score": 0.7063
+    },
+    {
+     "location": "src/components/core/Dashboard/AddCourse/CourseInformation/CourseInformationForm.jsx:218-277",
+     "score": 0.6972
+    },
+    {
+     "location": "src/components/core/Dashboard/AddCourse/CourseInformation/CourseInformationForm.jsx:142-157",
+     "score": 0.6947
+    },
+    {
+     "location": "src/components/core/Dashboard/Instructor.jsx:100-142",
+     "score": 0.6894
+    },
+    {
+     "location": "src/components/core/Catalog/Course_Slider.jsx:45-45",
+     "score": 0.6883
+    },
+    {
+     "location": "src/components/core/Course/CourseDetailsCard.jsx:117-125",
+     "score": 0.6873
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 217.2,
+    "embed_query": 195.8,
+    "vector_search": 15.7,
+    "downweight": 5.4,
+    "context": 4.3,
+    "generation": 1938.0,
+    "self_check": 1422.5
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 1,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "high",
+   "answer": "When a course is created, the thumbnail image is uploaded to Cloudinary using the `uploadImageToCloudinary` utility function within the `createCourse` controller.",
+   "citations": [
+    "server/controllers/Course.js:73-76"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies the service and function used for the thumbnail upload as shown in the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s15",
+   "category": "how-does",
+   "question": "How is the total duration of a course computed?",
+   "standalone_question": "How is the total duration of a course computed?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/Course.js",
+     "start_line": 321,
+     "end_line": 329
+    },
+    {
+     "path": "server/utils/secToDuration.js",
+     "start_line": 2,
+     "end_line": 14
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/profile.js:181-238",
+     "score": 0.6932
+    },
+    {
+     "location": "server/controllers/courseProgress.js:1-60",
+     "score": 0.6903
+    },
+    {
+     "location": "src/components/core/Dashboard/EnrolledCourses.jsx:35-94",
+     "score": 0.6894
+    },
+    {
+     "location": "server/controllers/Course.js:361-420",
+     "score": 0.6815
+    },
+    {
+     "location": "src/components/core/Dashboard/Instructor.jsx:9-39",
+     "score": 0.6811
+    },
+    {
+     "location": "server/utils/secToDuration.js:1-14",
+     "score": 0.6775
+    },
+    {
+     "location": "README.md:61-100",
+     "score": 0.6721
+    },
+    {
+     "location": "src/components/core/Catalog/Course_Card.jsx:10-58",
+     "score": 0.6709
+    },
+    {
+     "location": "src/pages/ViewCourse.jsx:15-50",
+     "score": 0.669
+    },
+    {
+     "location": "src/pages/CourseDetails.jsx:19-78",
+     "score": 0.6679
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.5,
+    "mrr": 0.16666666666666666
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 152.8,
+    "embed_query": 132.7,
+    "vector_search": 15.7,
+    "downweight": 3.9,
+    "context": 5.3,
+    "generation": 1831.7,
+    "self_check": 1826.1
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 2,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The total duration of a course is computed by iterating through all sections and subsections of a course, parsing the `timeDuration` field of each subsection as an integer, and summing these values to get the total duration in seconds. This total is then converted into a human-readable format (e.g., 'Xh Ym' or 'Zm Xs') using the `convertSecondsToDuration` helper function.",
+   "citations": [
+    "server/controllers/Course.js:384-392",
+    "server/utils/secToDuration.js:2-14"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the logic found in server/controllers/Course.js and server/utils/secToDuration.js.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s17",
+   "category": "what-happens-when",
+   "question": "What happens when a user deletes their account?",
+   "standalone_question": "What happens when a user deletes their account?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/profile.js",
+     "start_line": 60,
+     "end_line": 95
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/profile.js:61-120",
+     "score": 0.6437
+    },
+    {
+     "location": "src/components/core/Dashboard/Settings/DeleteAccount.jsx:7-48",
+     "score": 0.6152
+    },
+    {
+     "location": "src/services/operations/courseDetailsAPI.js:288-305",
+     "score": 0.5512
+    },
+    {
+     "location": "src/services/operations/courseDetailsAPI.js:240-260",
+     "score": 0.5446
+    },
+    {
+     "location": "src/services/operations/SettingsAPI.js:92-112",
+     "score": 0.54
+    },
+    {
+     "location": "src/services/operations/courseDetailsAPI.js:219-239",
+     "score": 0.5342
+    },
+    {
+     "location": "src/pages/ForgotPassword.jsx:8-67",
+     "score": 0.5315
+    },
+    {
+     "location": "server/controllers/Course.js:481-492",
+     "score": 0.5306
+    },
+    {
+     "location": "src/components/core/Dashboard/Settings/DeleteAccount.jsx:1-5",
+     "score": 0.5298
+    },
+    {
+     "location": "server/controllers/resetPassword.js:61-90",
+     "score": 0.5289
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 166.2,
+    "embed_query": 144.0,
+    "vector_search": 18.5,
+    "downweight": 3.5,
+    "context": 3.1,
+    "generation": 8229.2,
+    "self_check": 2293.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 7,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When a user deletes their account, the following sequence occurs:\n\n1. The `deleteProfile` service function is called, which sends a `DELETE` request to the server.\n2. On the server, the controller performs several cleanup tasks:\n   - It finds the user and deletes their associated profile details.\n   - It removes the user's ID from the `studentsEnroled` list of all courses they were enrolled in.\n   - It deletes the user record itself.\n   - It deletes all `CourseProgress` records associated with the user.\n3. Upon a successful response from the server, the client-side `deleteProfile` function dispatches a `logout` action, which clears the user's token and data from the Redux store and `localStorage`, displays a success toast, and navigates the user to the home page.",
+   "citations": [
+    "server/controllers/profile.js:61-85",
+    "src/services/operations/SettingsAPI.js:92-112",
+    "src/services/operations/authAPI.js:173-183"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 3,
+    "correct_citations": 1,
+    "precision": 0.3333333333333333,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the account deletion process based on the provided server and client-side code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s18",
+   "category": "how-does",
+   "question": "How is a student's progress percentage for a course calculated?",
+   "standalone_question": "How is a student's progress percentage for a course calculated?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/profile.js",
+     "start_line": 177,
+     "end_line": 191
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/profile.js:181-238",
+     "score": 0.7295
+    },
+    {
+     "location": "server/controllers/courseProgress.js:61-99",
+     "score": 0.711
+    },
+    {
+     "location": "server/controllers/courseProgress.js:1-60",
+     "score": 0.7106
+    },
+    {
+     "location": "server/controllers/Course.js:361-420",
+     "score": 0.6696
+    },
+    {
+     "location": "server/controllers/payments.js:141-199",
+     "score": 0.6676
+    },
+    {
+     "location": "src/pages/CourseDetails.jsx:19-78",
+     "score": 0.654
+    },
+    {
+     "location": "src/components/core/Catalog/Course_Card.jsx:10-58",
+     "score": 0.6533
+    },
+    {
+     "location": "src/components/core/Dashboard/EnrolledCourses.jsx:35-94",
+     "score": 0.6478
+    },
+    {
+     "location": "server/models/CourseProgress.js:1-20",
+     "score": 0.6447
+    },
+    {
+     "location": "README.md:61-100",
+     "score": 0.641
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 198.1,
+    "embed_query": 174.6,
+    "vector_search": 19.2,
+    "downweight": 3.9,
+    "context": 4.0,
+    "generation": 1870.7,
+    "self_check": 1989.8
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 2,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "high",
+   "answer": "A student's progress percentage is calculated by dividing the number of completed videos by the total number of subsections in the course, multiplying by 100, and rounding the result to two decimal places. This logic is implemented in the server-side controller for user profiles.",
+   "citations": [
+    "server/controllers/profile.js:181-193"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the calculation logic and identifies the correct location in the codebase.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s20",
+   "category": "what-happens-when",
+   "question": "What happens when a student tries to review the same course twice?",
+   "standalone_question": "What happens when a student tries to review the same course twice?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "server/controllers/RatingandReview.js",
+     "start_line": 25,
+     "end_line": 36
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "server/controllers/RatingandReview.js:1-60",
+     "score": 0.6236
+    },
+    {
+     "location": "server/controllers/Course.js:241-300",
+     "score": 0.6181
+    },
+    {
+     "location": "server/controllers/Course.js:361-420",
+     "score": 0.606
+    },
+    {
+     "location": "server/controllers/Course.js:301-360",
+     "score": 0.6031
+    },
+    {
+     "location": "src/components/core/Dashboard/AddCourse/CourseBuilder/CourseBuilderForm.jsx:74-101",
+     "score": 0.6021
+    },
+    {
+     "location": "src/pages/CourseDetails.jsx:19-78",
+     "score": 0.5998
+    },
+    {
+     "location": "server/controllers/payments.js:141-199",
+     "score": 0.5985
+    },
+    {
+     "location": "server/controllers/RatingandReview.js:121-135",
+     "score": 0.596
+    },
+    {
+     "location": "src/components/core/Dashboard/AddCourse/CourseInformation/CourseInformationForm.jsx:82-141",
+     "score": 0.5953
+    },
+    {
+     "location": "README.md:121-160",
+     "score": 0.5915
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.9,
+    "retrieval": 199.4,
+    "embed_query": 175.7,
+    "vector_search": 19.5,
+    "downweight": 3.9,
+    "context": 3.4,
+    "generation": 1848.4,
+    "self_check": 1436.0
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 2,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "When a student attempts to review a course they have already reviewed, the `createRating` controller checks for an existing entry in the `RatingAndReview` collection for that specific user and course. If an entry is found, the function returns a 403 status code with the message \"Course already reviewed by user\".",
+   "citations": [
+    "server/controllers/RatingandReview.js:26-36"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the logic implemented in the createRating controller provided in the context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s22",
+   "category": "where-is",
+   "question": "Where is the shopping cart persisted in the browser?",
+   "standalone_question": "Where is the shopping cart persisted in the browser?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "src/slices/cartSlice.js",
+     "start_line": 4,
+     "end_line": 40
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "src/components/core/Dashboard/Cart/index.jsx:1-4",
+     "score": 0.6827
+    },
+    {
+     "location": "src/components/core/Dashboard/Cart/index.jsx:6-35",
+     "score": 0.6787
+    },
+    {
+     "location": "src/components/core/Dashboard/Cart/RenderTotalAmount.jsx:1-5",
+     "score": 0.6615
+    },
+    {
+     "location": "src/components/core/Dashboard/Cart/RenderCartCourses.jsx:1-6",
+     "score": 0.6607
+    },
+    {
+     "location": "src/slices/cartSlice.js:1-60",
+     "score": 0.6555
+    },
+    {
+     "location": "src/pages/ForgotPassword.jsx:1-6",
+     "score": 0.6543
+    },
+    {
+     "location": "src/pages/Dashboard.jsx:1-4",
+     "score": 0.6537
+    },
+    {
+     "location": "src/components/core/Dashboard/Cart/RenderCartCourses.jsx:8-66",
+     "score": 0.6533
+    },
+    {
+     "location": "src/pages/Catalog.jsx:119-139",
+     "score": 0.6511
+    },
+    {
+     "location": "src/components/core/Dashboard/Cart/RenderTotalAmount.jsx:7-30",
+     "score": 0.6489
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.2
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 167.2,
+    "embed_query": 145.0,
+    "vector_search": 18.3,
+    "downweight": 3.6,
+    "context": 2.1,
+    "generation": 2815.6,
+    "self_check": 1155.4
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 2,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The shopping cart data is persisted in the browser using `localStorage`. Specifically, the `cart`, `total`, and `totalItems` values are stored as JSON strings under these respective keys.",
+   "citations": [
+    "src/slices/cartSlice.js:4-13",
+    "src/slices/cartSlice.js:35-37",
+    "src/slices/cartSlice.js:50-52"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 3,
+    "correct_citations": 2,
+    "precision": 0.6666666666666666,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies that the shopping cart is persisted in localStorage using the keys cart, total, and totalItems.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s23",
+   "category": "how-does",
+   "question": "How does the frontend open the Razorpay checkout?",
+   "standalone_question": "How does the frontend open the Razorpay checkout?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "src/services/operations/studentFeaturesAPI.js",
+     "start_line": 16,
+     "end_line": 97
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:39-97",
+     "score": 0.7592
+    },
+    {
+     "location": "server/config/razorpay.js:1-6",
+     "score": 0.727
+    },
+    {
+     "location": "server/controllers/payments.js:61-120",
+     "score": 0.717
+    },
+    {
+     "location": "server/controllers/payments.js:1-60",
+     "score": 0.7087
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:15-28",
+     "score": 0.6919
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:125-143",
+     "score": 0.6818
+    },
+    {
+     "location": "src/pages/Signup.jsx:1-2",
+     "score": 0.6311
+    },
+    {
+     "location": "src/components/core/Auth/OpenRoute.jsx:5-13",
+     "score": 0.6278
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:99-123",
+     "score": 0.6259
+    },
+    {
+     "location": "src/components/Common/ReviewSlider.jsx:1-18",
+     "score": 0.6245
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 149.3,
+    "embed_query": 125.2,
+    "vector_search": 20.1,
+    "downweight": 3.7,
+    "context": 2.6,
+    "generation": 2273.6,
+    "self_check": 1507.0
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 3,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "high",
+   "answer": "The frontend opens the Razorpay checkout by first loading the Razorpay SDK script via `loadScript`. It then initiates an order by calling the backend `COURSE_PAYMENT_API` using `apiConnector`. Once the order is successfully created, it initializes a new `window.Razorpay` object with the required payment options (including the order ID, amount, and currency) and calls the `paymentObject.open()` method.",
+   "citations": [
+    "src/services/operations/studentFeaturesAPI.js:41-41",
+    "src/services/operations/studentFeaturesAPI.js:51-62",
+    "src/services/operations/studentFeaturesAPI.js:70-86",
+    "src/services/operations/studentFeaturesAPI.js:87-87",
+    "src/services/operations/studentFeaturesAPI.js:89-89"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 5,
+    "correct_citations": 5,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the process of loading the script, creating the order, and invoking the Razorpay SDK as shown in the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s27",
+   "category": "overview",
+   "question": "What does this repository do and what is its tech stack?",
+   "standalone_question": "What does this repository do and what is its tech stack?",
+   "rewrite_method": "unchanged",
+   "route": "overview",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "README.md:31-70",
+     "score": 0.6821
+    },
+    {
+     "location": "README.md:1-40",
+     "score": 0.6572
+    },
+    {
+     "location": "README.md:61-100",
+     "score": 0.6406
+    },
+    {
+     "location": "README.md:151-183",
+     "score": 0.6383
+    },
+    {
+     "location": "README.md:91-130",
+     "score": 0.6299
+    },
+    {
+     "location": "README.md:121-160",
+     "score": 0.6235
+    },
+    {
+     "location": "src/pages/About.jsx:16-75",
+     "score": 0.6073
+    },
+    {
+     "location": "public/index.html:1-37",
+     "score": 0.5919
+    },
+    {
+     "location": "server/package.json:1-33",
+     "score": 0.5914
+    },
+    {
+     "location": "src/components/core/AboutPage/LearningGrid.jsx:1-45",
+     "score": 0.5852
+    }
+   ],
+   "overview": [
+    {
+     "location": "@overview/repository:1-3",
+     "score": 0.7129
+    },
+    {
+     "location": "README.md:1-80",
+     "score": 0.6627
+    },
+    {
+     "location": "@overview/structure:1-60",
+     "score": 0.6575
+    }
+   ],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.8,
+    "retrieval": 160.1,
+    "embed_query": 135.9,
+    "vector_search": 20.5,
+    "downweight": 3.4,
+    "overview_embed": 164.8,
+    "overview_search": 22.5,
+    "context": 7.3,
+    "generation": 3457.8,
+    "self_check": 40019.7
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 7,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "StudyNotion is a fully functional ed-tech platform designed to enable users to create, consume, and rate educational content. It provides a platform for instructors to showcase their expertise and offers students an interactive learning experience. The platform is built using the MERN stack, which consists of:\n\n*   **MongoDB**: A NoSQL database for storing user data, course content, and other information.\n*   **Express.js**: A web application framework for Node.js used to build the back-end.\n*   **ReactJS**: A JavaScript library used for building the front-end user interface.\n*   **Node.js**: A JavaScript runtime used for the back-end server.",
+   "citations": [
+    "README.md:3-4",
+    "README.md:31-55"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately summarizes the platform's purpose and tech stack based on the provided documentation.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s28",
+   "category": "overview",
+   "question": "How is the project organized between the client and the server?",
+   "standalone_question": "How is the project organized between the client and the server?",
+   "rewrite_method": "unchanged",
+   "route": "overview",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "server/index.js:1-60",
+     "score": 0.642
+    },
+    {
+     "location": "README.md:31-70",
+     "score": 0.6414
+    },
+    {
+     "location": "server/routes/Course.js:1-60",
+     "score": 0.6393
+    },
+    {
+     "location": "server/controllers/Section.js:1-60",
+     "score": 0.6267
+    },
+    {
+     "location": "server/routes/Payments.js:1-21",
+     "score": 0.6243
+    },
+    {
+     "location": "server/index.js:61-64",
+     "score": 0.6214
+    },
+    {
+     "location": "server/models/Section.js:1-18",
+     "score": 0.6208
+    },
+    {
+     "location": "README.md:61-100",
+     "score": 0.6175
+    },
+    {
+     "location": "server/controllers/Course.js:1-60",
+     "score": 0.6138
+    },
+    {
+     "location": "server/routes/Course.js:61-105",
+     "score": 0.6134
+    }
+   ],
+   "overview": [
+    {
+     "location": "@overview/folder/server:1-3",
+     "score": 0.6585
+    },
+    {
+     "location": "@overview/folder/server/controllers:1-11",
+     "score": 0.6554
+    },
+    {
+     "location": "@overview/folder/src/services:1-1",
+     "score": 0.6433
+    }
+   ],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 218.5,
+    "embed_query": 194.1,
+    "vector_search": 20.9,
+    "downweight": 3.3,
+    "overview_embed": 121.2,
+    "overview_search": 7.3,
+    "context": 3.1,
+    "generation": 2155.2,
+    "self_check": 2161.7
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": true,
+    "supported": 3,
+    "unsupported": [
+     "The back end is built using Node.js and ExpressJS, providing APIs for functionalities such as user authentication, course management, and payment processing."
+    ],
+    "action": "remove"
+   },
+   "confidence": "medium",
+   "answer": "The StudyNotion platform follows a client-server architecture. The front end (client) is built using ReactJS and communicates with the back end (server) via RESTful API calls. The database, built with MongoDB, stores user data and course content.\n\n_Self-check removed 1 statement the cited code did not support._",
+   "citations": [
+    "README.md:31-45"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately summarizes the client-server architecture and communication method described in the provided documentation.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s29",
+   "category": "unanswerable",
+   "question": "Where is the GraphQL schema defined?",
+   "standalone_question": "Where is the GraphQL schema defined?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "server/models/Course.js:1-60",
+     "score": 0.6675
+    },
+    {
+     "location": "server/models/Category.js:1-19",
+     "score": 0.667
+    },
+    {
+     "location": "server/models/Profile.js:1-22",
+     "score": 0.6645
+    },
+    {
+     "location": "server/models/Subsection.js:1-10",
+     "score": 0.6643
+    },
+    {
+     "location": "server/models/Section.js:1-18",
+     "score": 0.6635
+    },
+    {
+     "location": "server/models/User.js:1-60",
+     "score": 0.6579
+    },
+    {
+     "location": "server/models/RatingandReview.js:1-27",
+     "score": 0.6562
+    },
+    {
+     "location": "server/models/CourseProgress.js:1-20",
+     "score": 0.6456
+    },
+    {
+     "location": "src/data/homepage-explore.js:61-117",
+     "score": 0.6437
+    },
+    {
+     "location": "server/models/User.js:61-77",
+     "score": 0.6365
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 164.1,
+    "embed_query": 138.7,
+    "vector_search": 20.4,
+    "downweight": 4.7,
+    "context": 1.8,
+    "generation": 2985.1
+   },
+   "used_llm": true,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I don't know based on the indexed code. The provided files only contain Mongoose schemas for a MongoDB database, and there is no mention of a GraphQL schema definition.\n\n**Closest files I found:** `server/models/Course.js`, `server/models/Category.js`, `server/models/Profile.js`\n\n**Questions that work for this repository:**\n- What is the overall architecture of the StudyNotion ed-tech platform?\n- Where can I find the configuration for Tailwind CSS styling?\n- How are user authentication and course creation handled in the back end?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "no",
+    "reason": "The assistant correctly identified that the provided context does not contain a GraphQL schema and explained that the files are Mongoose schemas.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "s30",
+   "category": "unanswerable",
+   "question": "How are live classes streamed to students over WebSockets?",
+   "standalone_question": "How are live classes streamed to students over WebSockets?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "README.md:61-100",
+     "score": 0.6722
+    },
+    {
+     "location": "server/controllers/payments.js:141-199",
+     "score": 0.629
+    },
+    {
+     "location": "README.md:151-183",
+     "score": 0.6264
+    },
+    {
+     "location": "README.md:1-40",
+     "score": 0.6251
+    },
+    {
+     "location": "README.md:31-70",
+     "score": 0.6196
+    },
+    {
+     "location": "src/data/homepage-explore.js:1-60",
+     "score": 0.6147
+    },
+    {
+     "location": "src/services/operations/studentFeaturesAPI.js:30-38",
+     "score": 0.6132
+    },
+    {
+     "location": "README.md:121-160",
+     "score": 0.61
+    },
+    {
+     "location": "src/data/homepage-explore.js:61-117",
+     "score": 0.6019
+    },
+    {
+     "location": "src/pages/ViewCourse.jsx:15-50",
+     "score": 0.6018
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 169.9,
+    "embed_query": 147.2,
+    "vector_search": 18.6,
+    "downweight": 3.8,
+    "context": 8.1,
+    "generation": 7266.2
+   },
+   "used_llm": true,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I don't know based on the indexed code. The provided documentation and code do not mention WebSockets or live class streaming functionality.\n\n**Closest files I found:** `README.md`, `server/controllers/payments.js`, `src/data/homepage-explore.js`\n\n**Questions that work for this repository:**\n- What is the overall architecture of the StudyNotion ed-tech platform?\n- Where can I find the configuration for Tailwind CSS styling?\n- How are user authentication and course creation handled in the back end?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "no",
+    "reason": "The provided context does not contain information about WebSockets or live streaming, so the assistant correctly stated it does not know.",
+    "unsupported": []
+   }
+  }
+ ]
+}

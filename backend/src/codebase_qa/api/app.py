@@ -13,7 +13,7 @@ import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 
-from codebase_qa.api.observe import observed_ask
+from codebase_qa.api.answers import answer_request
 from codebase_qa.api.rate_limit import DailyLimiter, SlidingWindowLimiter, client_ip, enforce, enforce_daily
 from codebase_qa.api.schemas import (
     AskRequest,
@@ -98,6 +98,7 @@ def validate_repo_url(url: str, services: Container) -> tuple[str, str]:
 def index_action(services: Container, url: str) -> Callable[[Progress], dict[str, Any]]:
     def action(progress: Progress) -> dict[str, Any]:
         record = services.indexer.index(url, progress=progress)
+        services.answer_cache.invalidate(record.repo_id)
         return RepoOut.from_record(record).model_dump()
 
     return action
@@ -109,6 +110,7 @@ def reindex_action(services: Container, repo_id: str) -> Callable[[Progress], di
         if record is None:
             raise ValueError(f"repo {repo_id} is not indexed")
         _, report = services.indexer.reindex(record, progress=progress)
+        services.answer_cache.invalidate(repo_id)
         return ReindexOut.from_report(report).model_dump()
 
     return action
@@ -268,12 +270,11 @@ def create_app(container: Container | None = None) -> FastAPI:
     def ask(body: AskRequest, request: Request, services: Services, visitor: Visitor) -> AskResponse:
         record = authorize_ask(body, request, services, visitor)
         try:
-            result = observed_ask(services, record, body.question, body.turns(), body.filters.to_filter())
+            return answer_request(services, record, body)
         except QuotaExhaustedError as exc:
             raise HTTPException(status_code=503, detail=QUOTA_MESSAGE) from exc
         except GenerationError as exc:
             raise HTTPException(status_code=503, detail=str(exc)) from exc
-        return AskResponse.from_result(result, record.commit_sha)
 
     @app.post("/ask/stream")
     def ask_stream(body: AskRequest, request: Request, services: Services, visitor: Visitor) -> StreamingResponse:
@@ -304,15 +305,7 @@ def stream_answer(
     services: Container, record: RepoRecord, body: AskRequest, events: "queue.Queue[dict[str, Any] | None]"
 ) -> None:
     try:
-        result = observed_ask(
-            services,
-            record,
-            body.question,
-            body.turns(),
-            body.filters.to_filter(),
-            on_delta=lambda text: events.put({"type": "delta", "text": text}),
-        )
-        response = AskResponse.from_result(result, record.commit_sha)
+        response = answer_request(services, record, body, lambda text: events.put({"type": "delta", "text": text}))
         events.put({"type": "final", "response": response.model_dump()})
     except QuotaExhaustedError:
         events.put({"type": "error", "detail": QUOTA_MESSAGE})

@@ -198,6 +198,8 @@ class AskResponse(BaseModel):
     self_check: SelfCheckOut
     confidence: str
     confidence_reasons: list[str]
+    cached: bool = False
+    degraded: str = ""
 
     @classmethod
     def from_result(cls, result: AskResult, commit_sha: str) -> "AskResponse":
@@ -234,6 +236,7 @@ class AskResponse(BaseModel):
             refused=result.refused,
             suggestions=result.suggestions,
             standalone_question=result.question,
+            degraded=result.degraded,
             confidence=result.confidence.level,
             confidence_reasons=result.confidence.reasons,
             self_check=SelfCheckOut(

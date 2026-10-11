@@ -132,12 +132,12 @@ class QuotaLLM(FakeLLM):
         raise QuotaExhaustedError("daily quota exhausted")
 
 
-def test_stream_endpoint_reports_quota_errors(tmp_path: Path, make_repo: RepoFactory) -> None:
+def test_stream_endpoint_falls_back_on_quota_errors(tmp_path: Path, make_repo: RepoFactory) -> None:
     headers = {"X-Visitor-Id": VISITOR_A}
     with build_client(tmp_path, QuotaLLM()) as client:
         job = client.post("/repos", json={"url": make_repo().as_uri()}, headers=headers).json()
         wait_for_job(client, job["job_id"], headers)
         events = stream_events(client, {"repo_id": "origin", "question": "AuthService login token"}, headers)
-    assert events == [
-        {"type": "error", "detail": "The AI model's free daily quota is used up. Please try again tomorrow."}
-    ]
+    assert [event["type"] for event in events] == ["final"]
+    response = events[0]["response"]
+    assert response["degraded"] == "QuotaExhaustedError" and "daily quota is used up" in response["answer"]

@@ -73,6 +73,8 @@ class Settings(BaseSettings):
     self_check_action: Literal["remove", "flag"] = "remove"
     confidence_high_score: float = 0.70
     confidence_low_margin: float = 0.03
+    embedding_cache: bool = True
+    answer_cache: bool = True
     llm_input_price_per_million: float = 0.10
     llm_output_price_per_million: float = 0.40
 
@@ -102,6 +104,23 @@ class Settings(BaseSettings):
             downweight_tests=self.downweight_tests,
             enabled=self.hygiene,
         )
+
+    @property
+    def embedding_cache_path(self) -> Path:
+        return self.data_dir / "embeddings.sqlite3"
+
+    @property
+    def answer_cache_path(self) -> Path:
+        return self.data_dir / "answers.sqlite3"
+
+    @property
+    def answer_fingerprint(self) -> str:
+        fields = (
+            "gemini_model", "chunker", "retrieval_mode", "rerank", "top_k", "min_vector_score", "overview", "routing",
+            "hygiene", "downweight_factor", "downweight_tests", "query_expansion", "parent_context", "call_context",
+            "self_check", "self_check_action",
+        )
+        return "|".join(f"{name}={getattr(self, name)}" for name in fields)
 
     @property
     def stats_path(self) -> Path:
