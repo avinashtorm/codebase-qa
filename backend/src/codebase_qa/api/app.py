@@ -23,7 +23,7 @@ from codebase_qa.api.schemas import (
 )
 from codebase_qa.config import get_settings
 from codebase_qa.container import Container
-from codebase_qa.generation.gemini_generator import GenerationError, QuotaExhaustedError
+from codebase_qa.generation.llm import GenerationError, QuotaExhaustedError
 from codebase_qa.indexing.access import is_valid_visitor
 from codebase_qa.indexing.jobs import Job, JobManager, Progress
 from codebase_qa.indexing.registry import RepoRecord

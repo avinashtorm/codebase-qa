@@ -287,6 +287,8 @@ The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git 
 | `MAX_REPO_SIZE_MB` | no | Larger repositories are rejected (default 200) |
 | `ASK_RATE_LIMIT_PER_MINUTE` | no | Questions per visitor per minute (default 10) |
 | `GITHUB_TOKEN` | no | Raises GitHub's API limit for the repo size check (a token with no scopes is enough) |
+| `OVERVIEW` | no | Build a repository overview (folder tree, README, one-line LLM summaries) when indexing (default true) |
+| `OVERVIEW_MAX_CALLS` | no | Most LLM calls per repository for overview summaries (default 5; each call summarizes up to `OVERVIEW_BATCH_SIZE`=20 items). `OVERVIEW_MAX_FILES` (60), `OVERVIEW_MAX_FOLDERS` (25) and `OVERVIEW_FILE_CHARS` (1200) bound the cost further |
 
 ## Step 11: Start the stack
 

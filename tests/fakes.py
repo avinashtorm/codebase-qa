@@ -1,9 +1,14 @@
 import hashlib
+import json
 import math
 import re
 import time
+from collections.abc import Callable
+
+from pydantic import BaseModel
 
 from codebase_qa.config import Settings
+from codebase_qa.generation.llm import LLMResponse
 from codebase_qa.models import Citation, GeneratedAnswer, RetrievedChunk
 
 TOKEN = re.compile(r"[A-Za-z]+")
@@ -39,6 +44,36 @@ class EchoGenerator:
         top = context[0].chunk
         citation = Citation(path=top.path, start_line=top.start_line, end_line=top.end_line)
         return GeneratedAnswer(answer=f"See {citation.location}", citations=[citation])
+
+
+ITEM_HEADER = re.compile(r"^### (?:repository|folder|file): (.+)$", re.MULTILINE)
+
+
+def summaries_response(prompt: str) -> dict:
+    return {"summaries": [{"path": path, "summary": f"Summary of {path}"} for path in ITEM_HEADER.findall(prompt)]}
+
+
+class FakeLLM:
+    model = "fake-llm"
+
+    def __init__(self, handlers: dict[str, Callable[[str], object]] | None = None) -> None:
+        self.handlers: dict[str, Callable[[str], object]] = {"SummariesSchema": summaries_response} | (handlers or {})
+        self.calls: list[tuple[str, str, str]] = []
+
+    def complete(self, system: str, prompt: str, schema: type[BaseModel] | None = None) -> LLMResponse:
+        name = schema.__name__ if schema is not None else "text"
+        self.calls.append((name, system, prompt))
+        handler = self.handlers.get(name)
+        payload = handler(prompt) if handler else ""
+        text = payload if isinstance(payload, str) else json.dumps(payload)
+        return LLMResponse(text=text, input_tokens=len(prompt) // 4, output_tokens=len(text) // 4)
+
+    def calls_for(self, schema_name: str) -> list[str]:
+        return [prompt for name, _, prompt in self.calls if name == schema_name]
+
+
+def fake_llm(_: Settings) -> FakeLLM:
+    return FakeLLM()
 
 
 def fake_embedder(_: Settings) -> HashingEmbedder:

@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from codebase_qa.api.app import create_app
 from codebase_qa.container import Container
-from codebase_qa.generation.gemini_generator import GenerationError, QuotaExhaustedError
+from codebase_qa.generation.llm import GenerationError, QuotaExhaustedError
 from tests.conftest import FIXTURE_FILES
 from tests.fakes import VISITOR_A, fake_embedder, fake_generator, make_settings, wait_for_job
 

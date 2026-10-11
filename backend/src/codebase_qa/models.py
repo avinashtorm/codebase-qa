@@ -28,6 +28,7 @@ class Chunk:
     end_line: int
     content: str
     header: str = ""
+    kind: str = "code"
 
     @property
     def location(self) -> str:

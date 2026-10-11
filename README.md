@@ -102,6 +102,17 @@ commits (`3ecbabf7` to `7257e606`) changed 15 files.
 | Incremental re-index (git diff, 15 files) | **17.0 s (7.2x faster)** | 81 chunks added, 80 removed; 14.2 s of it is embedding |
 | Result | identical | same chunk ids, BM25 corpus and file registry as the full rebuild |
 
+### Improvement log (v2)
+
+Each change below was measured on the 35 development questions before and after, with the same index and
+`gemini-3.5-flash-lite`. Retrieval metrics come from the pipeline's retrieval stage; citation metrics from grounded
+answers.
+
+| Step | Change | Hit@1 | Hit@5 | Recall@10 | MRR | Citation precision | Notes |
+|---|---|---|---|---|---|---|---|
+| 0 | Starting point (tree-sitter + vector + grounded generation) | 0.571 | 0.714 | 0.767 | 0.651 | 0.714 | reproduced from the table above |
+| 1 | Index-time repository overview (tree, README, LLM summaries) | 0.571 | 0.714 | 0.767 | 0.651 | 0.729 | overview stored separately, not used by code retrieval yet; 31 overview chunks from 5 LLM calls; citation change is LLM run-to-run noise after a cache-key change |
+
 ## Running it locally
 
 Requirements: Python 3.11 ([uv](https://docs.astral.sh/uv/) recommended), git, and a Google AI Studio API key for

@@ -1,5 +1,8 @@
 from typing import Protocol
 
+from pydantic import BaseModel
+
+from codebase_qa.generation.llm import LLMResponse
 from codebase_qa.models import Chunk, GeneratedAnswer, RetrievedChunk, SourceFile
 
 
@@ -28,3 +31,9 @@ class Reranker(Protocol):
 
 class Generator(Protocol):
     def generate(self, question: str, context: list[RetrievedChunk]) -> GeneratedAnswer: ...
+
+
+class LLM(Protocol):
+    model: str
+
+    def complete(self, system: str, prompt: str, schema: type[BaseModel] | None = None) -> LLMResponse: ...

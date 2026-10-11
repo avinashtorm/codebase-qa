@@ -21,6 +21,7 @@ class RepoRecord:
     indexed_at: str
     file_count: int = 0
     chunk_count: int = 0
+    overview_count: int = 0
     files: dict[str, FileRecord] = field(default_factory=dict)
 
     @classmethod

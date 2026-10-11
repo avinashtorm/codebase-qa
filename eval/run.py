@@ -1,14 +1,14 @@
 import argparse
 import json
 import time
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from codebase_qa.config import Settings
 from codebase_qa.container import Container
-from codebase_qa.generation.gemini_generator import GenerationError
+from codebase_qa.generation.llm import GenerationError
 from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.ingestion.git import repo_id_from_url
 from codebase_qa.models import RetrievedChunk
@@ -24,10 +24,17 @@ RETRIEVAL_DEPTH = 10
 
 def ensure_indexed(container: Container, url: str) -> RepoRecord:
     record = container.repo_record(repo_id_from_url(url))
-    if record is not None and container.store.collection(record.collection).count() > 0:
-        return record
-    print(f"indexing {url} with chunker={container.settings.chunker} ...")
-    return container.indexer.index(url)
+    if record is None or container.store.collection(record.collection).count() == 0:
+        print(f"indexing {url} with chunker={container.settings.chunker} ...")
+        return container.indexer.index(url)
+    if container.settings.overview and not container.indexer.has_overview(record.collection):
+        print(f"building overview for {record.repo_id} ...")
+        count = container.indexer.refresh_overview(
+            record.repo_id, record.collection, Path(record.local_path), record.files, print
+        )
+        record = replace(record, overview_count=count)
+        container.registry.save(record.collection, record)
+    return record
 
 
 def describe(item: RetrievedChunk) -> dict[str, Any]:

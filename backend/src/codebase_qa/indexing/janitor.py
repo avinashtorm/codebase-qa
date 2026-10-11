@@ -21,6 +21,7 @@ class RepoJanitor:
         bm25_dir: Path,
         ttl: timedelta,
         max_repos: int,
+        overview_dir: Path | None = None,
         clock: Callable[[], datetime] = utc_now,
     ) -> None:
         self.registry = registry
@@ -31,6 +32,7 @@ class RepoJanitor:
         self.ttl = ttl
         self.max_repos = max_repos
         self.clock = clock
+        self.overview_dir = overview_dir
 
     def last_used(self) -> dict[str, datetime]:
         entries = self.access.load()
@@ -66,6 +68,8 @@ class RepoJanitor:
             if record.repo_id == repo_id:
                 self.store.delete_collection(record.collection)
                 remove_tree(self.bm25_dir / record.collection)
+                if self.overview_dir is not None:
+                    (self.overview_dir / f"{record.collection}.json").unlink(missing_ok=True)
                 self.registry.delete(key)
         remove_tree(self.repos_dir / repo_id)
         self.access.remove(repo_id)

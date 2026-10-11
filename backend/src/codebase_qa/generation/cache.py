@@ -1,6 +1,7 @@
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 
 class ResponseCache:
@@ -14,13 +15,17 @@ class ResponseCache:
     def path(self, key: str) -> Path:
         return self.directory / key[:2] / f"{key}.json"
 
-    def get(self, key: str) -> str | None:
+    def get_entry(self, key: str) -> dict[str, Any] | None:
         path = self.path(key)
         if not path.exists():
             return None
-        return str(json.loads(path.read_text(encoding="utf-8"))["text"])
+        return dict(json.loads(path.read_text(encoding="utf-8")))
 
-    def put(self, key: str, text: str) -> None:
+    def get(self, key: str) -> str | None:
+        entry = self.get_entry(key)
+        return None if entry is None else str(entry["text"])
+
+    def put(self, key: str, text: str, **extra: Any) -> None:
         path = self.path(key)
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps({"text": text}), encoding="utf-8")
+        path.write_text(json.dumps({"text": text} | extra), encoding="utf-8")

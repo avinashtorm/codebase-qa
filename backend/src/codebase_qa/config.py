@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     github_token: str = ""
     log_level: str = "INFO"
     llm_cache: bool = False
+    overview: bool = True
+    overview_max_files: int = 60
+    overview_max_folders: int = 25
+    overview_batch_size: int = 20
+    overview_max_calls: int = 5
+    overview_file_chars: int = 1200
 
     @property
     def repos_dir(self) -> Path:
@@ -56,6 +62,10 @@ class Settings(BaseSettings):
     @property
     def bm25_dir(self) -> Path:
         return self.data_dir / "bm25"
+
+    @property
+    def overview_dir(self) -> Path:
+        return self.data_dir / "overview"
 
     @property
     def llm_cache_dir(self) -> Path:

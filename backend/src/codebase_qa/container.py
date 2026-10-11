@@ -4,11 +4,16 @@ from functools import cached_property
 
 from codebase_qa.chunking.factory import build_chunker
 from codebase_qa.config import Settings
+from codebase_qa.generation.generator import LLMGenerator
+from codebase_qa.generation.llm import OfflineLLM
 from codebase_qa.indexing.access import AccessStore
 from codebase_qa.indexing.indexer import Indexer
 from codebase_qa.indexing.janitor import RepoJanitor
 from codebase_qa.indexing.registry import RepoRecord, RepoRegistry
-from codebase_qa.interfaces import Embedder, Generator, Reranker, Retriever
+from codebase_qa.interfaces import LLM, Embedder, Generator, Reranker, Retriever
+from codebase_qa.overview.builder import OverviewBuilder
+from codebase_qa.overview.store import OverviewStore
+from codebase_qa.overview.summarizer import LLMSummarizer
 from codebase_qa.qa import QAPipeline
 from codebase_qa.retrieval.bm25 import BM25Index, BM25Retriever
 from codebase_qa.retrieval.hybrid import HybridRetriever
@@ -23,15 +28,17 @@ def default_embedder(settings: Settings) -> Embedder:
     return SentenceTransformerEmbedder(settings.embedding_model)
 
 
-def default_generator(settings: Settings) -> Generator:
+def default_llm(settings: Settings) -> LLM:
+    if not settings.gemini_api_key:
+        return OfflineLLM()
     from google import genai
 
     from codebase_qa.generation.cache import ResponseCache
-    from codebase_qa.generation.gemini_generator import GeminiGenerator
+    from codebase_qa.generation.gemini_llm import GeminiLLM
 
     cache = ResponseCache(settings.llm_cache_dir) if settings.llm_cache else None
     client = genai.Client(api_key=settings.gemini_api_key)
-    return GeminiGenerator(client, settings.gemini_model, cache=cache)
+    return GeminiLLM(client, settings.gemini_model, cache=cache)
 
 
 def default_reranker(settings: Settings) -> Reranker:
@@ -45,13 +52,15 @@ class Container:
         self,
         settings: Settings,
         embedder_factory: Callable[[Settings], Embedder] = default_embedder,
-        generator_factory: Callable[[Settings], Generator] = default_generator,
+        generator_factory: Callable[[Settings], Generator] | None = None,
         reranker_factory: Callable[[Settings], Reranker] = default_reranker,
+        llm_factory: Callable[[Settings], LLM] = default_llm,
     ) -> None:
         self.settings = settings
         self.embedder_factory = embedder_factory
         self.generator_factory = generator_factory
         self.reranker_factory = reranker_factory
+        self.llm_factory = llm_factory
         self.bm25_cache: dict[tuple[str, str], BM25Index] = {}
 
     @cached_property
@@ -59,8 +68,30 @@ class Container:
         return self.embedder_factory(self.settings)
 
     @cached_property
+    def llm(self) -> LLM:
+        return self.llm_factory(self.settings)
+
+    @cached_property
     def generator(self) -> Generator:
-        return self.generator_factory(self.settings)
+        if self.generator_factory is not None:
+            return self.generator_factory(self.settings)
+        return LLMGenerator(self.llm)
+
+    @cached_property
+    def overview_store(self) -> OverviewStore:
+        return OverviewStore(self.settings.overview_dir)
+
+    def overview_builder(self) -> OverviewBuilder | None:
+        if not self.settings.overview:
+            return None
+        settings = self.settings
+        summarizer = LLMSummarizer(self.llm, settings.overview_batch_size, settings.overview_max_calls)
+        return OverviewBuilder(
+            summarizer,
+            max_files=settings.overview_max_files,
+            max_folders=settings.overview_max_folders,
+            file_chars=settings.overview_file_chars,
+        )
 
     @cached_property
     def reranker(self) -> Reranker:
@@ -85,6 +116,8 @@ class Container:
             bm25_dir=self.settings.bm25_dir,
             clone_timeout=self.settings.clone_timeout_seconds,
             max_repo_bytes=self.settings.max_repo_size_mb * 1024 * 1024,
+            overview=self.overview_builder(),
+            overview_store=self.overview_store,
         )
 
     @cached_property
@@ -101,6 +134,7 @@ class Container:
             bm25_dir=self.settings.bm25_dir,
             ttl=timedelta(hours=self.settings.repo_ttl_hours),
             max_repos=self.settings.max_visitor_repos,
+            overview_dir=self.settings.overview_dir,
         )
 
     def visible_records(self, visitor: str | None) -> list[RepoRecord]:

@@ -13,6 +13,8 @@ from codebase_qa.ingestion.github import RepoTooLarge, directory_size_bytes
 from codebase_qa.ingestion.walker import MAX_FILE_BYTES, load_source_file, walk_repo
 from codebase_qa.interfaces import Chunker, Embedder
 from codebase_qa.models import Chunk, ClonedRepo, SourceFile
+from codebase_qa.overview.builder import OverviewBuilder
+from codebase_qa.overview.store import OverviewIndex, OverviewStore
 from codebase_qa.retrieval.bm25 import BM25Index
 from codebase_qa.retrieval.vector_store import ChromaStore, VectorCollection, collection_name
 from codebase_qa.timing import timed
@@ -59,6 +61,8 @@ class Indexer:
         bm25_dir: Path,
         clone_timeout: float = 120.0,
         max_repo_bytes: int | None = None,
+        overview: OverviewBuilder | None = None,
+        overview_store: OverviewStore | None = None,
     ) -> None:
         self.store = store
         self.embedder = embedder
@@ -68,6 +72,8 @@ class Indexer:
         self.bm25_dir = bm25_dir
         self.clone_timeout = clone_timeout
         self.max_repo_bytes = max_repo_bytes
+        self.overview = overview
+        self.overview_store = overview_store
 
     def collection_for(self, repo_id: str) -> str:
         return collection_name(repo_id, self.chunker.name)
@@ -97,6 +103,7 @@ class Indexer:
         files = self.add_sources(collection, sources)
         progress("building keyword index")
         self.rebuild_bm25(collection)
+        overview_count = self.refresh_overview(cloned.repo_id, name, Path(cloned.local_path), files, progress)
         record = RepoRecord(
             repo_id=cloned.repo_id,
             url=cloned.url,
@@ -108,6 +115,7 @@ class Indexer:
             file_count=len(files),
             chunk_count=collection.count(),
             files=files,
+            overview_count=overview_count,
         )
         self.registry.save(name, record)
         logger.info("indexed repo", extra={"repo_id": cloned.repo_id, "chunks": record.chunk_count})
@@ -141,6 +149,13 @@ class Indexer:
         files.update(added_files)
         if changes.file_count:
             timed(stages, "bm25_rebuild", lambda: self.rebuild_bm25(collection))
+        overview_count = record.overview_count
+        if changes.file_count or not self.has_overview(record.collection):
+            overview_count = timed(
+                stages,
+                "overview",
+                lambda: self.refresh_overview(record.repo_id, record.collection, repo_path, files, progress),
+            )
         updated = replace(
             record,
             commit_sha=new_sha,
@@ -148,6 +163,7 @@ class Indexer:
             file_count=len(files),
             chunk_count=collection.count(),
             files=files,
+            overview_count=overview_count,
         )
         self.registry.save(record.collection, updated)
         report = ReindexReport(
@@ -166,6 +182,35 @@ class Indexer:
         )
         logger.info("reindexed repo", extra={"repo_id": record.repo_id, "files_changed": report.files_changed})
         return updated, report
+
+    def has_overview(self, name: str) -> bool:
+        return self.overview_store is None or self.overview_store.path(name).exists()
+
+    def refresh_overview(
+        self, repo_id: str, name: str, repo_path: Path, files: dict[str, FileRecord], progress: Progress
+    ) -> int:
+        if self.overview is None or self.overview_store is None:
+            return 0
+        progress("summarizing files and folders")
+        previous = self.overview_store.load(name)
+
+        def read(path: str) -> str | None:
+            source = load_source_file(repo_path, path, repo_id, MAX_FILE_BYTES)
+            return source.content if source is not None else None
+
+        build = self.overview.build(repo_id, files, read, previous.entries if previous else {})
+        vectors = previous.embedding_by_id() if previous else {}
+        missing = [chunk for chunk in build.chunks if chunk.chunk_id not in vectors]
+        if missing:
+            embedded = self.embedder.embed_documents([chunk.embedding_text for chunk in missing])
+            vectors.update({chunk.chunk_id: vector for chunk, vector in zip(missing, embedded, strict=True)})
+        index = OverviewIndex(build.entries, build.chunks, [vectors[chunk.chunk_id] for chunk in build.chunks])
+        self.overview_store.save(name, index)
+        logger.info(
+            "built overview",
+            extra={"repo_id": repo_id, "chunks": len(build.chunks), "llm_calls": build.llm_calls},
+        )
+        return len(build.chunks)
 
     def bm25_path(self, name: str) -> Path:
         return self.bm25_dir / name
