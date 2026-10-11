@@ -3,6 +3,7 @@ from dataclasses import dataclass, field, replace
 from codebase_qa.context.builder import ContextBuilder
 from codebase_qa.generation.grounding import is_low_relevance, validate_citations
 from codebase_qa.generation.refusal import NOT_FOUND_LEAD, closest_files, helpful_text, is_unknown, pick_suggestions
+from codebase_qa.generation.selfcheck import SKIPPED, SelfCheck, SelfChecker
 from codebase_qa.interfaces import Generator, Retriever
 from codebase_qa.models import GeneratedAnswer, RetrievedChunk
 from codebase_qa.routing.followup import FollowUpRewriter, Rewrite, Turn
@@ -32,6 +33,7 @@ class AskResult:
     refused: bool = False
     suggestions: list[str] = field(default_factory=list)
     question: str = ""
+    self_check: SelfCheck = SKIPPED
 
 
 class QAPipeline:
@@ -48,6 +50,7 @@ class QAPipeline:
         suggestions: list[str] | None = None,
         rewriter: FollowUpRewriter | None = None,
         context_builder: ContextBuilder | None = None,
+        self_checker: SelfChecker | None = None,
     ) -> None:
         self.retriever = retriever
         self.generator = generator
@@ -60,6 +63,7 @@ class QAPipeline:
         self.suggestions = suggestions or []
         self.rewriter = rewriter
         self.context_builder = context_builder
+        self.self_checker = self_checker
 
     def route(self, question: str) -> RouteDecision:
         if self.router is None:
@@ -116,7 +120,13 @@ class QAPipeline:
         grounded = replace(generated, citations=valid, invalid_citations=generated.invalid_citations + invalid)
         if is_unknown(grounded):
             return self.helpful(grounded.answer, context, timings, retrieval.route, grounded.invalid_citations)
-        return AskResult(answer=grounded, context=context, timings_ms=timings, route=retrieval.route)
+        check = SKIPPED
+        checker = self.self_checker
+        if checker is not None:
+            grounded, check = timed(timings, "self_check", lambda: checker.check(question, grounded, context))
+        return AskResult(
+            answer=grounded, context=context, timings_ms=timings, route=retrieval.route, self_check=check
+        )
 
     def helpful(
         self,

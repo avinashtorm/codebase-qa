@@ -121,6 +121,7 @@ answers.
 | 7a | Parent context (methods -> whole class, split parts -> whole function, top-level/config chunks +-10 lines; cap 100 lines) | 0.571 | 0.829 | 0.805 | 0.678 | 0.729 | answers only: any-correct 0.771, refused 5; off by default |
 | 7b | Call context (definitions of repo functions called by retrieved code; max 4 functions / 150 lines) | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | any-correct **0.829** (+1 question), refused 3; **on by default** |
 | 7c | Parent + call context | 0.571 | 0.829 | 0.805 | 0.678 | 0.719 | any-correct 0.800, refused 3 |
+| 8 | Self-check pass (claims verified against the code blocks that contain each citation; unsupported claims removed) | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | 0 of 32 cited dev answers had unsupported claims; a planted false claim was removed in 2/2 spot checks while true claims stayed; +1 LLM call (~1.5 s). Checking only the narrowed cited lines wrongly flagged 8 answers (true claims cited too narrowly), so evidence is the whole containing block |
 
 ## Running it locally
 

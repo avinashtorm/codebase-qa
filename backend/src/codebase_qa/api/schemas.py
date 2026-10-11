@@ -140,6 +140,13 @@ class ContextChunkOut(BaseModel):
     content: str
 
 
+class SelfCheckOut(BaseModel):
+    ran: bool
+    supported: int
+    unsupported: list[str]
+    action: str
+
+
 class AskResponse(BaseModel):
     answer: str
     citations: list[CitationOut]
@@ -152,6 +159,7 @@ class AskResponse(BaseModel):
     refused: bool
     suggestions: list[str]
     standalone_question: str
+    self_check: SelfCheckOut
 
     @classmethod
     def from_result(cls, result: AskResult, commit_sha: str) -> "AskResponse":
@@ -188,4 +196,10 @@ class AskResponse(BaseModel):
             refused=result.refused,
             suggestions=result.suggestions,
             standalone_question=result.question,
+            self_check=SelfCheckOut(
+                ran=result.self_check.ran,
+                supported=result.self_check.supported,
+                unsupported=result.self_check.unsupported,
+                action=result.self_check.action,
+            ),
         )

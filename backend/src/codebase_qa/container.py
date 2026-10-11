@@ -9,6 +9,7 @@ from codebase_qa.context.builder import ContextBuilder
 from codebase_qa.context.catalog import ChunkCatalog, LineReader
 from codebase_qa.generation.generator import LLMGenerator
 from codebase_qa.generation.llm import OfflineLLM
+from codebase_qa.generation.selfcheck import SelfChecker
 from codebase_qa.indexing.access import AccessStore
 from codebase_qa.indexing.indexer import Indexer
 from codebase_qa.indexing.janitor import RepoJanitor
@@ -240,6 +241,7 @@ class Container:
             suggestions=record.suggested_questions,
             rewriter=FollowUpRewriter(self.llm) if self.settings.followup_rewrite else None,
             context_builder=self.context_builder(record),
+            self_checker=SelfChecker(self.llm, self.settings.self_check_action) if self.settings.self_check else None,
         )
 
     def context_builder(self, record: RepoRecord) -> ContextBuilder | None:

@@ -64,10 +64,12 @@ def evaluate_question(
     if with_answers:
         answered = pipeline.answer(question.question, retrieval)
         answer = answered.answer
-        if "generation" in answered.timings_ms:
-            result["latency_ms"]["generation"] = answered.timings_ms["generation"]
+        for stage in ("context", "generation", "self_check"):
+            if stage in answered.timings_ms:
+                result["latency_ms"][stage] = answered.timings_ms[stage]
         result["used_llm"] = answer.used_llm
         result["refused"] = answered.refused
+        result["self_check"] = asdict(answered.self_check)
         result["answer"] = answer.answer
         result["citations"] = [citation.location for citation in answer.citations]
         result["invalid_citations"] = answer.invalid_citations
@@ -86,6 +88,12 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, float]:
         metrics["citation_any_correct"] = average([row["citation_scores"]["any_correct"] for row in answered])
         metrics["invalid_citations"] = sum(row["invalid_citations"] for row in answered)
         metrics["refused"] = sum(row.get("refused", not row["used_llm"]) for row in answered)
+        checked = [row["self_check"] for row in answered if row.get("self_check", {}).get("ran")]
+        if checked:
+            metrics["self_checked"] = len(checked)
+            metrics["answers_with_unsupported"] = sum(bool(check["unsupported"]) for check in checked)
+            claims = sum(check["supported"] + len(check["unsupported"]) for check in checked)
+            metrics["unsupported_claim_rate"] = round(sum(len(c["unsupported"]) for c in checked) / max(claims, 1), 4)
     for route in ("code", "overview", "tool"):
         metrics[f"route_{route}"] = sum(row.get("route") == route for row in rows)
     stages = sorted({stage for row in rows for stage in row["latency_ms"]})
@@ -166,6 +174,7 @@ def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
         "expansion_skip_above": settings.expansion_skip_above,
         "parent_context": settings.parent_context,
         "call_context": settings.call_context,
+        "self_check": settings.self_check,
         "hygiene": settings.hygiene,
         "downweight_factor": settings.downweight_factor,
         "downweight_tests": settings.downweight_tests,

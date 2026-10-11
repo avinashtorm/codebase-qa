@@ -69,6 +69,8 @@ class Settings(BaseSettings):
     call_context: bool = True
     call_max_functions: int = 4
     call_max_lines: int = 150
+    self_check: bool = True
+    self_check_action: Literal["remove", "flag"] = "remove"
 
     @property
     def repos_dir(self) -> Path:
