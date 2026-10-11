@@ -9,12 +9,12 @@ from collections.abc import AsyncIterator, Awaitable, Callable, Iterator
 from contextlib import asynccontextmanager
 from typing import Annotated, Any
 
-import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from codebase_qa.api.answers import answer_request
 from codebase_qa.api.rate_limit import DailyLimiter, SlidingWindowLimiter, client_ip, enforce, enforce_daily
+from codebase_qa.api.repos import index_action, resolve_repo, submit_index
 from codebase_qa.api.schemas import (
     AskRequest,
     AskResponse,
@@ -31,10 +31,9 @@ from codebase_qa.config import get_settings
 from codebase_qa.container import Container
 from codebase_qa.generation.llm import GenerationError, QuotaExhaustedError
 from codebase_qa.indexing.access import is_valid_visitor
-from codebase_qa.indexing.jobs import Job, JobManager, Progress
+from codebase_qa.indexing.jobs import JobManager, Progress
 from codebase_qa.indexing.registry import RepoRecord
-from codebase_qa.ingestion.git import repo_id_from_url
-from codebase_qa.ingestion.github import InvalidRepoUrl, RepoTooLarge, check_remote_size, parse_github_url
+from codebase_qa.ingestion.github import InvalidRepoUrl, RepoTooLarge, not_found, parse_github_url
 from codebase_qa.logging_config import configure_logging
 from codebase_qa.retrieval.filters import folder_counts, language_counts
 
@@ -85,22 +84,13 @@ def limit_ask(request: Request) -> None:
     enforce_daily(request.app.state.ask_site_wide, "all", "The demo has reached its daily question limit.")
 
 
-def validate_repo_url(url: str, services: Container) -> tuple[str, str]:
-    settings = services.settings
-    if settings.allow_local_repos and url.startswith("file://"):
-        return url, repo_id_from_url(url)
-    repo = parse_github_url(url)
-    headers = {"Authorization": f"Bearer {settings.github_token}"} if settings.github_token else {}
-    with httpx.Client(headers=headers) as client:
-        check_remote_size(repo, settings.max_repo_size_mb, client)
-    return repo.url, repo.repo_id
-
-
-def index_action(services: Container, url: str) -> Callable[[Progress], dict[str, Any]]:
+def insights_action(services: Container, repo_id: str) -> Callable[[Progress], dict[str, Any]]:
     def action(progress: Progress) -> dict[str, Any]:
-        record = services.indexer.index(url, progress=progress)
-        services.answer_cache.invalidate(record.repo_id)
-        return RepoOut.from_record(record).model_dump()
+        record = services.repo_record(repo_id)
+        if record is None:
+            raise ValueError(f"repo {repo_id} is not indexed")
+        updated = services.indexer.backfill_insights(record, progress)
+        return RepoOut.from_record(updated).model_dump()
 
     return action
 
@@ -121,27 +111,22 @@ def finished_index(jobs: JobManager, record: RepoRecord) -> JobOut:
     return JobOut.from_job(jobs.completed("index", record.repo_id, RepoOut.from_record(record).model_dump()))
 
 
-def submit_index(services: Container, jobs: JobManager, url: str, repo_id: str) -> Job:
-    active = jobs.active_for(repo_id)
-    if active is not None:
-        return active
-    services.janitor.cleanup(keep=jobs.active_repo_ids() | {repo_id}, reserve=1)
-    return jobs.submit("index", repo_id, index_action(services, url))
-
-
 def auto_index_demo(services: Container, jobs: JobManager) -> None:
     url = services.settings.demo_repo_url
     if not url:
         return
     try:
-        canonical, repo_id = validate_repo_url(url, services)
+        target = resolve_repo(services, url)
     except (InvalidRepoUrl, RepoTooLarge) as exc:
         logger.warning("demo repo not indexed", extra={"reason": str(exc)})
         return
-    services.access.pin(repo_id)
-    if services.repo_record(repo_id) is None:
-        logger.info("auto-indexing demo repo", extra={"repo_id": repo_id})
-        jobs.submit("index", repo_id, index_action(services, canonical))
+    services.access.pin(target.repo_id)
+    record = services.repo_record(target.repo_id)
+    if record is None:
+        logger.info("auto-indexing demo repo", extra={"repo_id": target.repo_id})
+        jobs.submit("index", target.repo_id, index_action(services, target, None))
+    elif services.indexer.needs_insights(record):
+        jobs.submit("insights", target.repo_id, insights_action(services, target.repo_id))
 
 
 def cleanup_loop(services: Container, jobs: JobManager, stop: threading.Event) -> None:
@@ -218,16 +203,20 @@ def create_app(container: Container | None = None) -> FastAPI:
     ) -> JobOut:
         if visitor is None:
             raise HTTPException(status_code=400, detail="missing or invalid X-Visitor-Id header")
+        token = body.token()
         try:
-            url, repo_id = validate_repo_url(body.url, services)
+            target = resolve_repo(services, body.url, body.branch, token)
         except InvalidRepoUrl as exc:
             raise HTTPException(status_code=400, detail=str(exc)) from exc
         except RepoTooLarge as exc:
             raise HTTPException(status_code=413, detail=str(exc)) from exc
+        repo_id = target.repo_id
         existing = services.repo_record(repo_id)
         if existing is not None and services.access.can_see(repo_id, visitor):
             services.access.touch(repo_id)
             return finished_index(jobs, existing)
+        if existing is not None and existing.private and not target.proven_by_token:
+            raise HTTPException(status_code=400, detail=str(not_found(parse_github_url(target.url))))
         enforce_daily(
             request.app.state.index_per_visitor,
             visitor_ip(request),
@@ -236,7 +225,7 @@ def create_app(container: Container | None = None) -> FastAPI:
         services.access.grant(repo_id, visitor)
         if existing is not None:
             return finished_index(jobs, existing)
-        return JobOut.from_job(submit_index(services, jobs, url, repo_id))
+        return JobOut.from_job(submit_index(services, jobs, target, token))
 
     @app.get("/repos", response_model=list[RepoOut])
     def list_repos(services: Services, visitor: Visitor) -> list[RepoOut]:

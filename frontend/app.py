@@ -75,7 +75,8 @@ def client() -> BackendClient:
 
 def repo_name(repo: dict[str, Any]) -> str:
     match = re.match(r"https://github\.com/([^/]+/[^/]+?)(?:\.git)?/?$", repo["url"])
-    return match.group(1) if match else repo["repo_id"]
+    name = match.group(1) if match else repo["repo_id"]
+    return f'{name} @ {repo["branch"]}' if repo.get("branch") else name
 
 
 def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:
@@ -212,10 +213,22 @@ def landing() -> None:
         unsafe_allow_html=True,
     )
     with st.container():
-        url = st.chat_input("Paste a public GitHub URL, e.g. https://github.com/owner/repository", key="repo_url")
+        st.chat_input(
+            "Paste a GitHub URL, e.g. https://github.com/owner/repository", key="repo_url", on_submit=queue_index
+        )
+    with st.expander("Branch or private repository (optional)", icon=":material/tune:"):
+        st.text_input("Branch", key="branch", placeholder="default branch")
+        st.text_input(
+            "GitHub token for a private repository",
+            key="github_token",
+            type="password",
+            help="Needs read access to the repository. It is used once to check and clone the repository, "
+            "kept only in memory for that request, and never stored or logged.",
+        )
     sample = st.button("No repository in mind? Try a sample repository", type="tertiary")
-    if url:
-        index_repository(url.strip())
+    pending = st.session_state.pop("pending_index", None)
+    if pending:
+        index_repository(*pending)
     elif sample:
         index_repository(SAMPLE_REPO_URL)
     st.write("")
@@ -229,12 +242,20 @@ def landing() -> None:
         column.markdown(feature(title, text), unsafe_allow_html=True)
 
 
-def index_repository(url: str) -> None:
+def queue_index() -> None:
+    url = (st.session_state.get("repo_url") or "").strip()
+    branch = (st.session_state.get("branch") or "").strip()
+    token = (st.session_state.get("github_token") or "").strip() or None
+    st.session_state["github_token"] = ""
+    st.session_state["pending_index"] = (url, branch, token)
+
+
+def index_repository(url: str, branch: str = "", token: str | None = None) -> None:
     if not url:
         st.warning("Paste a GitHub repository URL first, for example https://github.com/owner/repository.")
         return
     try:
-        job = wait_for_job(client().index(url), "Indexing repository")
+        job = wait_for_job(client().index(url, branch, token), "Indexing repository")
     except BackendError as exc:
         st.error(str(exc))
         return
@@ -261,12 +282,21 @@ def owner_tools(active: dict[str, Any]) -> None:
                 st.error("Wrong or missing owner password." if exc.status_code == 401 else str(exc))
 
 
+def branch_label(repo: dict[str, Any]) -> str:
+    parts = []
+    if repo.get("private"):
+        parts.append("private")
+    if repo.get("branch"):
+        parts.append(f'branch <code>{html.escape(repo["branch"])}</code>')
+    return "".join(f"{part} &middot; " for part in parts)
+
+
 def repo_header(repo: dict[str, Any]) -> None:
     st.markdown(f'<div class="repo-title">{repo_name(repo)}</div>', unsafe_allow_html=True)
     st.markdown(
-        f'<div class="repo-meta"><a href="{repo["url"]}" target="_blank">GitHub</a> &middot; commit '
-        f'<code>{repo["commit_sha"][:7]}</code> &middot; {repo["file_count"]} files &middot; '
-        f'{repo["chunk_count"]} code chunks</div>',
+        f'<div class="repo-meta"><a href="{repo["url"]}" target="_blank">GitHub</a> &middot; '
+        f'{branch_label(repo)}commit <code>{repo["commit_sha"][:7]}</code> &middot; {repo["file_count"]} files '
+        f'&middot; {repo["chunk_count"]} code chunks</div>',
         unsafe_allow_html=True,
     )
 

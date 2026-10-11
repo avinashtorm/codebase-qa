@@ -1,7 +1,7 @@
 from dataclasses import asdict
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SecretStr
 
 from codebase_qa.generation.grounding import snippet_for
 from codebase_qa.indexing.indexer import ReindexReport
@@ -15,6 +15,12 @@ from codebase_qa.routing.followup import Turn
 
 class IndexRepoRequest(BaseModel):
     url: str = Field(min_length=1, max_length=300)
+    branch: str = Field(default="", max_length=200)
+    github_token: SecretStr | None = Field(default=None, max_length=300)
+
+    def token(self) -> str | None:
+        value = self.github_token.get_secret_value().strip() if self.github_token else ""
+        return value or None
 
 
 class RepoOut(BaseModel):
@@ -26,6 +32,8 @@ class RepoOut(BaseModel):
     file_count: int
     chunk_count: int
     suggested_questions: list[str] = []
+    branch: str = ""
+    private: bool = False
 
     @classmethod
     def from_record(cls, record: RepoRecord) -> "RepoOut":
@@ -38,6 +46,8 @@ class RepoOut(BaseModel):
             file_count=record.file_count,
             chunk_count=record.chunk_count,
             suggested_questions=record.suggested_questions,
+            branch=record.branch,
+            private=record.private,
         )
 
 

@@ -25,6 +25,8 @@ class RepoRecord:
     overview_count: int = 0
     files: dict[str, FileRecord] = field(default_factory=dict)
     suggested_questions: list[str] = field(default_factory=list)
+    branch: str = ""
+    private: bool = False
 
     @classmethod
     def from_dict(cls, data: dict) -> "RepoRecord":

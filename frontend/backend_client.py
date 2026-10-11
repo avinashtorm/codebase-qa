@@ -58,8 +58,11 @@ class BackendClient:
     def repos(self) -> list[dict[str, Any]]:
         return self.request("GET", "/repos")
 
-    def index(self, url: str) -> dict[str, Any]:
-        return self.request("POST", "/repos", json={"url": url})
+    def index(self, url: str, branch: str = "", token: str | None = None) -> dict[str, Any]:
+        payload: dict[str, Any] = {"url": url, "branch": branch}
+        if token:
+            payload["github_token"] = token
+        return self.request("POST", "/repos", json=payload)
 
     def reindex(self, repo_id: str) -> dict[str, Any]:
         return self.request("POST", f"/repos/{repo_id}/reindex")

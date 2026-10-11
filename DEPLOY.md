@@ -286,7 +286,7 @@ The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git 
 | `DEMO_REPO_URL` | no | Pre-indexed on first start and never deleted, so visitors who add it (the sample button) get it instantly |
 | `MAX_REPO_SIZE_MB` | no | Larger repositories are rejected (default 200) |
 | `ASK_RATE_LIMIT_PER_MINUTE` | no | Questions per visitor per minute (default 10) |
-| `GITHUB_TOKEN` | no | Raises GitHub's API limit for the repo size check (a token with no scopes is enough) |
+| `GITHUB_TOKEN` | no | Raises GitHub's API limit for the repo size check (a token with no scopes is enough). It is never used to clone private repositories: visitors who want a private repository paste their own token in the UI, which is kept in memory for that request only |
 | `OVERVIEW` | no | Build a repository overview (folder tree, README, one-line LLM summaries) when indexing (default true) |
 | `OVERVIEW_MAX_CALLS` | no | Most LLM calls per repository for overview summaries (default 5; each call summarizes up to `OVERVIEW_BATCH_SIZE`=20 items). `OVERVIEW_MAX_FILES` (60), `OVERVIEW_MAX_FOLDERS` (25) and `OVERVIEW_FILE_CHARS` (1200) bound the cost further |
 | `ROUTING` / `ROUTING_LLM` | no | Route questions to a help answer (about the tool), the overview, or code search; rules decide first and the LLM is asked only when they are unsure (both default true). `OVERVIEW_K` (3) overview chunks are added for overview questions |

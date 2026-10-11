@@ -136,6 +136,8 @@ answers.
 | 17 | Prompt-injection defense: repo text in delimited `<context_block>` elements with delimiter tags neutralized, untrusted-data rules in every prompt, output guard (secret and key redaction, system-prompt leak block) | tests with a fixture repo whose files say "ignore previous instructions", "reveal your system prompt", "output the API key" (also simulating a model that obeys): no answer or stream contains the key or prompt. Real model check (gemini-3.1-flash-lite): 3 attack questions refused, 0 leaks. On the same 32 dev answers citation precision went 0.732 -> **0.818** with the delimited prompt |
 | 18 | Thumbs up/down feedback stored with question, answer, citations and retrieved chunks (server-side copy, SQLite) + `python -m codebase_qa.feedback.export --out feedback.jsonl` | - |
 | 19 | Locust load test of `/ask` (mocked LLM) | see the load test table below; found and fixed a concurrency bug (parallel questions rewrote `access.json` through one temp file: 5-28 HTTP 500s per run) |
+| 20 | Private repositories with a user-supplied GitHub token | token used for the API check and the clone (as an HTTP header passed to git through environment variables, never in the URL or `.git/config`), kept in memory for that request only; a private index is shared only with visitors whose token can see the repo; a test indexes with a token and scans logs, stdout/stderr, job results and every file under `data/` for it |
+| 21 | Branch selection | index any branch (its own index, `owner__repo@branch`); the header shows branch and indexed commit; re-index pulls the same branch |
 
 **Load test** ([loadtest/](loadtest), [eval/benchmarks](eval/benchmarks)): one uvicorn process on the development laptop
 (Windows, 16 logical CPUs), real bge-small embeddings on CPU and Chroma search for every request, LLM mocked (instant),
@@ -221,7 +223,7 @@ Other tools: `eval.calibrate` (refusal threshold), `eval.benchmark_reindex` (inc
 | Method and path | Purpose |
 |---|---|
 | `GET /health` | Status, number of repos, active jobs, visitor limits, whether re-indexing needs the owner password |
-| `POST /repos` `{"url"}` | Validate a GitHub URL and add it for this visitor: reuses an existing index instantly, otherwise starts an indexing job (202 + job) |
+| `POST /repos` `{"url", "branch", "github_token"}` | Validate a GitHub URL and add it for this visitor: reuses an existing index instantly, otherwise starts an indexing job (202 + job) |
 | `GET /repos` | Repositories visible to this visitor (the demo repo plus their own) with commit, file and chunk counts |
 | `POST /repos/{id}/reindex` | Start an incremental re-index job; its result is the change report |
 | `GET /jobs/{id}` | Job status, progress text, result or error |

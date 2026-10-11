@@ -3,6 +3,8 @@ from datetime import timedelta
 from functools import cached_property
 from pathlib import Path
 
+import httpx
+
 from codebase_qa.caching.answers import AnswerCache
 from codebase_qa.chunking.factory import build_chunker
 from codebase_qa.config import Settings
@@ -80,6 +82,7 @@ class Container:
         self.generator_factory = generator_factory
         self.reranker_factory = reranker_factory
         self.llm_factory = llm_factory
+        self.github_transport: httpx.BaseTransport | None = None
         self.bm25_cache: dict[tuple[str, str], BM25Index] = {}
         self.overview_cache: dict[tuple[str, str], OverviewIndex] = {}
         self.catalog_cache: dict[tuple[str, str], ChunkCatalog] = {}

@@ -94,11 +94,21 @@ class Indexer:
     def collection_for(self, repo_id: str) -> str:
         return collection_name(repo_id, self.chunker.name)
 
-    def index(self, url: str, repo_id: str | None = None, progress: Progress = ignore_progress) -> RepoRecord:
+    def index(
+        self,
+        url: str,
+        repo_id: str | None = None,
+        progress: Progress = ignore_progress,
+        branch: str = "",
+        token: str | None = None,
+        private: bool = False,
+    ) -> RepoRecord:
         progress("cloning repository")
-        cloned = clone_repo(url, self.repos_dir, repo_id=repo_id, timeout=self.clone_timeout)
+        cloned = clone_repo(
+            url, self.repos_dir, repo_id=repo_id, timeout=self.clone_timeout, branch=branch, token=token
+        )
         self.enforce_size_limit(Path(cloned.local_path))
-        return self.index_checkout(cloned, progress)
+        return self.index_checkout(cloned, progress, branch=branch, private=private)
 
     def enforce_size_limit(self, checkout: Path) -> None:
         if self.max_repo_bytes is None:
@@ -109,7 +119,9 @@ class Indexer:
             limit_mb = self.max_repo_bytes // (1024 * 1024)
             raise RepoTooLarge(f"repository checkout is {size // (1024 * 1024)} MB, the limit is {limit_mb} MB")
 
-    def index_checkout(self, cloned: ClonedRepo, progress: Progress = ignore_progress) -> RepoRecord:
+    def index_checkout(
+        self, cloned: ClonedRepo, progress: Progress = ignore_progress, branch: str = "", private: bool = False
+    ) -> RepoRecord:
         name = self.collection_for(cloned.repo_id)
         self.store.delete_collection(name)
         collection = self.store.collection(name)
@@ -126,6 +138,8 @@ class Indexer:
             url=cloned.url,
             local_path=cloned.local_path,
             commit_sha=cloned.commit_sha,
+            branch=branch,
+            private=private,
             collection=name,
             chunker=self.chunker.name,
             indexed_at=now_iso(),
@@ -144,7 +158,9 @@ class Indexer:
         stages: dict[str, float] = {}
         repo_path = Path(record.local_path)
         progress("pulling latest commit")
-        new_sha = timed(stages, "pull", lambda: pull_latest(repo_path, timeout=self.clone_timeout))
+        new_sha = timed(
+            stages, "pull", lambda: pull_latest(repo_path, timeout=self.clone_timeout, branch=record.branch)
+        )
         if new_sha == record.commit_sha:
             changes = ChangeSet(method="unchanged")
         else:
