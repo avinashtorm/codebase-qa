@@ -60,13 +60,15 @@ class VectorCollection:
                 embeddings=embeddings[start : start + self.max_batch],
             )
 
-    def query(self, embedding: list[float], k: int) -> list[tuple[Chunk, float]]:
+    def query(self, embedding: list[float], k: int, paths: list[str] | None = None) -> list[tuple[Chunk, float]]:
         total = self.count()
-        if total == 0:
+        if total == 0 or (paths is not None and not paths):
             return []
+        where = {"path": {"$in": paths}} if paths is not None else None
         result = self.raw.query(
             query_embeddings=[embedding],
             n_results=min(k, total),
+            where=where,
             include=["documents", "metadatas", "distances"],
         )
         columns = [result[key][0] for key in ("ids", "documents", "metadatas", "distances")]

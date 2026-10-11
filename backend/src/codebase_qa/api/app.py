@@ -20,6 +20,7 @@ from codebase_qa.api.schemas import (
     JobOut,
     ReindexOut,
     RepoOut,
+    ScopeOut,
 )
 from codebase_qa.config import get_settings
 from codebase_qa.container import Container
@@ -30,6 +31,7 @@ from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.ingestion.git import repo_id_from_url
 from codebase_qa.ingestion.github import InvalidRepoUrl, RepoTooLarge, check_remote_size, parse_github_url
 from codebase_qa.logging_config import configure_logging
+from codebase_qa.retrieval.filters import folder_counts, language_counts
 
 logger = logging.getLogger("codebase_qa.api")
 CLEANUP_INTERVAL_SECONDS = 600
@@ -232,6 +234,13 @@ def create_app(container: Container | None = None) -> FastAPI:
     def list_repos(services: Services, visitor: Visitor) -> list[RepoOut]:
         return [RepoOut.from_record(record) for record in services.visible_records(visitor)]
 
+    @app.get("/repos/{repo_id}/scope", response_model=ScopeOut)
+    def repo_scope(repo_id: str, services: Services, visitor: Visitor) -> ScopeOut:
+        record = services.repo_record(repo_id)
+        if record is None or not services.access.can_see(repo_id, visitor):
+            raise HTTPException(status_code=404, detail=f"repo {repo_id} is not indexed")
+        return ScopeOut(folders=folder_counts(record.files), languages=language_counts(record.files))
+
     @app.post("/repos/{repo_id}/reindex", response_model=JobOut, status_code=202, dependencies=owner_only)
     def reindex_repo(repo_id: str, services: Services, jobs: Jobs) -> JobOut:
         if services.repo_record(repo_id) is None:
@@ -255,7 +264,7 @@ def create_app(container: Container | None = None) -> FastAPI:
         limit_ask(request)
         services.access.touch(body.repo_id)
         try:
-            result = services.pipeline(record).ask(body.question, body.turns())
+            result = services.pipeline(record, body.filters.to_filter()).ask(body.question, body.turns())
         except QuotaExhaustedError as exc:
             raise HTTPException(status_code=503, detail=QUOTA_MESSAGE) from exc
         except GenerationError as exc:

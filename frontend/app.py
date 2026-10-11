@@ -96,7 +96,39 @@ def select_repo(repo_id: str | None) -> None:
     st.session_state["active_repo"] = repo_id
 
 
-def sidebar(health: dict[str, Any], repos: list[dict[str, Any]], active: dict[str, Any] | None) -> bool:
+def repo_scope(repo_id: str) -> dict[str, Any]:
+    cache: dict[str, Any] = st.session_state.setdefault("scopes", {})
+    if repo_id not in cache:
+        try:
+            cache[repo_id] = client().scope(repo_id)
+        except BackendError:
+            return {"folders": {}, "languages": {}}
+    return cache[repo_id]
+
+
+def scope_controls(repo: dict[str, Any]) -> dict[str, Any]:
+    scope = repo_scope(repo["repo_id"])
+    st.markdown('<div class="section-label">Search scope</div>', unsafe_allow_html=True)
+    folders = ["", *scope["folders"]]
+    folder = st.selectbox(
+        "Folder",
+        folders,
+        format_func=lambda name: "All folders" if not name else f"{name}/ ({scope['folders'][name]} files)",
+        key=f"folder_{repo['repo_id']}",
+    )
+    languages = st.multiselect(
+        "Languages",
+        list(scope["languages"]),
+        format_func=lambda name: f"{name} ({scope['languages'][name]})",
+        placeholder="All languages",
+        key=f"languages_{repo['repo_id']}",
+    )
+    return {"folder": folder, "languages": languages}
+
+
+def sidebar(
+    health: dict[str, Any], repos: list[dict[str, Any]], active: dict[str, Any] | None
+) -> tuple[bool, dict[str, Any]]:
     with st.sidebar:
         st.markdown('<div class="app-brand">Codebase Q&A</div>', unsafe_allow_html=True)
         st.markdown('<div class="app-tagline">Cited answers about any GitHub repository</div>', unsafe_allow_html=True)
@@ -122,6 +154,7 @@ def sidebar(health: dict[str, Any], repos: list[dict[str, Any]], active: dict[st
                 on_click=select_repo,
                 args=(repo["repo_id"],),
             )
+        filters = scope_controls(active) if active is not None else {"folder": "", "languages": []}
         st.markdown('<div class="section-label">Settings</div>', unsafe_allow_html=True)
         show_details = st.toggle("Show retrieval details", value=False)
         repos_per_day = health["index_per_visitor_per_day"]
@@ -132,7 +165,7 @@ def sidebar(health: dict[str, Any], repos: list[dict[str, Any]], active: dict[st
             f"private to this link and are deleted {hours} hours after you last use them."
         )
         st.markdown(f'<div class="muted" style="margin-top:1.4rem">{note}</div>', unsafe_allow_html=True)
-    return show_details
+    return show_details, filters
 
 
 def feature(title: str, text: str) -> str:
@@ -281,7 +314,7 @@ def recent_turns(history: list[dict[str, Any]], limit: int = 6) -> list[dict[str
     ]
 
 
-def chat(repo: dict[str, Any], show_details: bool) -> None:
+def chat(repo: dict[str, Any], show_details: bool, filters: dict[str, Any]) -> None:
     history: list[dict[str, Any]] = st.session_state.setdefault("history", {}).setdefault(repo["repo_id"], [])
     for position, message in enumerate(history):
         with st.chat_message(message["role"]):
@@ -302,7 +335,7 @@ def chat(repo: dict[str, Any], show_details: bool) -> None:
     with st.chat_message("assistant"):
         try:
             with st.spinner("Searching the code..."):
-                response = client().ask(repo["repo_id"], question, previous)
+                response = client().ask(repo["repo_id"], question, previous, filters)
             message = {"role": "assistant", "content": response["answer"], "response": response}
         except BackendError as exc:
             message = {"role": "assistant", "content": f"Sorry, that didn't work: {exc}"}
@@ -320,13 +353,13 @@ def main() -> None:
         return
     by_id = {repo["repo_id"]: repo for repo in repos}
     active = by_id.get(st.session_state.get("active_repo") or "")
-    show_details = sidebar(health, repos, active)
+    show_details, filters = sidebar(health, repos, active)
     if active is None:
         landing()
         return
     owner_tools(active)
     repo_header(active)
-    chat(active, show_details)
+    chat(active, show_details, filters)
 
 
 main()

@@ -23,6 +23,7 @@ from codebase_qa.overview.summarizer import LLMSummarizer
 from codebase_qa.qa import QAPipeline
 from codebase_qa.retrieval.bm25 import BM25Index, BM25Retriever
 from codebase_qa.retrieval.expansion import ExpandingRetriever, QueryExpander
+from codebase_qa.retrieval.filters import NO_FILTER, SearchFilter
 from codebase_qa.retrieval.hybrid import HybridRetriever
 from codebase_qa.retrieval.overview import OverviewRetriever
 from codebase_qa.retrieval.reranker import RerankingRetriever
@@ -179,8 +180,8 @@ class Container:
             self.bm25_cache = {key: index}
         return self.bm25_cache[key]
 
-    def retriever(self, record: RepoRecord) -> Retriever:
-        base = self.first_stage_retriever(record)
+    def retriever(self, record: RepoRecord, search_filter: SearchFilter = NO_FILTER) -> Retriever:
+        base = self.first_stage_retriever(record, search_filter)
         rules = self.settings.hygiene_rules
         if rules.enabled and rules.factor != 1.0:
             base = DownweightingRetriever(base, rules)
@@ -199,16 +200,17 @@ class Container:
             base, self.reranker, candidates=self.settings.rerank_candidates, fuse=self.settings.rerank_fusion
         )
 
-    def first_stage_retriever(self, record: RepoRecord) -> Retriever:
+    def first_stage_retriever(self, record: RepoRecord, search_filter: SearchFilter = NO_FILTER) -> Retriever:
+        paths = search_filter.allowed_paths(record.files) if search_filter.active else None
         mode = self.settings.retrieval_mode
         if mode == "bm25":
-            return BM25Retriever(self.bm25_index(record))
-        vector = VectorRetriever(self.store.collection(record.collection), self.embedder)
+            return BM25Retriever(self.bm25_index(record), paths)
+        vector = VectorRetriever(self.store.collection(record.collection), self.embedder, paths)
         if mode == "vector":
             return vector
         return HybridRetriever(
             vector,
-            BM25Retriever(self.bm25_index(record)),
+            BM25Retriever(self.bm25_index(record), paths),
             candidates=self.settings.hybrid_candidates,
             rrf_k=self.settings.rrf_k,
         )
@@ -229,9 +231,9 @@ class Container:
             return None
         return QuestionRouter(self.llm if self.settings.routing_llm else None)
 
-    def pipeline(self, record: RepoRecord) -> QAPipeline:
+    def pipeline(self, record: RepoRecord, search_filter: SearchFilter = NO_FILTER) -> QAPipeline:
         return QAPipeline(
-            self.retriever(record),
+            self.retriever(record, search_filter),
             self.generator,
             top_k=self.settings.top_k,
             refusal_thresholds=self.settings.refusal_thresholds,

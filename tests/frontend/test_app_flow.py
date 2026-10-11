@@ -131,3 +131,12 @@ def test_suggested_questions_and_helpful_refusal(
         assert "couldn't find code" in assistant.markdown[0].value
         assert "Questions that work" not in assistant.markdown[0].value
         assert any((item.key or "").startswith("suggest_1_") for item in page.button)
+
+
+def test_search_scope_controls_send_filters(page: AppTest, repo_url: str) -> None:
+    index(page, repo_url)
+    assert page.sidebar.selectbox(key="folder_origin").options == ["All folders", "app/ (2 files)", "web/ (1 files)"]
+    page.sidebar.selectbox(key="folder_origin").set_value("web").run()
+    page.chat_input[0].set_value("AuthService login").run()
+    assistant = [message for message in page.chat_message if message.name == "assistant"][0]
+    assert assistant.markdown[0].value.startswith("See web/index.ts")

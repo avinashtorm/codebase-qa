@@ -45,30 +45,33 @@ class BM25Index:
     def exists(directory: Path) -> bool:
         return (directory / CHUNKS_FILE).exists()
 
-    def search(self, query: str, k: int) -> list[RetrievedChunk]:
+    def search(self, query: str, k: int, paths: set[str] | None = None) -> list[RetrievedChunk]:
         if self.model is None:
             return []
         vocabulary = self.model.vocab_dict
         tokens = [token for token in code_tokenize(query) if token in vocabulary]
         if not tokens:
             return []
-        indices, scores = self.model.retrieve([tokens], k=min(k, len(self.chunks)), show_progress=False)
+        depth = len(self.chunks) if paths is not None else min(k, len(self.chunks))
+        indices, scores = self.model.retrieve([tokens], k=depth, show_progress=False)
         results = []
         for index, score in zip(indices[0], scores[0], strict=True):
-            if score > 0:
-                results.append(RetrievedChunk(self.chunks[int(index)], float(score), {"bm25": float(score)}))
-        return results
+            chunk = self.chunks[int(index)]
+            if score > 0 and (paths is None or chunk.path in paths):
+                results.append(RetrievedChunk(chunk, float(score), {"bm25": float(score)}))
+        return results[:k]
 
 
 class BM25Retriever:
     name = "bm25"
 
-    def __init__(self, index: BM25Index) -> None:
+    def __init__(self, index: BM25Index, paths: list[str] | None = None) -> None:
         self.index = index
+        self.paths = set(paths) if paths is not None else None
         self.timings: dict[str, float] = {}
 
     def retrieve(self, query: str, k: int) -> list[RetrievedChunk]:
         timings: dict[str, float] = {}
-        results = timed(timings, "bm25_search", lambda: self.index.search(query, k))
+        results = timed(timings, "bm25_search", lambda: self.index.search(query, k, self.paths))
         self.timings = timings
         return results

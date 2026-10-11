@@ -12,6 +12,7 @@ from codebase_qa.generation.llm import GenerationError
 from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.ingestion.git import repo_id_from_url
 from codebase_qa.models import RetrievedChunk
+from codebase_qa.retrieval.filters import NO_FILTER, SearchFilter
 from codebase_qa.routing.followup import Turn
 from eval.dataset import EvalQuestion, load_questions
 from eval.metrics import average, score_citations, score_retrieval
@@ -31,6 +32,11 @@ def ensure_indexed(container: Container, url: str) -> RepoRecord:
     return container.indexer.backfill_insights(record, print)
 
 
+def oracle_filter(question: EvalQuestion) -> SearchFilter:
+    path = question.expected_locations[0].path
+    return SearchFilter(folder=path.split("/")[0]) if "/" in path else NO_FILTER
+
+
 def describe(item: RetrievedChunk) -> dict[str, Any]:
     chunk = item.chunk
     return {"location": chunk.location, "score": round(item.score, 4)}
@@ -41,8 +47,9 @@ def evaluate_question(
     record: RepoRecord,
     question: EvalQuestion,
     with_answers: bool,
+    oracle: bool = False,
 ) -> dict[str, Any]:
-    pipeline = container.pipeline(record)
+    pipeline = container.pipeline(record, oracle_filter(question) if oracle else NO_FILTER)
     history = [Turn(turn["role"], turn["content"]) for turn in question.history]
     retrieval = pipeline.retrieve(question.question, RETRIEVAL_DEPTH, history)
     ranked = retrieval.code
@@ -138,11 +145,11 @@ def run(args: argparse.Namespace, container: Container | None = None) -> Path:
     for index, question in enumerate(questions, start=1):
         with_answers = args.answers and generation_error is None
         try:
-            rows.append(evaluate_question(container, record, question, with_answers))
+            rows.append(evaluate_question(container, record, question, with_answers, args.oracle_filter))
         except GenerationError as exc:
             generation_error = str(exc)
             print(f"generation stopped: {generation_error}")
-            rows.append(evaluate_question(container, record, question, False))
+            rows.append(evaluate_question(container, record, question, False, args.oracle_filter))
         print(f"[{index}/{len(questions)}] {question.id} hit@5={rows[-1]['retrieval']['hit_at_5']:.0f}")
         if with_answers and args.delay:
             time.sleep(args.delay)
@@ -223,6 +230,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--delay", type=float, default=0.0, help="seconds between LLM calls")
     parser.add_argument("--llm-model", default=None, help="override GEMINI_MODEL for this run")
     parser.add_argument("--no-routing", action="store_true", help="send every question down the code path")
+    parser.add_argument("--oracle-filter", action="store_true", help="restrict each question to its answer's folder")
     parser.add_argument("--set", action="append", default=[], metavar="KEY=VALUE", help="override any setting")
     parser.add_argument("--questions", type=Path, default=DEFAULT_QUESTIONS)
     parser.add_argument("--results-dir", type=Path, default=RESULTS_DIR)

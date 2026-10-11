@@ -7,6 +7,7 @@ from codebase_qa.indexing.indexer import ReindexReport
 from codebase_qa.indexing.jobs import Job
 from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.qa import AskResult
+from codebase_qa.retrieval.filters import SearchFilter
 from codebase_qa.routing.followup import Turn
 
 
@@ -113,10 +114,24 @@ class HistoryTurn(BaseModel):
     content: str = Field(max_length=4000)
 
 
+class FiltersIn(BaseModel):
+    folder: str = Field(default="", max_length=300)
+    languages: list[str] = Field(default_factory=list, max_length=20)
+
+    def to_filter(self) -> SearchFilter:
+        return SearchFilter(folder=self.folder.strip().strip("/"), languages=tuple(self.languages))
+
+
+class ScopeOut(BaseModel):
+    folders: dict[str, int]
+    languages: dict[str, int]
+
+
 class AskRequest(BaseModel):
     repo_id: str = Field(min_length=1, max_length=200)
     question: str = Field(min_length=1, max_length=2000)
     history: list[HistoryTurn] = Field(default_factory=list, max_length=12)
+    filters: FiltersIn = Field(default_factory=FiltersIn)
 
     def turns(self) -> list[Turn]:
         return [Turn(turn.role, turn.content) for turn in self.history]
