@@ -19,7 +19,8 @@ def verdict(*claims: tuple[str, bool], revised: str = "") -> dict:
 
 def test_evidence_shows_the_whole_containing_block() -> None:
     text = evidence(ANSWER, CONTEXT)
-    assert "[app/auth.py:10-20] (cited: lines 12-13)" in text and "line 10" in text and "line 20" in text
+    assert '<context_block source="app/auth.py:10-20" cited="12-13">' in text
+    assert "line 10" in text and "line 20" in text
 
 
 def test_supported_answer_is_unchanged() -> None:

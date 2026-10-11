@@ -23,6 +23,5 @@ def test_extract_ignores_plain_numbers_and_times() -> None:
 def test_prompt_labels_each_chunk_with_location() -> None:
     chunk = Chunk("id", "repo", "app/x.py", "python", 3, 9, "def f():\n    pass")
     prompt = build_user_prompt("What is f?", [RetrievedChunk(chunk, 0.9)])
-    assert "[app/x.py:3-9]" in prompt
-    assert "```python\ndef f():" in prompt
-    assert prompt.endswith("Question: What is f?")
+    assert '<context_block source="app/x.py:3-9" language="python">\ndef f():' in prompt
+    assert prompt.endswith("<question>What is f?</question>")

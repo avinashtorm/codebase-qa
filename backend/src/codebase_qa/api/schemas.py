@@ -124,6 +124,12 @@ class FiltersIn(BaseModel):
         return SearchFilter(folder=self.folder.strip().strip("/"), languages=tuple(self.languages))
 
 
+class FeedbackIn(BaseModel):
+    answer_id: str = Field(min_length=8, max_length=64)
+    rating: Literal["up", "down"]
+    comment: str = Field(default="", max_length=1000)
+
+
 class StatsOut(BaseModel):
     model: str
     questions: int
@@ -200,6 +206,7 @@ class AskResponse(BaseModel):
     confidence_reasons: list[str]
     cached: bool = False
     degraded: str = ""
+    answer_id: str = ""
 
     @classmethod
     def from_result(cls, result: AskResult, commit_sha: str) -> "AskResponse":

@@ -42,7 +42,7 @@ def test_generate_returns_answer_and_citations() -> None:
     answer = LLMGenerator(llm).generate("Where is login?", CONTEXT)
     assert answer.citations == [Citation("app/auth.py", 1, 7)]
     assert models.calls[0]["model"] == "gemini-test"
-    assert "[app/auth.py:1-7]" in models.calls[0]["contents"]
+    assert 'source="app/auth.py:1-7"' in models.calls[0]["contents"]
 
 
 def test_complete_reports_token_usage() -> None:

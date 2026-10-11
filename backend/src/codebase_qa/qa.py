@@ -4,6 +4,7 @@ from codebase_qa.context.builder import ContextBuilder
 from codebase_qa.generation.confidence import Confidence, ConfidencePolicy, assess
 from codebase_qa.generation.fallback import DEGRADING_ERRORS, fallback_answer
 from codebase_qa.generation.grounding import is_low_relevance, validate_citations
+from codebase_qa.generation.guard import GuardedDeltas, OutputGuard
 from codebase_qa.generation.refusal import NOT_FOUND_LEAD, closest_files, helpful_text, is_unknown, pick_suggestions
 from codebase_qa.generation.selfcheck import SKIPPED, SelfCheck, SelfChecker
 from codebase_qa.generation.streaming import Delta
@@ -39,6 +40,7 @@ class AskResult:
     self_check: SelfCheck = SKIPPED
     confidence: Confidence = Confidence("low")
     degraded: str = ""
+    blocked: list[str] = field(default_factory=list)
 
 
 class QAPipeline:
@@ -57,6 +59,7 @@ class QAPipeline:
         context_builder: ContextBuilder | None = None,
         self_checker: SelfChecker | None = None,
         confidence_policy: ConfidencePolicy | None = None,
+        guard: OutputGuard | None = None,
     ) -> None:
         self.retriever = retriever
         self.generator = generator
@@ -71,6 +74,7 @@ class QAPipeline:
         self.context_builder = context_builder
         self.self_checker = self_checker
         self.confidence_policy = confidence_policy or ConfidencePolicy()
+        self.guard = guard
 
     def route(self, question: str) -> RouteDecision:
         if self.router is None:
@@ -108,13 +112,20 @@ class QAPipeline:
         return self.answer(question, self.retrieve(question, self.top_k, history), on_delta)
 
     def answer(self, question: str, retrieval: Retrieval, on_delta: Delta | None = None) -> AskResult:
-        result = self.respond(retrieval.question or question, retrieval, on_delta)
+        guard = self.guard
+        streamed = GuardedDeltas(on_delta, guard) if on_delta is not None and guard is not None else on_delta
+        result = self.respond(retrieval.question or question, retrieval, streamed)
+        if isinstance(streamed, GuardedDeltas):
+            streamed.flush()
+        if guard is not None:
+            checked, blocked = guard.check(result.answer)
+            result = replace(result, answer=checked, blocked=blocked)
         if result.degraded:
             return replace(result, question=retrieval.question or question)
-        if result.route == "tool":
-            level = Confidence("high", ["answered from the assistant's own description"])
-        else:
+        if result.blocked or result.route != "tool":
             level = assess(result.answer, result.context, result.refused, result.self_check, self.confidence_policy)
+        else:
+            level = Confidence("high", ["answered from the assistant's own description"])
         return replace(result, question=retrieval.question or question, confidence=level)
 
     def respond(self, question: str, retrieval: Retrieval, on_delta: Delta | None = None) -> AskResult:

@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from codebase_qa.generation.grounding import snippet_for
 from codebase_qa.generation.llm import GenerationError
+from codebase_qa.generation.prompt import neutralize
 from codebase_qa.interfaces import LLM
 from codebase_qa.models import Citation, GeneratedAnswer, RetrievedChunk
 
@@ -73,8 +74,8 @@ def evidence(answer: GeneratedAnswer, context: list[RetrievedChunk]) -> str:
             continue
         seen.add(block)
         blocks.append(
-            f"[{block.location}] (cited: lines {citation.start_line}-{citation.end_line})\n```\n"
-            f"{snippet_for(block, context)}\n```"
+            f'<context_block source="{block.location}" cited="{citation.start_line}-{citation.end_line}">\n'
+            f"{neutralize(snippet_for(block, context))}\n</context_block>"
         )
     return "\n\n".join(blocks)
 

@@ -1,7 +1,8 @@
-import json
 import threading
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+
+from codebase_qa.jsonfile import JsonFile
 
 
 @dataclass
@@ -34,13 +35,11 @@ class RepoRecord:
 class RepoRegistry:
     def __init__(self, path: Path) -> None:
         self.path = path
+        self.file = JsonFile(path)
         self.lock = threading.Lock()
 
     def load_all(self) -> dict[str, RepoRecord]:
-        if not self.path.exists():
-            return {}
-        data = json.loads(self.path.read_text(encoding="utf-8"))
-        return {key: RepoRecord.from_dict(value) for key, value in data.items()}
+        return {key: RepoRecord.from_dict(value) for key, value in self.file.read().items()}
 
     def get(self, key: str) -> RepoRecord | None:
         return self.load_all().get(key)
@@ -61,8 +60,4 @@ class RepoRegistry:
                 self.write(records)
 
     def write(self, records: dict[str, RepoRecord]) -> None:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        payload = {key: asdict(record) for key, record in records.items()}
-        temp = self.path.with_suffix(".tmp")
-        temp.write_text(json.dumps(payload, indent=1), encoding="utf-8")
-        temp.replace(self.path)
+        self.file.write({key: asdict(record) for key, record in records.items()})

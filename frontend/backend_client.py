@@ -95,6 +95,9 @@ class BackendClient:
         except httpx.HTTPError as exc:
             raise BackendError(f"backend is not reachable ({type(exc).__name__})") from exc
 
+    def feedback(self, answer_id: str, rating: str, comment: str = "") -> dict[str, Any]:
+        return self.request("POST", "/feedback", json={"answer_id": answer_id, "rating": rating, "comment": comment})
+
     def stats(self) -> dict[str, Any]:
         return self.request("GET", "/stats")
 

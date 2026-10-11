@@ -9,8 +9,10 @@ from codebase_qa.config import Settings
 from codebase_qa.context.builder import ContextBuilder
 from codebase_qa.context.catalog import ChunkCatalog, LineReader
 from codebase_qa.embedding.cache import CachingEmbedder, EmbeddingStore
+from codebase_qa.feedback.store import FeedbackStore, RecentAnswers
 from codebase_qa.generation.confidence import ConfidencePolicy
 from codebase_qa.generation.generator import LLMGenerator
+from codebase_qa.generation.guard import OutputGuard
 from codebase_qa.generation.llm import OfflineLLM
 from codebase_qa.generation.selfcheck import SelfChecker
 from codebase_qa.indexing.access import AccessStore
@@ -88,6 +90,14 @@ class Container:
         if not self.settings.embedding_cache:
             return inner
         return CachingEmbedder(inner, EmbeddingStore(self.settings.embedding_cache_path), self.settings.embedding_model)
+
+    @cached_property
+    def feedback(self) -> FeedbackStore:
+        return FeedbackStore(self.settings.feedback_path)
+
+    @cached_property
+    def recent_answers(self) -> RecentAnswers:
+        return RecentAnswers()
 
     @cached_property
     def answer_cache(self) -> AnswerCache:
@@ -265,6 +275,7 @@ class Container:
             rewriter=FollowUpRewriter(self.llm) if self.settings.followup_rewrite else None,
             context_builder=self.context_builder(record),
             self_checker=SelfChecker(self.llm, self.settings.self_check_action) if self.settings.self_check else None,
+            guard=OutputGuard([self.settings.gemini_api_key, self.settings.github_token, self.settings.demo_password]),
             confidence_policy=ConfidencePolicy(
                 high_score=self.settings.confidence_high_score,
                 low_score=self.settings.min_vector_score + self.settings.confidence_low_margin,

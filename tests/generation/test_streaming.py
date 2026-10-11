@@ -19,6 +19,7 @@ from codebase_qa.qa import QAPipeline
 from tests.fakes import VISITOR_A, FakeLLM, fake_embedder, make_settings, wait_for_job
 
 RepoFactory = Callable[..., Path]
+LONG_ANSWER = "AuthService.login returns a token. " * 6
 CONTEXT = [RetrievedChunk(Chunk("a", "r", "app/auth.py", "python", 1, 9, "def login(): ..."), 0.9, {"vector": 0.9})]
 PAYLOAD = json.dumps(
     {
@@ -110,7 +111,7 @@ def build_client(tmp_path: Path, llm: FakeLLM) -> TestClient:
 def test_stream_endpoint_sends_deltas_then_final(tmp_path: Path, make_repo: RepoFactory) -> None:
     payload = json.dumps(
         {
-            "answer": "AuthService.login returns a token.",
+            "answer": LONG_ANSWER,
             "citations": [{"path": "app/auth.py", "start_line": 2, "end_line": 3}],
         }
     )
@@ -122,7 +123,7 @@ def test_stream_endpoint_sends_deltas_then_final(tmp_path: Path, make_repo: Repo
         missing = client.post("/ask/stream", json={"repo_id": "nope", "question": "q"}, headers=headers)
     deltas = [event["text"] for event in events if event["type"] == "delta"]
     final = events[-1]
-    assert len(deltas) > 1 and "".join(deltas) == "AuthService.login returns a token."
+    assert len(deltas) > 1 and "".join(deltas) == LONG_ANSWER
     assert final["type"] == "final" and final["response"]["citations"][0]["path"] == "app/auth.py"
     assert missing.status_code == 404
 

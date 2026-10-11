@@ -1,12 +1,14 @@
-import json
 import re
 import threading
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+from codebase_qa.jsonfile import JsonFile
+
 VISITOR_ID = re.compile(r"^[0-9a-f]{32}$")
+TOUCH_INTERVAL = timedelta(seconds=60)
 
 
 def utc_now() -> datetime:
@@ -28,22 +30,20 @@ class RepoAccess:
 
 
 class AccessStore:
-    def __init__(self, path: Path, clock: Callable[[], datetime] = utc_now) -> None:
+    def __init__(
+        self, path: Path, clock: Callable[[], datetime] = utc_now, touch_interval: timedelta = TOUCH_INTERVAL
+    ) -> None:
         self.path = path
         self.clock = clock
+        self.touch_interval = touch_interval
+        self.file = JsonFile(path)
         self.lock = threading.Lock()
 
     def load(self) -> dict[str, RepoAccess]:
-        if not self.path.exists():
-            return {}
-        data = json.loads(self.path.read_text(encoding="utf-8"))
-        return {repo_id: RepoAccess(**entry) for repo_id, entry in data.items()}
+        return {repo_id: RepoAccess(**entry) for repo_id, entry in self.file.read().items()}
 
     def write(self, entries: dict[str, RepoAccess]) -> None:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        temp = self.path.with_suffix(".tmp")
-        temp.write_text(json.dumps({key: asdict(value) for key, value in entries.items()}, indent=1), encoding="utf-8")
-        temp.replace(self.path)
+        self.file.write({key: asdict(value) for key, value in entries.items()})
 
     def update(self, repo_id: str, change: Callable[[RepoAccess], None]) -> None:
         with self.lock:
@@ -67,6 +67,10 @@ class AccessStore:
         self.update(repo_id, set_pinned)
 
     def touch(self, repo_id: str) -> None:
+        entry = self.load().get(repo_id)
+        if entry is not None and entry.last_used_at:
+            if self.clock() - datetime.fromisoformat(entry.last_used_at) < self.touch_interval:
+                return
         self.update(repo_id, lambda entry: None)
 
     def can_see(self, repo_id: str, visitor: str | None) -> bool:

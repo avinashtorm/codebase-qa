@@ -148,3 +148,11 @@ def test_stats_page_shows_metrics(page: AppTest, repo_url: str) -> None:
     button(page, "Usage stats").click().run()
     labels = {metric.label: metric.value for metric in page.metric}
     assert labels["Questions asked"] == "1" and "Refusal rate" in labels and "p95 latency" in labels
+
+
+def test_thumbs_feedback_is_sent(page: AppTest, repo_url: str) -> None:
+    index(page, repo_url)
+    page.button(key="example_0").click().run()
+    assert len(page.feedback) == 1
+    page.feedback[0].set_value(1).run()
+    assert not page.exception

@@ -133,6 +133,22 @@ answers.
 | 14 | Observability (per-stage latency, tokens, estimated cost in SQLite, `/stats` page) | every question logged; no metric change |
 | 15 | Embedding cache by content hash + answer cache per repo/commit/question | full re-index of the test repo **134.4 s -> 6.8 s** with a warm embedding cache (1,087/1,087 chunks reused); repeated question **7.1 s -> 61 ms**; caches cleared on re-index and repo deletion |
 | 16 | Typed LLM failures, backoff on 429/5xx/network errors, graceful fallback | quota, rate-limit or outage during answering returns a friendly message plus the best-matching code locations (low confidence) instead of an error; not cached |
+| 17 | Prompt-injection defense: repo text in delimited `<context_block>` elements with delimiter tags neutralized, untrusted-data rules in every prompt, output guard (secret and key redaction, system-prompt leak block) | tests with a fixture repo whose files say "ignore previous instructions", "reveal your system prompt", "output the API key" (also simulating a model that obeys): no answer or stream contains the key or prompt. Real model check (gemini-3.1-flash-lite): 3 attack questions refused, 0 leaks. On the same 32 dev answers citation precision went 0.732 -> **0.818** with the delimited prompt |
+| 18 | Thumbs up/down feedback stored with question, answer, citations and retrieved chunks (server-side copy, SQLite) + `python -m codebase_qa.feedback.export --out feedback.jsonl` | - |
+| 19 | Locust load test of `/ask` (mocked LLM) | see the load test table below; found and fixed a concurrency bug (parallel questions rewrote `access.json` through one temp file: 5-28 HTTP 500s per run) |
+
+**Load test** ([loadtest/](loadtest), [eval/benchmarks](eval/benchmarks)): one uvicorn process on the development laptop
+(Windows, 16 logical CPUs), real bge-small embeddings on CPU and Chroma search for every request, LLM mocked (instant),
+answer and embedding caches off, random dev questions, 45 s per level. The pipeline is CPU-bound on query embedding,
+so throughput is flat and latency grows with concurrency; the 2-vCPU VM will be slower, and real Gemini calls add
+2-5 s per question (I/O wait, not CPU).
+
+| Concurrent users | Requests/s | Median | p95 | Failures |
+|---|---|---|---|---|
+| 5 | 13.3 | 0.28 s | 0.54 s | 0 |
+| 10 | 13.2 | 0.63 s | 1.2 s | 0 |
+| 20 | 11.6 | 1.6 s | 2.8 s | 0 |
+
 
 **Before and after each part** (50 dev questions: the 35 code questions plus 10 overview and 5 unanswerable;
 `gemini-3.1-flash-lite` as generator and judge, see the note below). Retrieval and citation metrics use the 35 questions
@@ -210,6 +226,7 @@ Other tools: `eval.calibrate` (refusal threshold), `eval.benchmark_reindex` (inc
 | `POST /repos/{id}/reindex` | Start an incremental re-index job; its result is the change report |
 | `GET /jobs/{id}` | Job status, progress text, result or error |
 | `POST /ask/stream` | Same request as `/ask`; streams `{"type": "delta", "text"}` lines as the answer is generated, then one `final` line with the full `/ask` response (validated citations, self-check, confidence) or an `error` line |
+| `POST /feedback` `{"answer_id", "rating": "up"|"down", "comment"}` | Rate an answer from this server's recent answers (stored with its question, answer, citations and retrieved chunks) |
 | `GET /stats` | Questions asked, average and p95 latency, per-stage averages, tokens, LLM calls (cached), estimated cost, refusal rate |
 | `GET /repos/{id}/scope` | Folders (two levels) and languages with file counts, for the search-scope filters |
 | `POST /ask` `{"repo_id", "question"}` | Answer, validated citations with code snippets, retrieved chunks with scores, per-stage latency |

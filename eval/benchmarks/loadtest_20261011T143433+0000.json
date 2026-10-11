@@ -1,0 +1,36 @@
+{
+ "benchmark": "loadtest-ask",
+ "timestamp": "2026-10-11T14:34:33+00:00",
+ "duration_s": 45,
+ "setup": "single uvicorn process, real bge-small embedder on CPU, Chroma, tree-sitter index of the test repo, mocked LLM (instant), answer and embedding caches off, random dev questions",
+ "machine": "Windows-10-10.0.26200-SP0 cpus=12",
+ "results": [
+  {
+   "users": 5,
+   "requests": 575,
+   "failures": 0,
+   "rps": 13.28,
+   "median_ms": 280.0,
+   "p95_ms": 540.0,
+   "avg_ms": 318.5
+  },
+  {
+   "users": 10,
+   "requests": 589,
+   "failures": 0,
+   "rps": 13.16,
+   "median_ms": 630.0,
+   "p95_ms": 1200.0,
+   "avg_ms": 702.8
+  },
+  {
+   "users": 20,
+   "requests": 514,
+   "failures": 0,
+   "rps": 11.55,
+   "median_ms": 1600.0,
+   "p95_ms": 2800.0,
+   "avg_ms": 1673.6
+  }
+ ]
+}

@@ -18,6 +18,7 @@ from codebase_qa.api.rate_limit import DailyLimiter, SlidingWindowLimiter, clien
 from codebase_qa.api.schemas import (
     AskRequest,
     AskResponse,
+    FeedbackIn,
     HealthOut,
     IndexRepoRequest,
     JobOut,
@@ -174,6 +175,7 @@ def create_app(container: Container | None = None) -> FastAPI:
     app.state.ask_per_visitor = DailyLimiter(settings.ask_per_visitor_per_day)
     app.state.ask_site_wide = DailyLimiter(settings.ask_daily_limit)
     app.state.index_per_visitor = DailyLimiter(settings.index_per_visitor_per_day)
+    app.state.feedback_limiter = SlidingWindowLimiter(30, 60)
     owner_only = [Depends(require_owner_password)]
 
     @app.middleware("http")
@@ -239,6 +241,15 @@ def create_app(container: Container | None = None) -> FastAPI:
     @app.get("/repos", response_model=list[RepoOut])
     def list_repos(services: Services, visitor: Visitor) -> list[RepoOut]:
         return [RepoOut.from_record(record) for record in services.visible_records(visitor)]
+
+    @app.post("/feedback", status_code=201)
+    def feedback(body: FeedbackIn, request: Request, services: Services) -> dict[str, str]:
+        enforce(request.app.state.feedback_limiter, request, services.settings.trust_proxy)
+        record = services.recent_answers.get(body.answer_id)
+        if record is None:
+            raise HTTPException(status_code=404, detail="this answer is too old to rate; ask again to rate it")
+        services.feedback.add(record, body.rating, body.comment.strip())
+        return {"status": "recorded"}
 
     @app.get("/stats", response_model=StatsOut)
     def stats(services: Services) -> StatsOut:

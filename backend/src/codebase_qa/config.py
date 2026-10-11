@@ -123,6 +123,10 @@ class Settings(BaseSettings):
         return "|".join(f"{name}={getattr(self, name)}" for name in fields)
 
     @property
+    def feedback_path(self) -> Path:
+        return self.data_dir / "feedback.sqlite3"
+
+    @property
     def stats_path(self) -> Path:
         return self.data_dir / "stats.sqlite3"
 

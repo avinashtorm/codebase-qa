@@ -65,7 +65,7 @@ def test_judge_parses_verdict_and_sees_context() -> None:
     result = judge(llm, "How does login work?", "It checks and sends SMS.", context)
     assert result is not None and (result.faithfulness, result.relevance) == (3, 4)
     assert result.unsupported == ["It sends SMS"]
-    assert "[a.py:1-2]" in llm.calls[0][2] and "It checks and sends SMS." in llm.calls[0][2]
+    assert 'source="a.py:1-2"' in llm.calls[0][2] and "It checks and sends SMS." in llm.calls[0][2]
     assert judge(FakeLLM({"JudgeSchema": lambda _: "bad"}), "q", "a", context) is None
     assert "(no code context was retrieved)" in judge_prompt("q", "a", [])
 

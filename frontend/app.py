@@ -316,6 +316,23 @@ def confidence_badge(response: dict[str, Any]) -> str:
     return f'<span class="badge badge-{level}" title="{reasons}">{CONFIDENCE_LABELS[level]}</span>'
 
 
+def send_feedback(answer_id: str) -> None:
+    value = st.session_state.get(f"feedback_{answer_id}")
+    if value is None:
+        return
+    try:
+        client().feedback(answer_id, "up" if value == 1 else "down")
+        st.toast("Thanks for the feedback!")
+    except BackendError as exc:
+        st.toast(str(exc))
+
+
+def feedback_buttons(response: dict[str, Any]) -> None:
+    answer_id = response.get("answer_id")
+    if answer_id:
+        st.feedback("thumbs", key=f"feedback_{answer_id}", on_change=send_feedback, args=(answer_id,))
+
+
 def render_assistant(message: dict[str, Any], repo: dict[str, Any], show_details: bool, key: str) -> None:
     response = message.get("response")
     if response and response.get("refused") and response.get("suggestions"):
@@ -329,6 +346,7 @@ def render_assistant(message: dict[str, Any], repo: dict[str, Any], show_details
         if badge:
             st.markdown(badge, unsafe_allow_html=True)
         render_citations(response, repo)
+        feedback_buttons(response)
         if show_details:
             render_details(response)
 
