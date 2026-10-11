@@ -1,0 +1,778 @@
+{
+ "config": "step05-followups-norewrite",
+ "timestamp": "2026-10-11T07:46:47+00:00",
+ "split": "all",
+ "question_count": 8,
+ "with_answers": true,
+ "answered_count": 8,
+ "generation_error": null,
+ "settings": {
+  "chunker": "treesitter",
+  "retrieval_mode": "vector",
+  "rerank": false,
+  "rerank_candidates": 30,
+  "rerank_fusion": false,
+  "overview": true,
+  "routing": true,
+  "routing_llm": true,
+  "followup_rewrite": false,
+  "hygiene": true,
+  "downweight_factor": 0.9,
+  "downweight_tests": true,
+  "reranker_model": null,
+  "top_k": 8,
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "llm": "gemini-3.5-flash-lite",
+  "repo_commit": "7257e606cb94eada1dca40173e2b7f99dd549bc6"
+ },
+ "metrics": {
+  "hit_at_1": 0.125,
+  "hit_at_5": 0.625,
+  "recall_at_10": 0.5625,
+  "mrr": 0.3063,
+  "citation_precision": 0.4375,
+  "citation_any_correct": 0.5,
+  "invalid_citations": 0,
+  "refused": 3,
+  "route_code": 8,
+  "route_overview": 0,
+  "route_tool": 0,
+  "downweight_ms_mean": 2.6,
+  "embed_query_ms_mean": 107.0,
+  "generation_ms_mean": 1555.1,
+  "retrieval_ms_mean": 124.5,
+  "rewrite_ms_mean": 0.0,
+  "routing_ms_mean": 512.2,
+  "vector_search_ms_mean": 14.6
+ },
+ "by_category": {
+  "follow-up": {
+   "count": 8,
+   "hit_at_1": 0.125,
+   "hit_at_5": 0.625,
+   "recall_at_10": 0.5625,
+   "mrr": 0.3063,
+   "citation_precision": 0.4375,
+   "citation_any_correct": 0.5,
+   "invalid_citations": 0,
+   "refused": 3,
+   "route_code": 8,
+   "route_overview": 0,
+   "route_tool": 0,
+   "downweight_ms_mean": 2.6,
+   "embed_query_ms_mean": 107.0,
+   "generation_ms_mean": 1555.1,
+   "retrieval_ms_mean": 124.5,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 512.2,
+   "vector_search_ms_mean": 14.6
+  }
+ },
+ "questions": [
+  {
+   "id": "f01",
+   "category": "follow-up",
+   "question": "How long is it valid by default?",
+   "standalone_question": "How long is it valid by default?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/core/config.py",
+     "start_line": 24,
+     "end_line": 25
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/config.py:79-88",
+     "score": 0.632
+    },
+    {
+     "location": "backend/app/core/config.py:15-31",
+     "score": 0.6276
+    },
+    {
+     "location": "backend/app/core/config.py:68-77",
+     "score": 0.6057
+    },
+    {
+     "location": "backend/app/crud.py:40-42",
+     "score": 0.603
+    },
+    {
+     "location": "backend/alembic.ini:1-40",
+     "score": 0.6027
+    },
+    {
+     "location": "backend/app/models.py:80-83",
+     "score": 0.5988
+    },
+    {
+     "location": ".github/workflows/pre-commit.yml:31-70",
+     "score": 0.5954
+    },
+    {
+     "location": "backend/app/core/config.py:51-55",
+     "score": 0.593
+    },
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.5928
+    },
+    {
+     "location": "backend/app/models.py:31-37",
+     "score": 0.5914
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "rewrite": 0.1,
+    "routing": 10.1,
+    "retrieval": 271.4,
+    "embed_query": 229.9,
+    "vector_search": 30.8,
+    "downweight": 10.5,
+    "generation": 1721.5
+   },
+   "used_llm": true,
+   "refused": false,
+   "answer": "The access token is valid for 8 days by default (calculated as 60 minutes * 24 hours * 8 days = 8 days).",
+   "citations": [
+    "backend/app/core/config.py:23-24"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "f02",
+   "category": "follow-up",
+   "question": "And what happens when it can't be decoded?",
+   "standalone_question": "And what happens when it can't be decoded?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "llm",
+   "expected": [
+    {
+     "path": "backend/app/api/deps.py",
+     "start_line": 31,
+     "end_line": 40
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.5816
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:51-79",
+     "score": 0.5663
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:31-31",
+     "score": 0.5661
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:33-49",
+     "score": 0.5585
+    },
+    {
+     "location": "frontend/src/routes/_layout/admin.tsx:51-57",
+     "score": 0.554
+    },
+    {
+     "location": "backend/app/api/routes/items.py:48-58",
+     "score": 0.5508
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:667-677",
+     "score": 0.5086
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:121-180",
+     "score": 0.5074
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:637-647",
+     "score": 0.5067
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:471-485",
+     "score": 0.5064
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 821.5,
+    "retrieval": 97.1,
+    "embed_query": 79.9,
+    "vector_search": 16.3,
+    "downweight": 0.7
+   },
+   "used_llm": false,
+   "refused": true,
+   "answer": "I couldn't find code in this repository that answers that question.\n\n**Closest files I found:** `backend/app/utils.py`, `frontend/src/routes/recover-password.tsx`, `frontend/src/routes/_layout/admin.tsx`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "f03",
+   "category": "follow-up",
+   "question": "What happens there when the password is wrong?",
+   "standalone_question": "What happens there when the password is wrong?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/login.py",
+     "start_line": 30,
+     "end_line": 34
+    },
+    {
+     "path": "backend/app/crud.py",
+     "start_line": 52,
+     "end_line": 54
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/routes/recover-password.tsx:51-79",
+     "score": 0.6695
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.6633
+    },
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.6587
+    },
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.6553
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.6521
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:33-49",
+     "score": 0.6518
+    },
+    {
+     "location": "backend/app/api/routes/login.py:100-123",
+     "score": 0.647
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:69-98",
+     "score": 0.6428
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:80-130",
+     "score": 0.6423
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:41-67",
+     "score": 0.6414
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 72.6,
+    "embed_query": 59.4,
+    "vector_search": 11.3,
+    "downweight": 1.6,
+    "generation": 1299.7
+   },
+   "used_llm": true,
+   "refused": false,
+   "answer": "When updating your own password, if the current password provided is incorrect, the backend raises an HTTP 400 exception with the detail \"Incorrect password\".",
+   "citations": [
+    "backend/app/api/routes/users.py:103-111"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "f04",
+   "category": "follow-up",
+   "question": "What happens to them when an admin deletes their owner?",
+   "standalone_question": "What happens to them when an admin deletes their owner?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 214,
+     "end_line": 232
+    },
+    {
+     "path": "backend/app/models.py",
+     "start_line": 90,
+     "end_line": 92
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:54-93",
+     "score": 0.5875
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:95-95",
+     "score": 0.5749
+    },
+    {
+     "location": "backend/app/api/routes/users.py:132-143",
+     "score": 0.5721
+    },
+    {
+     "location": "backend/app/api/routes/users.py:214-232",
+     "score": 0.5698
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:27-53",
+     "score": 0.5673
+    },
+    {
+     "location": "frontend/src/components/UserSettings/DeleteConfirmation.tsx:21-80",
+     "score": 0.5613
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:22-25",
+     "score": 0.5497
+    },
+    {
+     "location": "backend/app/api/routes/items.py:99-113",
+     "score": 0.5398
+    },
+    {
+     "location": "frontend/src/components/Items/DeleteItem.tsx:54-92",
+     "score": 0.5322
+    },
+    {
+     "location": "frontend/src/routes/_layout/admin.tsx:59-74",
+     "score": 0.5219
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 0.5,
+    "mrr": 0.25
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.8,
+    "retrieval": 101.8,
+    "embed_query": 88.1,
+    "vector_search": 12.1,
+    "downweight": 1.4
+   },
+   "used_llm": false,
+   "refused": true,
+   "answer": "I couldn't find code in this repository that answers that question.\n\n**Closest files I found:** `frontend/src/components/Admin/DeleteUser.tsx`, `backend/app/api/routes/users.py`, `frontend/src/components/UserSettings/DeleteConfirmation.tsx`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "f05",
+   "category": "follow-up",
+   "question": "What about when a normal user requests one that belongs to someone else?",
+   "standalone_question": "What about when a normal user requests one that belongs to someone else?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "llm",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/items.py",
+     "start_line": 48,
+     "end_line": 58
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:162-179",
+     "score": 0.6437
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6308
+    },
+    {
+     "location": "CONTRIBUTING.md:31-68",
+     "score": 0.6245
+    },
+    {
+     "location": "backend/app/api/routes/users.py:132-143",
+     "score": 0.6209
+    },
+    {
+     "location": "backend/app/api/routes/items.py:48-58",
+     "score": 0.6197
+    },
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.6193
+    },
+    {
+     "location": "backend/app/api/routes/users.py:124-129",
+     "score": 0.617
+    },
+    {
+     "location": "backend/app/api/routes/users.py:146-159",
+     "score": 0.612
+    },
+    {
+     "location": "backend/app/api/deps.py:49-49",
+     "score": 0.6102
+    },
+    {
+     "location": "backend/app/api/routes/items.py:75-96",
+     "score": 0.6095
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.2
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 1188.2,
+    "retrieval": 96.5,
+    "embed_query": 82.9,
+    "vector_search": 11.6,
+    "downweight": 1.9,
+    "generation": 1402.8
+   },
+   "used_llm": true,
+   "refused": false,
+   "answer": "When a normal user requests an item that belongs to someone else, the request raises an HTTP 403 error with the detail \"Not enough permissions\".",
+   "citations": [
+    "backend/app/api/routes/items.py:54-57"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "f06",
+   "category": "follow-up",
+   "question": "Once signed up, how do they change their password?",
+   "standalone_question": "Once signed up, how do they change their password?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "llm",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 103,
+     "end_line": 121
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.6649
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.6507
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:68-127",
+     "score": 0.6411
+    },
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.6408
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:60-81",
+     "score": 0.6371
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:130-142",
+     "score": 0.6357
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.6352
+    },
+    {
+     "location": "packages/react-email/emails/reset_password.tsx:14-47",
+     "score": 0.632
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:41-67",
+     "score": 0.6297
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:128-144",
+     "score": 0.6266
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 1206.8,
+    "retrieval": 192.9,
+    "embed_query": 177.3,
+    "vector_search": 12.8,
+    "downweight": 2.5,
+    "generation": 1443.4
+   },
+   "used_llm": true,
+   "refused": false,
+   "answer": "Once signed up, a user can update their own password while logged in by making a PATCH request to the `/me/password` endpoint, which requires their current password and the new password.",
+   "citations": [
+    "backend/app/api/routes/users.py:103-121"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   }
+  },
+  {
+   "id": "f07",
+   "category": "follow-up",
+   "question": "What else happens after that?",
+   "standalone_question": "What else happens after that?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "llm",
+   "expected": [
+    {
+     "path": "frontend/src/hooks/useAuth.ts",
+     "start_line": 41,
+     "end_line": 54
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/hooks/useCustomToast.ts:3-17",
+     "score": 0.5151
+    },
+    {
+     "location": "frontend/src/components/UserSettings/DeleteConfirmation.tsx:21-80",
+     "score": 0.5054
+    },
+    {
+     "location": "frontend/src/components/Admin/UserActionsMenu.tsx:15-17",
+     "score": 0.5032
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:51-79",
+     "score": 0.4992
+    },
+    {
+     "location": "frontend/src/components/Items/ItemActionsMenu.tsx:14-16",
+     "score": 0.4954
+    },
+    {
+     "location": "frontend/src/components/Items/EditItem.tsx:40-43",
+     "score": 0.4939
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:33-49",
+     "score": 0.4925
+    },
+    {
+     "location": "frontend/src/components/Admin/EditUser.tsx:54-57",
+     "score": 0.4923
+    },
+    {
+     "location": "frontend/src/main.tsx:22-30",
+     "score": 0.4915
+    },
+    {
+     "location": "backend/app/alembic/env.py:37-55",
+     "score": 0.4902
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 870.1,
+    "retrieval": 82.5,
+    "embed_query": 69.5,
+    "vector_search": 11.8,
+    "downweight": 1.0
+   },
+   "used_llm": false,
+   "refused": true,
+   "answer": "I couldn't find code in this repository that answers that question.\n\n**Closest files I found:** `frontend/src/hooks/useCustomToast.ts`, `frontend/src/components/UserSettings/DeleteConfirmation.tsx`, `frontend/src/components/Admin/UserActionsMenu.tsx`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   }
+  },
+  {
+   "id": "f08",
+   "category": "follow-up",
+   "question": "How does the frontend page use it to set the new password?",
+   "standalone_question": "How does the frontend page use it to set the new password?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "frontend/src/routes/reset-password.tsx",
+     "start_line": 28,
+     "end_line": 30
+    },
+    {
+     "path": "frontend/src/routes/reset-password.tsx",
+     "start_line": 84,
+     "end_line": 97
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:128-144",
+     "score": 0.7102
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:69-98",
+     "score": 0.7075
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:68-127",
+     "score": 0.7049
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:146-146",
+     "score": 0.7045
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:99-158",
+     "score": 0.7035
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.7014
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:41-67",
+     "score": 0.6977
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:49-67",
+     "score": 0.6939
+    },
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.6848
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:1-45",
+     "score": 0.6786
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 81.0,
+    "embed_query": 69.2,
+    "vector_search": 10.1,
+    "downweight": 1.6,
+    "generation": 1908.0
+   },
+   "used_llm": true,
+   "refused": false,
+   "answer": "The `ResetPassword` component uses a form with `new_password` and `confirm_password` fields managed by `react-hook-form`. When submitted, `onSubmit` calls `mutation.mutate` passing the `new_password` and the `token` from the route search params to `LoginService.resetPassword`.",
+   "citations": [
+    "frontend/src/routes/reset-password.tsx:70-70",
+    "frontend/src/routes/reset-password.tsx:84-91",
+    "frontend/src/routes/reset-password.tsx:94-96",
+    "frontend/src/routes/reset-password.tsx:105-147"
+   ],
+   "invalid_citations": 0,
+   "citation_scores": {
+    "citation_count": 4,
+    "correct_citations": 2,
+    "precision": 0.5,
+    "any_correct": 1.0
+   }
+  }
+ ]
+}

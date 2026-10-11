@@ -53,5 +53,6 @@ class BackendClient:
     def job(self, job_id: str) -> dict[str, Any]:
         return self.request("GET", f"/jobs/{job_id}")
 
-    def ask(self, repo_id: str, question: str) -> dict[str, Any]:
-        return self.request("POST", "/ask", json={"repo_id": repo_id, "question": question})
+    def ask(self, repo_id: str, question: str, history: list[dict[str, str]] | None = None) -> dict[str, Any]:
+        payload = {"repo_id": repo_id, "question": question, "history": history or []}
+        return self.request("POST", "/ask", json=payload)

@@ -18,6 +18,7 @@ GENERIC_EXAMPLES = (
     "How is configuration loaded?",
 )
 SUGGESTIONS_HEADING = "**Questions that work for this repository:**"
+MAX_TURN_CHARS = 1500
 STYLE = """
 <style>
 .block-container {max-width: 920px; padding-top: 2.5rem;}
@@ -254,6 +255,14 @@ def example_buttons(repo: dict[str, Any]) -> None:
     question_buttons(repo.get("suggested_questions") or list(GENERIC_EXAMPLES), "example")
 
 
+def recent_turns(history: list[dict[str, Any]], limit: int = 6) -> list[dict[str, str]]:
+    turns = [message for message in history if message.get("response") or message["role"] == "user"]
+    return [
+        {"role": message["role"], "content": main_text(message["content"])[:MAX_TURN_CHARS]}
+        for message in turns[-limit:]
+    ]
+
+
 def chat(repo: dict[str, Any], show_details: bool) -> None:
     history: list[dict[str, Any]] = st.session_state.setdefault("history", {}).setdefault(repo["repo_id"], [])
     for position, message in enumerate(history):
@@ -268,13 +277,14 @@ def chat(repo: dict[str, Any], show_details: bool) -> None:
         if not history:
             example_buttons(repo)
         return
+    previous = recent_turns(history)
     history.append({"role": "user", "content": question})
     with st.chat_message("user"):
         st.markdown(question)
     with st.chat_message("assistant"):
         try:
             with st.spinner("Searching the code..."):
-                response = client().ask(repo["repo_id"], question)
+                response = client().ask(repo["repo_id"], question, previous)
             message = {"role": "assistant", "content": response["answer"], "response": response}
         except BackendError as exc:
             message = {"role": "assistant", "content": f"Sorry, that didn't work: {exc}"}

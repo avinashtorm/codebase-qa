@@ -255,7 +255,7 @@ def create_app(container: Container | None = None) -> FastAPI:
         limit_ask(request)
         services.access.touch(body.repo_id)
         try:
-            result = services.pipeline(record).ask(body.question)
+            result = services.pipeline(record).ask(body.question, body.turns())
         except QuotaExhaustedError as exc:
             raise HTTPException(status_code=503, detail=QUOTA_MESSAGE) from exc
         except GenerationError as exc:

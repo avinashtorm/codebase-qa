@@ -23,6 +23,7 @@ from codebase_qa.retrieval.reranker import RerankingRetriever
 from codebase_qa.retrieval.vector import VectorRetriever
 from codebase_qa.retrieval.vector_store import ChromaStore
 from codebase_qa.retrieval.weighting import DownweightingRetriever
+from codebase_qa.routing.followup import FollowUpRewriter
 from codebase_qa.routing.router import QuestionRouter
 from codebase_qa.routing.tool import ToolAnswerer
 
@@ -223,4 +224,5 @@ class Container:
             tool=ToolAnswerer(self.llm),
             overview_k=self.settings.overview_k,
             suggestions=record.suggested_questions,
+            rewriter=FollowUpRewriter(self.llm) if self.settings.followup_rewrite else None,
         )

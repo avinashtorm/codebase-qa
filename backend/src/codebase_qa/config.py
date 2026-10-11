@@ -58,6 +58,7 @@ class Settings(BaseSettings):
     suggested_questions: bool = True
     routing: bool = True
     routing_llm: bool = True
+    followup_rewrite: bool = True
 
     @property
     def repos_dir(self) -> Path:

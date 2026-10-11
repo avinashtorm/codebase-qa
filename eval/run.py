@@ -12,6 +12,7 @@ from codebase_qa.generation.llm import GenerationError
 from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.ingestion.git import repo_id_from_url
 from codebase_qa.models import RetrievedChunk
+from codebase_qa.routing.followup import Turn
 from eval.dataset import EvalQuestion, load_questions
 from eval.metrics import average, score_citations, score_retrieval
 
@@ -42,13 +43,16 @@ def evaluate_question(
     with_answers: bool,
 ) -> dict[str, Any]:
     pipeline = container.pipeline(record)
-    retrieval = pipeline.retrieve(question.question, RETRIEVAL_DEPTH)
+    history = [Turn(turn["role"], turn["content"]) for turn in question.history]
+    retrieval = pipeline.retrieve(question.question, RETRIEVAL_DEPTH, history)
     ranked = retrieval.code
     spans = [item.chunk for item in ranked]
     result: dict[str, Any] = {
         "id": question.id,
         "category": question.category,
         "question": question.question,
+        "standalone_question": retrieval.question,
+        "rewrite_method": retrieval.rewrite_method,
         "route": retrieval.route,
         "route_method": retrieval.route_method,
         "expected": [asdict(location) for location in question.expected_locations],
@@ -156,6 +160,7 @@ def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
         "overview": settings.overview,
         "routing": settings.routing,
         "routing_llm": settings.routing_llm,
+        "followup_rewrite": settings.followup_rewrite,
         "hygiene": settings.hygiene,
         "downweight_factor": settings.downweight_factor,
         "downweight_tests": settings.downweight_tests,

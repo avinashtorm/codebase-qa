@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -7,6 +7,7 @@ from codebase_qa.indexing.indexer import ReindexReport
 from codebase_qa.indexing.jobs import Job
 from codebase_qa.indexing.registry import RepoRecord
 from codebase_qa.qa import AskResult
+from codebase_qa.routing.followup import Turn
 
 
 class IndexRepoRequest(BaseModel):
@@ -107,9 +108,18 @@ class ReindexOut(BaseModel):
         )
 
 
+class HistoryTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(max_length=4000)
+
+
 class AskRequest(BaseModel):
     repo_id: str = Field(min_length=1, max_length=200)
     question: str = Field(min_length=1, max_length=2000)
+    history: list[HistoryTurn] = Field(default_factory=list, max_length=12)
+
+    def turns(self) -> list[Turn]:
+        return [Turn(turn.role, turn.content) for turn in self.history]
 
 
 class CitationOut(BaseModel):
@@ -141,6 +151,7 @@ class AskResponse(BaseModel):
     route: str
     refused: bool
     suggestions: list[str]
+    standalone_question: str
 
     @classmethod
     def from_result(cls, result: AskResult, commit_sha: str) -> "AskResponse":
@@ -176,4 +187,5 @@ class AskResponse(BaseModel):
             route=result.route,
             refused=result.refused,
             suggestions=result.suggestions,
+            standalone_question=result.question,
         )

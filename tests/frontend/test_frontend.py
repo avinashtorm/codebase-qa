@@ -60,8 +60,10 @@ def test_client_sends_password_and_parses_json() -> None:
         seen["body"] = json.loads(request.content)
         return httpx.Response(200, json={"answer": "ok"})
 
-    assert mock_backend(handler).ask("repo", "q?") == {"answer": "ok"}
-    assert seen == {"password": "pw", "ip": "203.0.113.7", "body": {"repo_id": "repo", "question": "q?"}}
+    history = [{"role": "user", "content": "first"}]
+    assert mock_backend(handler).ask("repo", "q?", history) == {"answer": "ok"}
+    body = {"repo_id": "repo", "question": "q?", "history": history}
+    assert seen == {"password": "pw", "ip": "203.0.113.7", "body": body}
 
 
 def test_client_raises_backend_error_with_detail() -> None:

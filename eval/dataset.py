@@ -1,9 +1,9 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
-CATEGORIES = ("where-is", "how-does", "what-happens-when", "config")
+CATEGORIES = ("where-is", "how-does", "what-happens-when", "config", "follow-up")
 Split = Literal["dev", "held_out", "all"]
 
 
@@ -21,6 +21,7 @@ class EvalQuestion:
     category: str
     expected_locations: list[Location]
     held_out: bool = False
+    history: list[dict[str, str]] = field(default_factory=list)
 
 
 def parse_question(data: dict) -> EvalQuestion:
@@ -38,6 +39,7 @@ def parse_question(data: dict) -> EvalQuestion:
         category=data["category"],
         expected_locations=locations,
         held_out=bool(data.get("held_out", False)),
+        history=list(data.get("history", [])),
     )
 
 

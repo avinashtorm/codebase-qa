@@ -4,6 +4,7 @@ from codebase_qa.generation.grounding import is_low_relevance, validate_citation
 from codebase_qa.generation.refusal import NOT_FOUND_LEAD, closest_files, helpful_text, is_unknown, pick_suggestions
 from codebase_qa.interfaces import Generator, Retriever
 from codebase_qa.models import GeneratedAnswer, RetrievedChunk
+from codebase_qa.routing.followup import FollowUpRewriter, Rewrite, Turn
 from codebase_qa.routing.router import QuestionRouter, RouteDecision
 from codebase_qa.routing.rules import Route
 from codebase_qa.routing.tool import ToolAnswerer
@@ -17,6 +18,8 @@ class Retrieval:
     code: list[RetrievedChunk]
     overview: list[RetrievedChunk] = field(default_factory=list)
     timings_ms: dict[str, float] = field(default_factory=dict)
+    question: str = ""
+    rewrite_method: str = "unchanged"
 
 
 @dataclass(frozen=True)
@@ -27,6 +30,7 @@ class AskResult:
     route: Route = "code"
     refused: bool = False
     suggestions: list[str] = field(default_factory=list)
+    question: str = ""
 
 
 class QAPipeline:
@@ -41,6 +45,7 @@ class QAPipeline:
         tool: ToolAnswerer | None = None,
         overview_k: int = 3,
         suggestions: list[str] | None = None,
+        rewriter: FollowUpRewriter | None = None,
     ) -> None:
         self.retriever = retriever
         self.generator = generator
@@ -51,25 +56,33 @@ class QAPipeline:
         self.tool = tool or ToolAnswerer(None)
         self.overview_k = overview_k
         self.suggestions = suggestions or []
+        self.rewriter = rewriter
 
     def route(self, question: str) -> RouteDecision:
         if self.router is None:
             return RouteDecision("code", "disabled")
         return self.router.route(question)
 
-    def retrieve(self, question: str, depth: int) -> Retrieval:
+    def standalone(self, question: str, history: list[Turn] | None) -> Rewrite:
+        if self.rewriter is None or not history:
+            return Rewrite(question, "unchanged")
+        return self.rewriter.rewrite(question, history)
+
+    def retrieve(self, question: str, depth: int, history: list[Turn] | None = None) -> Retrieval:
         timings: dict[str, float] = {}
-        decision = timed(timings, "routing", lambda: self.route(question))
+        rewrite = timed(timings, "rewrite", lambda: self.standalone(question, history))
+        query = rewrite.question
+        decision = timed(timings, "routing", lambda: self.route(query))
         if decision.route == "tool":
-            return Retrieval("tool", decision.method, [], [], timings)
-        code = timed(timings, "retrieval", lambda: self.retriever.retrieve(question, depth))
+            return Retrieval("tool", decision.method, [], [], timings, query, rewrite.method)
+        code = timed(timings, "retrieval", lambda: self.retriever.retrieve(query, depth))
         timings.update(self.retriever.timings)
         overview: list[RetrievedChunk] = []
         overview_retriever = self.overview
         if decision.route == "overview" and overview_retriever is not None:
-            overview = overview_retriever.retrieve(question, self.overview_k)
+            overview = overview_retriever.retrieve(query, self.overview_k)
             timings.update(overview_retriever.timings)
-        return Retrieval(decision.route, decision.method, code, overview, timings)
+        return Retrieval(decision.route, decision.method, code, overview, timings, query, rewrite.method)
 
     def context_for(self, retrieval: Retrieval) -> list[RetrievedChunk]:
         if not retrieval.overview:
@@ -77,10 +90,14 @@ class QAPipeline:
         code_slots = max(self.top_k - len(retrieval.overview), 0)
         return retrieval.overview + retrieval.code[:code_slots]
 
-    def ask(self, question: str) -> AskResult:
-        return self.answer(question, self.retrieve(question, self.top_k))
+    def ask(self, question: str, history: list[Turn] | None = None) -> AskResult:
+        return self.answer(question, self.retrieve(question, self.top_k, history))
 
     def answer(self, question: str, retrieval: Retrieval) -> AskResult:
+        result = self.respond(retrieval.question or question, retrieval)
+        return replace(result, question=retrieval.question or question)
+
+    def respond(self, question: str, retrieval: Retrieval) -> AskResult:
         timings = dict(retrieval.timings_ms)
         if retrieval.route == "tool":
             answered = timed(timings, "generation", lambda: self.tool.answer(question))
