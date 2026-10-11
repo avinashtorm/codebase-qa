@@ -248,7 +248,7 @@ No GitHub needed: you package the current commit on Windows and upload it.
    ```
    You should see `docker-compose.yml`, `Dockerfile`, `backend`, `frontend`, `deploy` and the other project files.
 
-If you push the project to GitHub later, you can use `git clone` on the VM instead of steps 1-4.
+The project is also on GitHub, so you can instead run `git clone https://github.com/avinashtorm/codebase-qa.git ~/codebase-qa` on the VM (see step 13).
 
 ## Step 10: Create the .env file on the server
 
@@ -349,11 +349,58 @@ All commands run on the VM in `~/codebase-qa`.
 | Browser can't connect at all | VM stopped, or ports 80/443 closed | Start the VM; check step 3 |
 | Certificate error, Caddy logs mention "challenge" | DNS label wrong or port 80 blocked | Check `DOMAIN` in `.env` against step 4, check step 3, then `docker compose restart caddy` |
 | "Cannot reach the backend" in the page | Backend still starting or crashed | `docker compose ps`, `docker compose logs backend` |
-| Answers fail with status 429 | Gemini free-tier daily quota used up | Wait for the reset, or set another `GEMINI_MODEL` in `.env` and run `docker compose up -d` |
+| Answers say the AI model's quota is used up and only list code locations | Gemini free-tier daily quota used up (it resets at midnight Pacific time) | Wait for the reset, or set another `GEMINI_MODEL` in `.env` and run `docker compose up -d` |
 | Build stops with "Killed" | Out of memory | Make sure swap from step 8 is on (`free -h`), then build again |
 | Build fails with "no space left on device" | Old images and build cache filled the 30 GB disk | `docker image prune -af && docker builder prune -af`, check `df -h /`, then build again. The running site keeps working while you do this |
 
 ## Step 13: Update to a new version
+
+The code is on GitHub (<https://github.com/avinashtorm/codebase-qa>), so the VM can pull updates itself. All commands
+run **on the VM** (the `azureuser@codebase-qa-vm:~$` window).
+
+**One time only**, turn the uploaded folder into a git checkout (your `.env` is copied over; indexes and certificates
+live in Docker volumes and are not touched):
+
+```bash
+cd ~ && git clone https://github.com/avinashtorm/codebase-qa.git codebase-qa-git && cp ~/codebase-qa/.env ~/codebase-qa-git/.env && chmod 600 ~/codebase-qa-git/.env
+```
+```bash
+mv ~/codebase-qa ~/codebase-qa-old && mv ~/codebase-qa-git ~/codebase-qa
+```
+
+**Every update** (pull, rebuild, restart, clean up):
+
+```bash
+cd ~/codebase-qa && git pull
+```
+```bash
+docker compose up -d --build
+```
+```bash
+docker image prune -af && docker builder prune -af
+```
+
+The Compose project name is fixed (`codebase-qa`), so the `app-data` volume (indexes, caches, stats, feedback) and the
+Caddy certificate survive. Remove old images and build cache every time: the VM disk is 30 GB and each rebuild leaves
+several GB behind ("no space left on device" otherwise).
+
+Then check:
+
+```bash
+docker compose ps && free -h && docker stats --no-stream
+```
+
+The backend should use well under 3 GB at idle: measured locally, the backend process peaks at about 0.5 GB resident
+(1.4 GB committed, mostly PyTorch reservations), the UI about 0.1 GB and Caddy a few tens of MB. The reranker is
+baked into the image but not loaded unless `RERANK=true`.
+
+What happens on the first start after the v2 update: new SQLite files appear in the volume (`stats.sqlite3`,
+`feedback.sqlite3`, `answers.sqlite3`, `embeddings.sqlite3`), and the pinned demo repository gets its repository
+overview and suggested questions in a background job (about 6 Gemini calls, 1-2 minutes; watch
+`docker compose logs -f backend`). Visitor repositories indexed with the old version keep working and get the new
+features when they are added again.
+
+**Alternative without git** (as in step 9): package and upload from Windows, then replace the code on the VM.
 
 1. In **PowerShell on Windows**, package and upload the new commit as in step 9:
    ```powershell
