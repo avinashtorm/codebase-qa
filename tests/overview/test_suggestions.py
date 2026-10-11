@@ -48,6 +48,12 @@ def test_heuristic_questions_when_llm_unavailable() -> None:
     assert QuestionSuggester(None, HashingEmbedder(), 0.6).suggest([FOLDER], FakeCollection({}, HashingEmbedder()))
 
 
+def test_heuristic_questions_ignore_readme_bullets() -> None:
+    readme = Chunk("s", "r", "@overview/summary", "overview", 1, 2, "- ⚡ [**FastAPI**](https://fastapi.dev): API")
+    noisy = Chunk("g", "r", "@overview/folder/x", "overview", 1, 2, "- see [docs](https://x.io): links\n- x/a.py: a")
+    assert heuristic_questions([readme, noisy], 5) == [OVERVIEW_QUESTION, "What does x/a.py do?"]
+
+
 def test_index_stores_suggestions_and_reindex_keeps_them(tmp_path: Path, make_repo: RepoFactory) -> None:
     llm = FakeLLM({"SuggestionsSchema": lambda _: {"questions": ["What does this repo do?", "Where is list_items?"]}})
     container = build_container(tmp_path, llm, min_vector_score=0.0)
