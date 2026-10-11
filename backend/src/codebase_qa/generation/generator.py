@@ -3,7 +3,7 @@ import json
 from pydantic import BaseModel, Field, ValidationError
 
 from codebase_qa.generation.citations import extract_citations
-from codebase_qa.generation.prompt import SYSTEM_PROMPT, build_user_prompt
+from codebase_qa.generation.prompt import build_user_prompt, system_prompt_for
 from codebase_qa.interfaces import LLM
 from codebase_qa.models import Citation, GeneratedAnswer, RetrievedChunk
 
@@ -33,5 +33,6 @@ class LLMGenerator:
         self.llm = llm
 
     def generate(self, question: str, context: list[RetrievedChunk]) -> GeneratedAnswer:
-        response = self.llm.complete(SYSTEM_PROMPT, build_user_prompt(question, context), AnswerSchema)
+        prompt = build_user_prompt(question, context)
+        response = self.llm.complete(system_prompt_for(context), prompt, AnswerSchema)
         return parse_answer(response.text)

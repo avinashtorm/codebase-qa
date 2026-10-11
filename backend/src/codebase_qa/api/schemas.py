@@ -136,6 +136,7 @@ class AskResponse(BaseModel):
     used_llm: bool
     invalid_citations: int
     commit_sha: str
+    route: str
 
     @classmethod
     def from_result(cls, result: AskResult, commit_sha: str) -> "AskResponse":
@@ -168,4 +169,5 @@ class AskResponse(BaseModel):
             used_llm=result.answer.used_llm,
             invalid_citations=result.answer.invalid_citations,
             commit_sha=commit_sha,
+            route=result.route,
         )

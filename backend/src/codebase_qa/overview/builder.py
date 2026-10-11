@@ -4,12 +4,11 @@ from dataclasses import dataclass
 
 from codebase_qa.chunking.ids import chunk_id
 from codebase_qa.indexing.registry import FileRecord
-from codebase_qa.models import Chunk
+from codebase_qa.models import OVERVIEW_PREFIX, Chunk
 from codebase_qa.overview.selection import find_readme, select_files, select_folders
 from codebase_qa.overview.summarizer import ItemKind, LLMSummarizer, SummaryItem
 from codebase_qa.overview.tree import Folder, build_folders, folder_tree
 
-OVERVIEW_PREFIX = "@overview/"
 OVERVIEW_LANGUAGE = "overview"
 REPOSITORY_KEY = "."
 README_CHARS = 2500
@@ -43,10 +42,6 @@ class Candidate:
 
 def digest(*parts: str) -> str:
     return hashlib.sha1("\x1f".join(parts).encode("utf-8")).hexdigest()
-
-
-def is_overview_path(path: str) -> bool:
-    return path.startswith(OVERVIEW_PREFIX)
 
 
 def folder_listing(paths: list[str], folder: str, limit: int = 40) -> list[str]:

@@ -49,23 +49,23 @@ def evaluate_question(
     with_answers: bool,
 ) -> dict[str, Any]:
     pipeline = container.pipeline(record)
-    retriever = pipeline.retriever
-    started = time.perf_counter()
-    ranked = retriever.retrieve(question.question, RETRIEVAL_DEPTH)
-    retrieval_ms = (time.perf_counter() - started) * 1000
-    stage_ms = dict(retriever.timings)
+    retrieval = pipeline.retrieve(question.question, RETRIEVAL_DEPTH)
+    ranked = retrieval.code
     spans = [item.chunk for item in ranked]
     result: dict[str, Any] = {
         "id": question.id,
         "category": question.category,
         "question": question.question,
+        "route": retrieval.route,
+        "route_method": retrieval.route_method,
         "expected": [asdict(location) for location in question.expected_locations],
         "retrieved": [describe(item) for item in ranked],
+        "overview": [describe(item) for item in retrieval.overview],
         "retrieval": asdict(score_retrieval(spans, question.expected_locations)),
-        "latency_ms": {"retrieval": round(retrieval_ms, 1)} | stage_ms,
+        "latency_ms": dict(retrieval.timings_ms),
     }
     if with_answers:
-        answered = pipeline.answer(question.question, ranked[: container.settings.top_k], {})
+        answered = pipeline.answer(question.question, retrieval)
         answer = answered.answer
         if "generation" in answered.timings_ms:
             result["latency_ms"]["generation"] = answered.timings_ms["generation"]
@@ -88,6 +88,8 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, float]:
         metrics["citation_any_correct"] = average([row["citation_scores"]["any_correct"] for row in answered])
         metrics["invalid_citations"] = sum(row["invalid_citations"] for row in answered)
         metrics["refused"] = sum(not row["used_llm"] for row in answered)
+    for route in ("code", "overview", "tool"):
+        metrics[f"route_{route}"] = sum(row.get("route") == route for row in rows)
     stages = sorted({stage for row in rows for stage in row["latency_ms"]})
     for stage in stages:
         values = [row["latency_ms"][stage] for row in rows if stage in row["latency_ms"]]
@@ -157,6 +159,9 @@ def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
         "rerank": settings.rerank,
         "rerank_candidates": settings.rerank_candidates,
         "rerank_fusion": settings.rerank_fusion,
+        "overview": settings.overview,
+        "routing": settings.routing,
+        "routing_llm": settings.routing_llm,
         "reranker_model": settings.reranker_model if settings.rerank else None,
         "top_k": settings.top_k,
         "embedding_model": settings.embedding_model,
@@ -172,6 +177,7 @@ def settings_overrides(args: argparse.Namespace) -> dict[str, Any]:
         "rerank": args.rerank or args.rerank_fusion,
         "rerank_fusion": args.rerank_fusion,
         "llm_cache": True,
+        "routing": not args.no_routing,
     }
     if args.llm_model:
         overrides["gemini_model"] = args.llm_model
@@ -190,6 +196,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--answers", action="store_true", help="also generate answers and score citations")
     parser.add_argument("--delay", type=float, default=0.0, help="seconds between LLM calls")
     parser.add_argument("--llm-model", default=None, help="override GEMINI_MODEL for this run")
+    parser.add_argument("--no-routing", action="store_true", help="send every question down the code path")
     parser.add_argument("--questions", type=Path, default=DEFAULT_QUESTIONS)
     parser.add_argument("--results-dir", type=Path, default=RESULTS_DIR)
     parser.add_argument("--repo-url", default=DEFAULT_REPO_URL)

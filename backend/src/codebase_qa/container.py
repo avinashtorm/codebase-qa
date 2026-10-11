@@ -12,14 +12,17 @@ from codebase_qa.indexing.janitor import RepoJanitor
 from codebase_qa.indexing.registry import RepoRecord, RepoRegistry
 from codebase_qa.interfaces import LLM, Embedder, Generator, Reranker, Retriever
 from codebase_qa.overview.builder import OverviewBuilder
-from codebase_qa.overview.store import OverviewStore
+from codebase_qa.overview.store import OverviewIndex, OverviewStore
 from codebase_qa.overview.summarizer import LLMSummarizer
 from codebase_qa.qa import QAPipeline
 from codebase_qa.retrieval.bm25 import BM25Index, BM25Retriever
 from codebase_qa.retrieval.hybrid import HybridRetriever
+from codebase_qa.retrieval.overview import OverviewRetriever
 from codebase_qa.retrieval.reranker import RerankingRetriever
 from codebase_qa.retrieval.vector import VectorRetriever
 from codebase_qa.retrieval.vector_store import ChromaStore
+from codebase_qa.routing.router import QuestionRouter
+from codebase_qa.routing.tool import ToolAnswerer
 
 
 def default_embedder(settings: Settings) -> Embedder:
@@ -62,6 +65,7 @@ class Container:
         self.reranker_factory = reranker_factory
         self.llm_factory = llm_factory
         self.bm25_cache: dict[tuple[str, str], BM25Index] = {}
+        self.overview_cache: dict[tuple[str, str], OverviewIndex] = {}
 
     @cached_property
     def embedder(self) -> Embedder:
@@ -180,10 +184,30 @@ class Container:
             rrf_k=self.settings.rrf_k,
         )
 
+    def overview_retriever(self, record: RepoRecord) -> OverviewRetriever | None:
+        if not self.settings.overview:
+            return None
+        key = (record.collection, record.indexed_at)
+        if key not in self.overview_cache:
+            index = self.overview_store.load(record.collection)
+            if index is None:
+                return None
+            self.overview_cache = {key: index}
+        return OverviewRetriever(self.overview_cache[key], self.embedder)
+
+    def router(self) -> QuestionRouter | None:
+        if not self.settings.routing:
+            return None
+        return QuestionRouter(self.llm if self.settings.routing_llm else None)
+
     def pipeline(self, record: RepoRecord) -> QAPipeline:
         return QAPipeline(
             self.retriever(record),
             self.generator,
             top_k=self.settings.top_k,
             refusal_thresholds=self.settings.refusal_thresholds,
+            router=self.router(),
+            overview=self.overview_retriever(record),
+            tool=ToolAnswerer(self.llm),
+            overview_k=self.settings.overview_k,
         )

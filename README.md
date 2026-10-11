@@ -112,6 +112,7 @@ answers.
 |---|---|---|---|---|---|---|---|
 | 0 | Starting point (tree-sitter + vector + grounded generation) | 0.571 | 0.714 | 0.767 | 0.651 | 0.714 | reproduced from the table above |
 | 1 | Index-time repository overview (tree, README, LLM summaries) | 0.571 | 0.714 | 0.767 | 0.651 | 0.729 | overview stored separately, not used by code retrieval yet; 31 overview chunks from 5 LLM calls; citation change is LLM run-to-run noise after a cache-key change |
+| 2 | Question routing (tool / overview / code; rules first, LLM only when unsure) | 0.571 | 0.714 | 0.767 | 0.651 | 0.729 | all 35 dev questions routed to code by rules (0 extra LLM calls, 0.4 ms); tool questions skip retrieval; overview questions get 3 overview chunks + 5 code chunks |
 
 ## Running it locally
 

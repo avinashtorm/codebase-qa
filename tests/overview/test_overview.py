@@ -3,7 +3,8 @@ from pathlib import Path
 
 from codebase_qa.container import Container
 from codebase_qa.indexing.registry import FileRecord
-from codebase_qa.overview.builder import OverviewBuilder, is_overview_path
+from codebase_qa.models import is_overview_path
+from codebase_qa.overview.builder import OverviewBuilder
 from codebase_qa.overview.selection import is_test_path, select_files, select_folders
 from codebase_qa.overview.summarizer import LLMSummarizer, SummaryItem, heuristic_summary
 from codebase_qa.overview.tree import folder_tree

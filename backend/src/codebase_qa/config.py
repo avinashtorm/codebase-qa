@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     overview_batch_size: int = 20
     overview_max_calls: int = 5
     overview_file_chars: int = 1200
+    overview_k: int = 3
+    routing: bool = True
+    routing_llm: bool = True
 
     @property
     def repos_dir(self) -> Path:

@@ -1,5 +1,11 @@
 from dataclasses import dataclass, field
 
+OVERVIEW_PREFIX = "@overview/"
+
+
+def is_overview_path(path: str) -> bool:
+    return path.startswith(OVERVIEW_PREFIX)
+
 
 @dataclass(frozen=True)
 class SourceFile:

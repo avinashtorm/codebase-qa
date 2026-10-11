@@ -1,4 +1,4 @@
-from codebase_qa.models import Citation, RetrievedChunk
+from codebase_qa.models import Citation, RetrievedChunk, is_overview_path
 
 Interval = tuple[int, int]
 
@@ -6,6 +6,8 @@ Interval = tuple[int, int]
 def context_intervals(context: list[RetrievedChunk]) -> dict[str, list[Interval]]:
     spans: dict[str, list[Interval]] = {}
     for item in context:
+        if is_overview_path(item.chunk.path):
+            continue
         spans.setdefault(item.chunk.path, []).append((item.chunk.start_line, item.chunk.end_line))
     merged: dict[str, list[Interval]] = {}
     for path, intervals in spans.items():
