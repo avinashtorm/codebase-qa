@@ -1,0 +1,5245 @@
+{
+ "config": "m31-partA-after",
+ "timestamp": "2026-10-11T13:17:53+00:00",
+ "split": "dev",
+ "question_count": 50,
+ "with_answers": true,
+ "answered_count": 35,
+ "generation_error": null,
+ "settings": {
+  "chunker": "treesitter",
+  "retrieval_mode": "vector",
+  "rerank": false,
+  "rerank_candidates": 30,
+  "rerank_fusion": false,
+  "overview": true,
+  "routing": true,
+  "routing_llm": true,
+  "followup_rewrite": true,
+  "query_expansion": false,
+  "expansion_original_weight": 4,
+  "expansion_skip_above": 0.0,
+  "parent_context": false,
+  "call_context": false,
+  "self_check": false,
+  "hygiene": true,
+  "downweight_factor": 0.9,
+  "downweight_tests": true,
+  "reranker_model": null,
+  "top_k": 8,
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "llm": "gemini-3.1-flash-lite",
+  "repo_commit": "7257e606cb94eada1dca40173e2b7f99dd549bc6"
+ },
+ "metrics": {
+  "hit_at_1": 0.5714,
+  "hit_at_5": 0.8286,
+  "recall_at_10": 0.8048,
+  "mrr": 0.6781,
+  "invalid_citations": 5,
+  "citation_precision": 0.7095,
+  "citation_any_correct": 0.8286,
+  "refused": 8,
+  "refusal_accuracy": 0.94,
+  "answered_when_answerable": 0.9333,
+  "refused_when_unanswerable": 1.0,
+  "judged": 50,
+  "faithfulness_mean": 4.9524,
+  "faithful_rate": 1.0,
+  "relevance_mean": 4.8889,
+  "relevant_rate": 0.9778,
+  "confidence_high": 0,
+  "confidence_medium": 39,
+  "confidence_medium_correct": 0.9032,
+  "confidence_low": 11,
+  "confidence_low_correct": 0.25,
+  "route_code": 43,
+  "route_overview": 7,
+  "route_tool": 0,
+  "downweight_ms_mean": 3.0,
+  "embed_query_ms_mean": 159.2,
+  "generation_ms_mean": 2900.6,
+  "overview_embed_ms_mean": 113.3,
+  "overview_search_ms_mean": 9.4,
+  "retrieval_ms_mean": 185.9,
+  "rewrite_ms_mean": 0.0,
+  "routing_ms_mean": 1.2,
+  "vector_search_ms_mean": 23.4
+ },
+ "by_category": {
+  "config": {
+   "count": 5,
+   "hit_at_1": 0.4,
+   "hit_at_5": 0.6,
+   "recall_at_10": 0.6,
+   "mrr": 0.5,
+   "invalid_citations": 0,
+   "citation_precision": 0.4,
+   "citation_any_correct": 0.4,
+   "refused": 1,
+   "refusal_accuracy": 0.8,
+   "answered_when_answerable": 0.8,
+   "judged": 5,
+   "faithfulness_mean": 5,
+   "faithful_rate": 1.0,
+   "relevance_mean": 5,
+   "relevant_rate": 1.0,
+   "confidence_high": 0,
+   "confidence_medium": 4,
+   "confidence_medium_correct": 0.5,
+   "confidence_low": 1,
+   "confidence_low_correct": 0.0,
+   "route_code": 5,
+   "route_overview": 0,
+   "route_tool": 0,
+   "downweight_ms_mean": 3.3,
+   "embed_query_ms_mean": 151.0,
+   "generation_ms_mean": 779.3,
+   "retrieval_ms_mean": 176.6,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.5,
+   "vector_search_ms_mean": 22.0
+  },
+  "how-does": {
+   "count": 10,
+   "hit_at_1": 0.5,
+   "hit_at_5": 0.9,
+   "recall_at_10": 0.8167,
+   "mrr": 0.6533,
+   "invalid_citations": 0,
+   "citation_precision": 0.7,
+   "citation_any_correct": 0.9,
+   "refused": 1,
+   "refusal_accuracy": 0.9,
+   "answered_when_answerable": 0.9,
+   "judged": 10,
+   "faithfulness_mean": 5,
+   "faithful_rate": 1.0,
+   "relevance_mean": 4.9,
+   "relevant_rate": 1.0,
+   "confidence_high": 0,
+   "confidence_medium": 8,
+   "confidence_medium_correct": 1.0,
+   "confidence_low": 2,
+   "confidence_low_correct": 0.5,
+   "route_code": 10,
+   "route_overview": 0,
+   "route_tool": 0,
+   "downweight_ms_mean": 2.6,
+   "embed_query_ms_mean": 184.8,
+   "generation_ms_mean": 3356.0,
+   "retrieval_ms_mean": 209.5,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.3,
+   "vector_search_ms_mean": 21.7
+  },
+  "overview": {
+   "count": 10,
+   "invalid_citations": 5,
+   "refused": 0,
+   "refusal_accuracy": 1.0,
+   "answered_when_answerable": 1.0,
+   "judged": 10,
+   "faithfulness_mean": 4.8,
+   "faithful_rate": 1.0,
+   "relevance_mean": 5,
+   "relevant_rate": 1.0,
+   "confidence_high": 0,
+   "confidence_medium": 8,
+   "confidence_low": 2,
+   "route_code": 3,
+   "route_overview": 7,
+   "route_tool": 0,
+   "downweight_ms_mean": 3.1,
+   "embed_query_ms_mean": 133.1,
+   "generation_ms_mean": 3111.0,
+   "overview_embed_ms_mean": 113.3,
+   "overview_search_ms_mean": 9.4,
+   "retrieval_ms_mean": 161.8,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 3.0,
+   "vector_search_ms_mean": 25.3
+  },
+  "unanswerable": {
+   "count": 5,
+   "invalid_citations": 0,
+   "refused": 5,
+   "refusal_accuracy": 1.0,
+   "refused_when_unanswerable": 1.0,
+   "judged": 5,
+   "confidence_high": 0,
+   "confidence_medium": 0,
+   "confidence_low": 5,
+   "route_code": 5,
+   "route_overview": 0,
+   "route_tool": 0,
+   "downweight_ms_mean": 2.4,
+   "embed_query_ms_mean": 144.5,
+   "generation_ms_mean": 3327.5,
+   "retrieval_ms_mean": 169.2,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.3,
+   "vector_search_ms_mean": 22.0
+  },
+  "what-happens-when": {
+   "count": 8,
+   "hit_at_1": 0.5,
+   "hit_at_5": 0.875,
+   "recall_at_10": 0.75,
+   "mrr": 0.6292,
+   "invalid_citations": 0,
+   "citation_precision": 0.6667,
+   "citation_any_correct": 0.875,
+   "refused": 1,
+   "refusal_accuracy": 0.875,
+   "answered_when_answerable": 0.875,
+   "judged": 8,
+   "faithfulness_mean": 5,
+   "faithful_rate": 1.0,
+   "relevance_mean": 4.5,
+   "relevant_rate": 0.875,
+   "confidence_high": 0,
+   "confidence_medium": 7,
+   "confidence_medium_correct": 1.0,
+   "confidence_low": 1,
+   "confidence_low_correct": 0.0,
+   "route_code": 8,
+   "route_overview": 0,
+   "route_tool": 0,
+   "downweight_ms_mean": 2.9,
+   "embed_query_ms_mean": 150.1,
+   "generation_ms_mean": 3197.0,
+   "retrieval_ms_mean": 173.6,
+   "rewrite_ms_mean": 0.0,
+   "routing_ms_mean": 0.4,
+   "vector_search_ms_mean": 20.4
+  },
+  "where-is": {
+   "count": 12,
+   "hit_at_1": 0.75,
+   "hit_at_5": 0.8333,
+   "recall_at_10": 0.9167,
+   "mrr": 0.8056,
+   "invalid_citations": 0,
+   "citation_precision": 0.875,
+   "citation_any_correct": 0.9167,
+   "refused": 0,
+   "refusal_accuracy": 1.0,
+   "answered_when_answerable": 1.0,
+   "judged": 12,
+   "faithfulness_mean": 5,
+   "faithful_rate": 1.0,
+   "relevance_mean": 5,
+   "relevant_rate": 1.0,
+   "confidence_high": 0,
+   "confidence_medium": 12,
+   "confidence_medium_correct": 0.9167,
+   "confidence_low": 0,
+   "route_code": 12,
+   "route_overview": 0,
+   "route_tool": 0,
+   "downweight_ms_mean": 3.7,
+   "embed_query_ms_mean": 175.1,
+   "generation_ms_mean": 2889.7,
+   "retrieval_ms_mean": 205.3,
+   "rewrite_ms_mean": 0.1,
+   "routing_ms_mean": 1.7,
+   "vector_search_ms_mean": 26.3
+  }
+ },
+ "questions": [
+  {
+   "id": "c01",
+   "category": "where-is",
+   "question": "Where is the JWT access token created?",
+   "standalone_question": "Where is the JWT access token created?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/core/security.py",
+     "start_line": 22,
+     "end_line": 26
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/security.py:22-26",
+     "score": 0.746
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:14-16",
+     "score": 0.6886
+    },
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.6835
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6786
+    },
+    {
+     "location": "backend/app/models.py:119-121",
+     "score": 0.6708
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.6559
+    },
+    {
+     "location": "backend/app/models.py:113-116",
+     "score": 0.6495
+    },
+    {
+     "location": "backend/app/api/deps.py:1-18",
+     "score": 0.6485
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:69-70",
+     "score": 0.6436
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:1-12",
+     "score": 0.6291
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 16.1,
+    "retrieval": 455.0,
+    "embed_query": 390.2,
+    "vector_search": 49.6,
+    "downweight": 15.0,
+    "generation": 3330.3
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The JWT access token is created in the `create_access_token` function located in `backend/app/core/security.py`.",
+   "citations": [
+    "backend/app/core/security.py:22-26"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the function and file responsible for creating the JWT access token based on the provided context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c03",
+   "category": "where-is",
+   "question": "Where is the current user extracted from the bearer token in API requests?",
+   "standalone_question": "Where is the current user extracted from the bearer token in API requests?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/deps.py",
+     "start_line": 30,
+     "end_line": 46
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.8005
+    },
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.744
+    },
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.7237
+    },
+    {
+     "location": "backend/app/api/deps.py:49-49",
+     "score": 0.7189
+    },
+    {
+     "location": "backend/app/models.py:113-116",
+     "score": 0.7189
+    },
+    {
+     "location": "backend/app/api/routes/users.py:124-129",
+     "score": 0.7173
+    },
+    {
+     "location": "backend/app/api/routes/users.py:162-179",
+     "score": 0.7105
+    },
+    {
+     "location": "backend/app/api/routes/users.py:1-29",
+     "score": 0.6997
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:14-16",
+     "score": 0.6991
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.6881
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 182.6,
+    "embed_query": 158.5,
+    "vector_search": 21.3,
+    "downweight": 2.6,
+    "generation": 1233.8
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The current user is extracted from the bearer token using the `get_current_user` dependency function located in `backend/app/api/deps.py`. This function decodes the JWT token, validates the user's existence and active status, and returns the `User` object.",
+   "citations": [
+    "backend/app/api/deps.py:30-46"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies the function and file responsible for extracting the user from the token based on the provided context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c04",
+   "category": "where-is",
+   "question": "Where is the login endpoint that returns an access token defined?",
+   "standalone_question": "Where is the login endpoint that returns an access token defined?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/login.py",
+     "start_line": 23,
+     "end_line": 42
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.7468
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.7336
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:14-16",
+     "score": 0.7321
+    },
+    {
+     "location": "backend/app/core/security.py:22-26",
+     "score": 0.7058
+    },
+    {
+     "location": "frontend/src/main.tsx:22-30",
+     "score": 0.694
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6828
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:130-142",
+     "score": 0.6824
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:18-67",
+     "score": 0.6704
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.6683
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:69-70",
+     "score": 0.6682
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 143.7,
+    "embed_query": 119.2,
+    "vector_search": 22.2,
+    "downweight": 1.9,
+    "generation": 1424.8
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The login endpoint that returns an access token is defined in `backend/app/api/routes/login.py` as the `login_access_token` function, which is mapped to the `/login/access-token` route.",
+   "citations": [
+    "backend/app/api/routes/login.py:23-25"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the file and function responsible for the login endpoint.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c05",
+   "category": "where-is",
+   "question": "Where is the check that the current user is a superuser implemented?",
+   "standalone_question": "Where is the check that the current user is a superuser implemented?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/deps.py",
+     "start_line": 52,
+     "end_line": 57
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.7809
+    },
+    {
+     "location": "backend/app/api/routes/users.py:32-51",
+     "score": 0.7054
+    },
+    {
+     "location": "backend/app/api/routes/users.py:132-143",
+     "score": 0.7027
+    },
+    {
+     "location": "backend/app/api/routes/users.py:162-179",
+     "score": 0.6934
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6902
+    },
+    {
+     "location": "backend/app/api/routes/users.py:124-129",
+     "score": 0.6838
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:15-23",
+     "score": 0.6819
+    },
+    {
+     "location": "backend/app/api/routes/users.py:214-232",
+     "score": 0.6817
+    },
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.6793
+    },
+    {
+     "location": "backend/app/api/routes/users.py:1-29",
+     "score": 0.6765
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.5,
+    "retrieval": 173.4,
+    "embed_query": 146.8,
+    "vector_search": 22.9,
+    "downweight": 3.4,
+    "generation": 1606.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The check to verify if the current user is a superuser is implemented in the `get_current_active_superuser` function located in `backend/app/api/deps.py`.",
+   "citations": [
+    "backend/app/api/deps.py:52-57"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the function and file where the superuser check is implemented.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c07",
+   "category": "where-is",
+   "question": "Where is the password reset token generated?",
+   "standalone_question": "Where is the password reset token generated?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/utils.py",
+     "start_line": 105,
+     "end_line": 115
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.7706
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.7448
+    },
+    {
+     "location": "backend/app/utils.py:70-84",
+     "score": 0.7197
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.7196
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.7101
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:99-158",
+     "score": 0.7087
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:49-67",
+     "score": 0.7084
+    },
+    {
+     "location": "packages/react-email/emails/reset_password.tsx:14-47",
+     "score": 0.6993
+    },
+    {
+     "location": "packages/react-email/emails/reset_password.tsx:7-12",
+     "score": 0.6957
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:69-98",
+     "score": 0.6913
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 178.8,
+    "embed_query": 150.1,
+    "vector_search": 25.5,
+    "downweight": 2.9,
+    "generation": 1723.2
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The password reset token is generated in the `generate_password_reset_token` function located in `backend/app/utils.py`.",
+   "citations": [
+    "backend/app/utils.py:105-115"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the function and file where the token is generated.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c08",
+   "category": "where-is",
+   "question": "Where is the Item database table and its relationship to its owner defined?",
+   "standalone_question": "Where is the Item database table and its relationship to its owner defined?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/models.py",
+     "start_line": 87,
+     "end_line": 93
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/models.py:86-93",
+     "score": 0.7149
+    },
+    {
+     "location": "backend/app/models.py:69-72",
+     "score": 0.6671
+    },
+    {
+     "location": "backend/app/models.py:50-55",
+     "score": 0.6654
+    },
+    {
+     "location": "backend/app/crud.py:63-68",
+     "score": 0.6478
+    },
+    {
+     "location": "backend/app/models.py:96-100",
+     "score": 0.6437
+    },
+    {
+     "location": "frontend/src/components/Items/ItemActionsMenu.tsx:14-16",
+     "score": 0.6173
+    },
+    {
+     "location": "backend/app/models.py:80-83",
+     "score": 0.616
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6135
+    },
+    {
+     "location": "frontend/src/components/Admin/columns.tsx:9-11",
+     "score": 0.6097
+    },
+    {
+     "location": "backend/app/models.py:103-105",
+     "score": 0.6013
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 192.7,
+    "embed_query": 166.2,
+    "vector_search": 24.1,
+    "downweight": 2.2,
+    "generation": 1449.8
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The `Item` database table is defined in `backend/app/models.py` within the `Item` class (lines 86-93). Its relationship to the `User` model is defined via the `owner` field, which uses a `Relationship` pointing to `User` with `back_populates=\"items\"` (line 93). The `User` model also defines the inverse relationship to `Item` (line 55).",
+   "citations": [
+    "backend/app/models.py:86-93",
+    "backend/app/models.py:55-55"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies the file and lines where the model and relationship are defined.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c09",
+   "category": "where-is",
+   "question": "Where is CORS configured for the backend?",
+   "standalone_question": "Where is CORS configured for the backend?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/main.py",
+     "start_line": 27,
+     "end_line": 33
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/main.py:1-11",
+     "score": 0.7092
+    },
+    {
+     "location": "development.md:31-70",
+     "score": 0.6863
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.683
+    },
+    {
+     "location": "backend/app/core/config.py:15-31",
+     "score": 0.6746
+    },
+    {
+     "location": ".github/workflows/deploy.yml:31-54",
+     "score": 0.6743
+    },
+    {
+     "location": "backend/app/main.py:18-36",
+     "score": 0.6719
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.6675
+    },
+    {
+     "location": "frontend/tsconfig.json:1-31",
+     "score": 0.664
+    },
+    {
+     "location": "compose.override.yml:61-100",
+     "score": 0.6604
+    },
+    {
+     "location": ".dockerignore:1-10",
+     "score": 0.6589
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.16666666666666666
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 145.5,
+    "embed_query": 110.3,
+    "vector_search": 31.7,
+    "downweight": 3.2,
+    "generation": 180.8
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "CORS is configured in `backend/app/main.py` using the `CORSMiddleware` from `starlette.middleware.cors`. It is added to the FastAPI application instance with `allow_origins` set to `settings.FRONTEND_HOST`.",
+   "citations": [
+    "backend/app/main.py:24-31"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the file and the mechanism used to configure CORS.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c11",
+   "category": "where-is",
+   "question": "Where is the first superuser created when the database is initialised?",
+   "standalone_question": "Where is the first superuser created when the database is initialised?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/core/db.py",
+     "start_line": 15,
+     "end_line": 33
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/db.py:15-33",
+     "score": 0.7329
+    },
+    {
+     "location": "backend/app/core/db.py:1-12",
+     "score": 0.7078
+    },
+    {
+     "location": "deployment.md:61-97",
+     "score": 0.706
+    },
+    {
+     "location": "backend/app/models.py:50-55",
+     "score": 0.7054
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6904
+    },
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.6888
+    },
+    {
+     "location": "backend/app/api/routes/users.py:54-78",
+     "score": 0.688
+    },
+    {
+     "location": "backend/app/api/routes/users.py:1-29",
+     "score": 0.6876
+    },
+    {
+     "location": "backend/app/crud.py:10-17",
+     "score": 0.6873
+    },
+    {
+     "location": "backend/app/initial_data.py:11-13",
+     "score": 0.6834
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 1.2,
+    "retrieval": 210.0,
+    "embed_query": 185.3,
+    "vector_search": 22.0,
+    "downweight": 2.5,
+    "generation": 1417.4
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The first superuser is created in the `init_db` function located in `backend/app/core/db.py`. This function checks if a user with the email defined in `settings.FIRST_SUPERUSER` exists; if not, it creates one using `crud.create_user` with the credentials provided in the settings.",
+   "citations": [
+    "backend/app/core/db.py:15-33"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the function and file responsible for creating the first superuser.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c12",
+   "category": "where-is",
+   "question": "Where does the frontend store the access token after a successful login?",
+   "standalone_question": "Where does the frontend store the access token after a successful login?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "frontend/src/hooks/useAuth.ts",
+     "start_line": 41,
+     "end_line": 46
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.7199
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.7118
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:33-49",
+     "score": 0.6948
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:35-51",
+     "score": 0.6932
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:14-16",
+     "score": 0.6913
+    },
+    {
+     "location": "frontend/src/main.tsx:22-30",
+     "score": 0.6826
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:130-142",
+     "score": 0.6817
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:49-67",
+     "score": 0.6816
+    },
+    {
+     "location": "backend/app/core/config.py:15-31",
+     "score": 0.6777
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.6742
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.6,
+    "retrieval": 229.8,
+    "embed_query": 203.7,
+    "vector_search": 23.0,
+    "downweight": 2.8,
+    "generation": 1344.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The frontend stores the access token in the browser's `localStorage` under the key `\"access_token\"`.",
+   "citations": [
+    "frontend/src/hooks/useAuth.ts:14-16"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the storage mechanism and key used by the frontend based on the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c15",
+   "category": "where-is",
+   "question": "Where is the health check endpoint implemented?",
+   "standalone_question": "Where is the health check endpoint implemented?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/utils.py",
+     "start_line": 29,
+     "end_line": 31
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/utils.py:29-31",
+     "score": 0.6921
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:275-284",
+     "score": 0.6067
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.5933
+    },
+    {
+     "location": "release-notes.md:271-310",
+     "score": 0.5885
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:31-45",
+     "score": 0.5812
+    },
+    {
+     "location": "README.md:1-40",
+     "score": 0.581
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:764-771",
+     "score": 0.5778
+    },
+    {
+     "location": "release-notes.md:541-580",
+     "score": 0.5765
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:757-762",
+     "score": 0.575
+    },
+    {
+     "location": "release-notes.md:781-820",
+     "score": 0.5746
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 176.9,
+    "embed_query": 151.7,
+    "vector_search": 22.7,
+    "downweight": 2.2,
+    "generation": 19407.7
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The health check endpoint is implemented in the backend at `backend/app/api/routes/utils.py`.",
+   "citations": [
+    "backend/app/api/routes/utils.py:29-31"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the file location of the health check endpoint implementation provided in the context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c16",
+   "category": "where-is",
+   "question": "Where are the HTML email templates rendered?",
+   "standalone_question": "Where are the HTML email templates rendered?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/utils.py",
+     "start_line": 25,
+     "end_line": 31
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/utils.py:25-31",
+     "score": 0.8252
+    },
+    {
+     "location": "backend/app/utils.py:60-67",
+     "score": 0.7438
+    },
+    {
+     "location": "packages/react-email/ui/Layout.tsx:1-12",
+     "score": 0.7391
+    },
+    {
+     "location": "README.md:31-70",
+     "score": 0.7319
+    },
+    {
+     "location": "packages/react-email/ui/Layout.tsx:14-18",
+     "score": 0.7186
+    },
+    {
+     "location": "packages/react-email/ui/Layout.tsx:20-55",
+     "score": 0.7171
+    },
+    {
+     "location": "packages/react-email/emails/test_email.tsx:11-35",
+     "score": 0.7158
+    },
+    {
+     "location": "packages/react-email/ui/Layout.tsx:57-111",
+     "score": 0.7155
+    },
+    {
+     "location": "backend/README.md:121-145",
+     "score": 0.713
+    },
+    {
+     "location": "packages/react-email/ui/Heading.tsx:1-1",
+     "score": 0.7107
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.8,
+    "routing": 0.3,
+    "retrieval": 179.5,
+    "embed_query": 145.8,
+    "vector_search": 29.5,
+    "downweight": 3.9,
+    "generation": 87.2
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The HTML email templates are rendered in the backend using the `render_email_template` function located in `backend/app/utils.py`. This function reads a template file from the `email-templates` directory and uses the `Template` class to render it with the provided context.",
+   "citations": [
+    "backend/app/utils.py:25-31"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies the rendering function and file location provided in the context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c18",
+   "category": "where-is",
+   "question": "Where is the public user signup endpoint?",
+   "standalone_question": "Where is the public user signup endpoint?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 146,
+     "end_line": 159
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:146-159",
+     "score": 0.6675
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:60-81",
+     "score": 0.6581
+    },
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.6524
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:42-58",
+     "score": 0.6515
+    },
+    {
+     "location": "backend/app/api/routes/private.py:23-38",
+     "score": 0.6495
+    },
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.6483
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:82-141",
+     "score": 0.6456
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6388
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:130-142",
+     "score": 0.6361
+    },
+    {
+     "location": "frontend/src/components/Admin/UserActionsMenu.tsx:15-17",
+     "score": 0.636
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 196.2,
+    "embed_query": 173.1,
+    "vector_search": 20.9,
+    "downweight": 1.8,
+    "generation": 1470.2
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The public user signup endpoint is defined in `backend/app/api/routes/users.py` at the `/signup` route.",
+   "citations": [
+    "backend/app/api/routes/users.py:146-146"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the file and route for the public signup endpoint.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c19",
+   "category": "how-does",
+   "question": "How does the backend authenticate a user's email and password?",
+   "standalone_question": "How does the backend authenticate a user's email and password?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/crud.py",
+     "start_line": 45,
+     "end_line": 60
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.7694
+    },
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.7225
+    },
+    {
+     "location": "backend/app/api/routes/users.py:146-159",
+     "score": 0.7219
+    },
+    {
+     "location": "backend/app/api/routes/login.py:100-123",
+     "score": 0.7172
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.7157
+    },
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.6991
+    },
+    {
+     "location": "backend/app/api/routes/private.py:16-20",
+     "score": 0.6989
+    },
+    {
+     "location": "backend/app/api/routes/users.py:54-78",
+     "score": 0.6959
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.6929
+    },
+    {
+     "location": "backend/app/crud.py:10-17",
+     "score": 0.686
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 179.1,
+    "embed_query": 158.5,
+    "vector_search": 17.8,
+    "downweight": 2.6,
+    "generation": 1683.5
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The backend authenticates a user by retrieving the user record from the database using their email. To prevent timing attacks, it performs a password verification check even if the user does not exist. If the user exists, it verifies the provided password against the stored hashed password. If the verification is successful and a password hash update is required, it updates the user's record in the database.",
+   "citations": [
+    "backend/app/crud.py:45-60"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the authentication process as implemented in the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c22",
+   "category": "how-does",
+   "question": "How are old password hashes upgraded when a user logs in?",
+   "standalone_question": "How are old password hashes upgraded when a user logs in?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/crud.py",
+     "start_line": 52,
+     "end_line": 59
+    },
+    {
+     "path": "backend/app/core/security.py",
+     "start_line": 11,
+     "end_line": 16
+    },
+    {
+     "path": "backend/app/core/security.py",
+     "start_line": 29,
+     "end_line": 32
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.7286
+    },
+    {
+     "location": "backend/app/core/security.py:29-32",
+     "score": 0.687
+    },
+    {
+     "location": "backend/app/core/security.py:35-36",
+     "score": 0.6805
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.6802
+    },
+    {
+     "location": "backend/app/crud.py:20-31",
+     "score": 0.6758
+    },
+    {
+     "location": "backend/app/api/routes/login.py:100-123",
+     "score": 0.6696
+    },
+    {
+     "location": "backend/app/crud.py:40-42",
+     "score": 0.6686
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:129-162",
+     "score": 0.6648
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:96-130",
+     "score": 0.6604
+    },
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.6604
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 0.6666666666666666,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 171.2,
+    "embed_query": 152.1,
+    "vector_search": 16.6,
+    "downweight": 2.3,
+    "generation": 2281.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When a user logs in, the `verify_password` function is called, which utilizes `password_hash.verify_and_update`. This method verifies the provided password against the stored hash and automatically performs an upgrade if the hashing algorithm is outdated (e.g., upgrading from bcrypt to Argon2).",
+   "citations": [
+    "backend/app/core/security.py:29-32",
+    "backend/tests/api/routes/test_login.py:129-162"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the mechanism for password hash upgrades using the provided context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c23",
+   "category": "how-does",
+   "question": "How does password recovery avoid revealing whether an email address is registered?",
+   "standalone_question": "How does password recovery avoid revealing whether an email address is registered?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/login.py",
+     "start_line": 53,
+     "end_line": 74
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.7218
+    },
+    {
+     "location": "backend/app/api/routes/login.py:100-123",
+     "score": 0.6791
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:51-79",
+     "score": 0.6662
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:80-130",
+     "score": 0.6584
+    },
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.6543
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:67-79",
+     "score": 0.6339
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:49-64",
+     "score": 0.6321
+    },
+    {
+     "location": "backend/app/api/routes/private.py:16-20",
+     "score": 0.6287
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:33-49",
+     "score": 0.6252
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.6199
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 504.1,
+    "embed_query": 470.9,
+    "vector_search": 28.2,
+    "downweight": 3.2,
+    "generation": 4157.2
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The password recovery process avoids email enumeration attacks by returning the same generic success message regardless of whether the provided email address exists in the system. If the user is found, the system proceeds to generate a token and send an email; if the user is not found, it skips these steps but still returns the same response.",
+   "citations": [
+    "backend/app/api/routes/login.py:57-74",
+    "backend/tests/api/routes/test_login.py:74-79"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the logic implemented in the provided code to prevent email enumeration.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c24",
+   "category": "how-does",
+   "question": "How does listing items differ between superusers and normal users?",
+   "standalone_question": "How does listing items differ between superusers and normal users?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/items.py",
+     "start_line": 13,
+     "end_line": 45
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/items.py:13-45",
+     "score": 0.6333
+    },
+    {
+     "location": "backend/app/api/routes/users.py:32-51",
+     "score": 0.6267
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6245
+    },
+    {
+     "location": "backend/app/api/deps.py:52-57",
+     "score": 0.6129
+    },
+    {
+     "location": "backend/app/api/routes/users.py:1-29",
+     "score": 0.6122
+    },
+    {
+     "location": "backend/app/api/routes/items.py:48-58",
+     "score": 0.6119
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:61-66",
+     "score": 0.5675
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:26-34",
+     "score": 0.5667
+    },
+    {
+     "location": "backend/tests/api/routes/test_users.py:451-460",
+     "score": 0.564
+    },
+    {
+     "location": "frontend/tests/admin.spec.ts:181-205",
+     "score": 0.5584
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 158.6,
+    "embed_query": 127.9,
+    "vector_search": 27.9,
+    "downweight": 2.5,
+    "generation": 1592.1
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When retrieving items, superusers can access all items in the database, whereas normal users are restricted to items where the `owner_id` matches their own user ID.",
+   "citations": [
+    "backend/app/api/routes/items.py:13-45"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the conditional logic in the provided code for retrieving items based on user privileges.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c26",
+   "category": "how-does",
+   "question": "How does the frontend react when the API responds with 401 or 403?",
+   "standalone_question": "How does the frontend react when the API responds with 401 or 403?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "frontend/src/main.tsx",
+     "start_line": 22,
+     "end_line": 38
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/config.py:15-31",
+     "score": 0.6793
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6771
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:377-382",
+     "score": 0.6393
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:22-38",
+     "score": 0.6296
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:718-723",
+     "score": 0.6253
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:241-257",
+     "score": 0.6233
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:160-176",
+     "score": 0.6232
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:496-501",
+     "score": 0.6216
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:603-608",
+     "score": 0.6208
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:361-366",
+     "score": 0.6204
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 191.7,
+    "embed_query": 174.0,
+    "vector_search": 16.6,
+    "downweight": 0.8,
+    "generation": 1430.7
+   },
+   "used_llm": true,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I don't know based on the indexed code. The provided context contains API definitions and client-side SDK methods for making requests, but it does not include the frontend's global error handling logic or interceptors that would define how the application reacts to 401 or 403 HTTP status codes.\n\n**Closest files I found:** `backend/app/core/config.py`, `backend/app/api/deps.py`, `frontend/src/client/types.gen.ts`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "no",
+    "reason": "The provided context does not contain the frontend logic required to answer how it reacts to specific HTTP status codes.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c27",
+   "category": "how-does",
+   "question": "How does a logged-in user change their own password on the backend?",
+   "standalone_question": "How does a logged-in user change their own password on the backend?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 103,
+     "end_line": 121
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.7286
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.7022
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.696
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:128-144",
+     "score": 0.6911
+    },
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.6805
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:41-67",
+     "score": 0.679
+    },
+    {
+     "location": "backend/app/api/routes/login.py:100-123",
+     "score": 0.6784
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:69-98",
+     "score": 0.6781
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:53-69",
+     "score": 0.6748
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:68-127",
+     "score": 0.6741
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 162.1,
+    "embed_query": 137.1,
+    "vector_search": 20.9,
+    "downweight": 3.9,
+    "generation": 1564.5
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "A logged-in user changes their own password by sending a PATCH request to the `/me/password` endpoint. The `update_password_me` function verifies the user's current password, ensures the new password is different from the current one, hashes the new password, and updates the user record in the database.",
+   "citations": [
+    "backend/app/api/routes/users.py:103-121"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the backend process for changing a password based on the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c28",
+   "category": "how-does",
+   "question": "How are API errors turned into toast notifications in the frontend?",
+   "standalone_question": "How are API errors turned into toast notifications in the frontend?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "frontend/src/utils.ts",
+     "start_line": 3,
+     "end_line": 20
+    },
+    {
+     "path": "frontend/src/hooks/useCustomToast.ts",
+     "start_line": 10,
+     "end_line": 14
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/hooks/useCustomToast.ts:1-1",
+     "score": 0.7364
+    },
+    {
+     "location": "frontend/src/components/ui/sonner.tsx:40-40",
+     "score": 0.7274
+    },
+    {
+     "location": "frontend/src/hooks/useCustomToast.ts:3-17",
+     "score": 0.7066
+    },
+    {
+     "location": "frontend/package.json:31-65",
+     "score": 0.7041
+    },
+    {
+     "location": "README.md:31-70",
+     "score": 0.704
+    },
+    {
+     "location": "frontend/src/components/ui/sonner.tsx:1-11",
+     "score": 0.7009
+    },
+    {
+     "location": "frontend/src/main.tsx:22-30",
+     "score": 0.6988
+    },
+    {
+     "location": "frontend/src/utils.ts:3-15",
+     "score": 0.6987
+    },
+    {
+     "location": "frontend/src/components/UserSettings/DeleteConfirmation.tsx:1-19",
+     "score": 0.6972
+    },
+    {
+     "location": "frontend/src/utils.ts:1-1",
+     "score": 0.6954
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.3333333333333333
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 158.8,
+    "embed_query": 140.9,
+    "vector_search": 16.6,
+    "downweight": 1.2,
+    "generation": 18428.2
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "API errors are handled by the `useCustomToast` hook, which provides an `showErrorToast` function that triggers a toast notification using the `sonner` library with the message \"Something went wrong!\". While the provided code shows how to extract error messages from `AxiosError` objects using `extractErrorMessage` and how to handle specific status codes (401, 403) in `main.tsx`, the specific integration connecting these error handlers to the `showErrorToast` function is not explicitly shown in the provided context.",
+   "citations": [
+    "frontend/src/hooks/useCustomToast.ts:8-12",
+    "frontend/src/utils.ts:3-15",
+    "frontend/src/main.tsx:22-30"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 3,
+    "correct_citations": 2,
+    "precision": 0.6666666666666666,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 4,
+    "answers_question": "partially",
+    "reason": "The answer correctly identifies the components involved but notes that the specific integration logic is missing from the provided context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c30",
+   "category": "how-does",
+   "question": "How is pagination implemented when listing users?",
+   "standalone_question": "How is pagination implemented when listing users?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 32,
+     "end_line": 51
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:32-51",
+     "score": 0.687
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:11-21",
+     "score": 0.6861
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:40-43",
+     "score": 0.6825
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:45-66",
+     "score": 0.6801
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:102-117",
+     "score": 0.6722
+    },
+    {
+     "location": "backend/app/models.py:64-66",
+     "score": 0.6683
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:36-38",
+     "score": 0.6619
+    },
+    {
+     "location": "backend/app/api/routes/items.py:13-45",
+     "score": 0.6599
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:23-34",
+     "score": 0.6537
+    },
+    {
+     "location": "frontend/src/components/ui/pagination.tsx:68-83",
+     "score": 0.6523
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 165.7,
+    "embed_query": 136.2,
+    "vector_search": 26.8,
+    "downweight": 2.5,
+    "generation": 70.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "Pagination for users is implemented on the backend using `skip` and `limit` parameters in the `read_users` function. The database query uses these parameters to offset and limit the results retrieved from the `User` table, while a separate count query retrieves the total number of users to support pagination metadata.",
+   "citations": [
+    "backend/app/api/routes/users.py:36-51"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the backend implementation of pagination using skip and limit parameters and the total count query.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c31",
+   "category": "how-does",
+   "question": "How does the reset password page get the token and submit the new password?",
+   "standalone_question": "How does the reset password page get the token and submit the new password?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "frontend/src/routes/reset-password.tsx",
+     "start_line": 28,
+     "end_line": 30
+    },
+    {
+     "path": "frontend/src/routes/reset-password.tsx",
+     "start_line": 84,
+     "end_line": 97
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.7483
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.7426
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:99-158",
+     "score": 0.7418
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.7373
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:69-98",
+     "score": 0.7239
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:49-67",
+     "score": 0.7201
+    },
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.7196
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:80-130",
+     "score": 0.7089
+    },
+    {
+     "location": "packages/react-email/emails/reset_password.tsx:14-47",
+     "score": 0.7076
+    },
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.7002
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 0.5,
+    "mrr": 0.2
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.6,
+    "retrieval": 191.2,
+    "embed_query": 169.9,
+    "vector_search": 17.7,
+    "downweight": 3.3,
+    "generation": 2288.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The reset password page retrieves the token from the URL search parameters using `Route.useSearch()`. When the user submits the form, the `onSubmit` function triggers a mutation that calls `LoginService.resetPassword` with the `new_password` and the `token` retrieved from the URL.",
+   "citations": [
+    "frontend/src/routes/reset-password.tsx:70-70",
+    "frontend/src/routes/reset-password.tsx:82-83",
+    "frontend/src/routes/reset-password.tsx:96-98"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 3,
+    "correct_citations": 1,
+    "precision": 0.3333333333333333,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the token retrieval and form submission process based on the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c32",
+   "category": "how-does",
+   "question": "How is the selected colour theme remembered between visits?",
+   "standalone_question": "How is the selected colour theme remembered between visits?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "frontend/src/components/theme-provider.tsx",
+     "start_line": 37,
+     "end_line": 39
+    },
+    {
+     "path": "frontend/src/components/theme-provider.tsx",
+     "start_line": 95,
+     "end_line": 98
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/components/theme-provider.tsx:17-21",
+     "score": 0.6219
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:31-90",
+     "score": 0.6207
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:92-106",
+     "score": 0.599
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:9-9",
+     "score": 0.5988
+    },
+    {
+     "location": "frontend/src/components/Common/Appearance.tsx:19-23",
+     "score": 0.5983
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:23-29",
+     "score": 0.5889
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:108-115",
+     "score": 0.5854
+    },
+    {
+     "location": "frontend/src/index.css:31-70",
+     "score": 0.5835
+    },
+    {
+     "location": "frontend/src/index.css:1-40",
+     "score": 0.5693
+    },
+    {
+     "location": "frontend/src/components/theme-provider.tsx:11-15",
+     "score": 0.5677
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 212.2,
+    "embed_query": 180.6,
+    "vector_search": 28.1,
+    "downweight": 3.3,
+    "generation": 62.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "The selected colour theme is remembered between visits by storing the theme value in the browser's `localStorage` using a specified `storageKey` (defaulting to `\"vite-ui-theme\"`). When the `ThemeProvider` initializes, it retrieves the theme from `localStorage` if available, and updates it whenever the `setTheme` function is called.",
+   "citations": [
+    "frontend/src/components/theme-provider.tsx:31-37",
+    "frontend/src/components/theme-provider.tsx:92-98"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 2,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the mechanism for persisting the theme using localStorage as shown in the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c35",
+   "category": "what-happens-when",
+   "question": "What happens when a user tries to log in with a wrong password?",
+   "standalone_question": "What happens when a user tries to log in with a wrong password?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/login.py",
+     "start_line": 30,
+     "end_line": 34
+    },
+    {
+     "path": "backend/app/crud.py",
+     "start_line": 52,
+     "end_line": 54
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.6829
+    },
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.6744
+    },
+    {
+     "location": "backend/app/api/routes/login.py:100-123",
+     "score": 0.6688
+    },
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.6525
+    },
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.6468
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:51-79",
+     "score": 0.6414
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:1-45",
+     "score": 0.6353
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.6336
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:80-130",
+     "score": 0.632
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.6314
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 0.5,
+    "mrr": 0.2
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 168.1,
+    "embed_query": 145.2,
+    "vector_search": 19.2,
+    "downweight": 3.3,
+    "generation": 3753.3
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When a user attempts to log in with an incorrect password, the `authenticate` function in `backend/app/crud.py` is called. If the user exists, `verify_password` returns `False`, and the function returns `None`. If the user does not exist, the system performs a dummy password verification to prevent timing attacks before returning `None`.",
+   "citations": [
+    "backend/app/crud.py:45-60"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the authentication logic provided in the context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c38",
+   "category": "what-happens-when",
+   "question": "What happens to a user's items when an admin deletes that user?",
+   "standalone_question": "What happens to a user's items when an admin deletes that user?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 214,
+     "end_line": 232
+    },
+    {
+     "path": "backend/app/models.py",
+     "start_line": 90,
+     "end_line": 92
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/items.py:99-113",
+     "score": 0.6756
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:54-93",
+     "score": 0.6748
+    },
+    {
+     "location": "backend/app/api/routes/users.py:214-232",
+     "score": 0.653
+    },
+    {
+     "location": "backend/app/api/routes/users.py:132-143",
+     "score": 0.6433
+    },
+    {
+     "location": "frontend/src/components/Items/DeleteItem.tsx:54-92",
+     "score": 0.6331
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:27-53",
+     "score": 0.6318
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:95-95",
+     "score": 0.6211
+    },
+    {
+     "location": "frontend/src/components/Admin/DeleteUser.tsx:22-25",
+     "score": 0.6094
+    },
+    {
+     "location": "frontend/src/components/UserSettings/DeleteConfirmation.tsx:21-80",
+     "score": 0.6057
+    },
+    {
+     "location": "backend/app/api/routes/items.py:75-96",
+     "score": 0.6035
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 0.5,
+    "mrr": 0.3333333333333333
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.5,
+    "retrieval": 198.4,
+    "embed_query": 173.0,
+    "vector_search": 22.4,
+    "downweight": 2.7,
+    "generation": 1983.9
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When an admin deletes a user, all items associated with that user are also permanently deleted from the database.",
+   "citations": [
+    "backend/app/api/routes/users.py:226-227",
+    "frontend/src/components/Admin/DeleteUser.tsx:63-66"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately reflects the logic found in backend/app/api/routes/users.py which executes a delete statement on items associated with the user before deleting the user record.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c39",
+   "category": "what-happens-when",
+   "question": "What happens when a normal user requests an item that belongs to someone else?",
+   "standalone_question": "What happens when a normal user requests an item that belongs to someone else?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/items.py",
+     "start_line": 48,
+     "end_line": 58
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/items.py:48-58",
+     "score": 0.675
+    },
+    {
+     "location": "backend/app/api/routes/items.py:75-96",
+     "score": 0.663
+    },
+    {
+     "location": "backend/app/api/routes/items.py:99-113",
+     "score": 0.647
+    },
+    {
+     "location": "backend/app/api/routes/items.py:13-45",
+     "score": 0.6343
+    },
+    {
+     "location": "backend/app/api/routes/users.py:162-179",
+     "score": 0.6339
+    },
+    {
+     "location": "backend/app/api/routes/items.py:61-72",
+     "score": 0.6336
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6215
+    },
+    {
+     "location": "backend/app/api/routes/users.py:1-29",
+     "score": 0.6184
+    },
+    {
+     "location": "CONTRIBUTING.md:31-68",
+     "score": 0.6161
+    },
+    {
+     "location": "backend/app/models.py:86-93",
+     "score": 0.615
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 173.7,
+    "embed_query": 147.2,
+    "vector_search": 22.9,
+    "downweight": 3.3,
+    "generation": 2523.2
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When a normal user attempts to access, update, or delete an item that does not belong to them, the system checks if the user is a superuser. If the user is not a superuser and the `owner_id` of the item does not match the user's ID, the system raises an `HTTPException` with a 403 status code and the detail \"Not enough permissions\".",
+   "citations": [
+    "backend/app/api/routes/items.py:53-54",
+    "backend/app/api/routes/items.py:85-86",
+    "backend/app/api/routes/items.py:107-108"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 3,
+    "correct_citations": 1,
+    "precision": 0.3333333333333333,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the behavior defined in the provided code snippets for accessing, updating, and deleting items.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c42",
+   "category": "what-happens-when",
+   "question": "What happens when an admin creates a new user while emails are enabled?",
+   "standalone_question": "What happens when an admin creates a new user while emails are enabled?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 57,
+     "end_line": 78
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:54-78",
+     "score": 0.727
+    },
+    {
+     "location": "backend/app/api/routes/users.py:146-159",
+     "score": 0.6862
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6719
+    },
+    {
+     "location": "backend/app/core/config.py:51-55",
+     "score": 0.667
+    },
+    {
+     "location": "backend/app/api/routes/private.py:23-38",
+     "score": 0.6663
+    },
+    {
+     "location": "backend/app/models.py:31-37",
+     "score": 0.6612
+    },
+    {
+     "location": "backend/app/core/config.py:59-62",
+     "score": 0.6569
+    },
+    {
+     "location": "backend/app/utils.py:87-102",
+     "score": 0.652
+    },
+    {
+     "location": "backend/app/api/routes/users.py:81-100",
+     "score": 0.6466
+    },
+    {
+     "location": "packages/react-email/emails/new_account.tsx:8-13",
+     "score": 0.6436
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 184.9,
+    "embed_query": 161.3,
+    "vector_search": 20.4,
+    "downweight": 3.0,
+    "generation": 3458.3
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When an admin creates a new user via the `create_user` endpoint, the system checks if emails are enabled. If `settings.emails_enabled` is true and the user has an email address, the system generates a new account email using `generate_new_account_email` and sends it to the user via `send_email`.",
+   "citations": [
+    "backend/app/api/routes/users.py:54-78",
+    "backend/app/utils.py:87-102"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 1,
+    "precision": 0.5,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the logic found in the provided code context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c43",
+   "category": "what-happens-when",
+   "question": "What happens when the JWT sent with a request cannot be decoded?",
+   "standalone_question": "What happens when the JWT sent with a request cannot be decoded?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/deps.py",
+     "start_line": 31,
+     "end_line": 40
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.7049
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6805
+    },
+    {
+     "location": "backend/app/models.py:119-121",
+     "score": 0.6741
+    },
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.6735
+    },
+    {
+     "location": "backend/app/core/security.py:22-26",
+     "score": 0.6653
+    },
+    {
+     "location": "backend/app/api/deps.py:1-18",
+     "score": 0.634
+    },
+    {
+     "location": "frontend/src/client/core/types.gen.ts:35-92",
+     "score": 0.6027
+    },
+    {
+     "location": "frontend/src/client/sdk.gen.ts:100-112",
+     "score": 0.5776
+    },
+    {
+     "location": "backend/tests/api/routes/test_login.py:67-79",
+     "score": 0.577
+    },
+    {
+     "location": "frontend/src/client/core/serverSentEvents.gen.ts:99-158",
+     "score": 0.5753
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 162.5,
+    "embed_query": 138.3,
+    "vector_search": 22.7,
+    "downweight": 1.3,
+    "generation": 3743.9
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When a JWT sent with a request cannot be decoded, the `get_current_user` function catches the `InvalidTokenError` (along with `ValidationError`) and raises an `HTTPException` with a 403 Forbidden status code and the detail \"Could not validate credentials\".",
+   "citations": [
+    "backend/app/api/deps.py:31-40"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the behavior defined in the provided code context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c45",
+   "category": "what-happens-when",
+   "question": "What happens when a user changes their email to one already used by another account?",
+   "standalone_question": "What happens when a user changes their email to one already used by another account?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/api/routes/users.py",
+     "start_line": 89,
+     "end_line": 94
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/users.py:81-100",
+     "score": 0.6909
+    },
+    {
+     "location": "backend/app/api/routes/users.py:54-78",
+     "score": 0.6733
+    },
+    {
+     "location": "backend/app/utils.py:87-102",
+     "score": 0.6546
+    },
+    {
+     "location": "backend/app/models.py:12-17",
+     "score": 0.6545
+    },
+    {
+     "location": "backend/app/api/routes/users.py:146-159",
+     "score": 0.6494
+    },
+    {
+     "location": "backend/app/api/routes/users.py:182-211",
+     "score": 0.6399
+    },
+    {
+     "location": "backend/app/api/routes/login.py:53-74",
+     "score": 0.6342
+    },
+    {
+     "location": "backend/app/core/config.py:51-55",
+     "score": 0.6333
+    },
+    {
+     "location": "backend/app/crud.py:34-37",
+     "score": 0.6296
+    },
+    {
+     "location": "backend/README.md:121-145",
+     "score": 0.6277
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 173.4,
+    "embed_query": 152.4,
+    "vector_search": 16.9,
+    "downweight": 3.7,
+    "generation": 3574.1
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "When a user attempts to update their email to one that is already associated with another account, the system checks for the existence of that email. If an existing user is found with that email and a different ID, the system raises an `HTTPException` with a 409 status code and the detail \"User with this email already exists\".",
+   "citations": [
+    "backend/app/api/routes/users.py:86-91"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the logic implemented in the provided code for updating a user's email.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c47",
+   "category": "what-happens-when",
+   "question": "What happens in the frontend after a successful login?",
+   "standalone_question": "What happens in the frontend after a successful login?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "frontend/src/hooks/useAuth.ts",
+     "start_line": 41,
+     "end_line": 54
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/routes/login.tsx:35-51",
+     "score": 0.6756
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:33-49",
+     "score": 0.6557
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:53-69",
+     "score": 0.6409
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:42-58",
+     "score": 0.6377
+    },
+    {
+     "location": "development.md:31-70",
+     "score": 0.636
+    },
+    {
+     "location": "release-notes.md:661-700",
+     "score": 0.634
+    },
+    {
+     "location": "backend/app/api/routes/login.py:1-20",
+     "score": 0.6322
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:49-67",
+     "score": 0.6319
+    },
+    {
+     "location": "frontend/README.md:1-40",
+     "score": 0.6317
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:130-142",
+     "score": 0.6306
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.5,
+    "retrieval": 164.1,
+    "embed_query": 146.4,
+    "vector_search": 15.4,
+    "downweight": 2.2,
+    "generation": 3251.0
+   },
+   "used_llm": true,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I don't know based on the indexed code. The provided code shows the login form submission logic and the `beforeLoad` check that redirects logged-in users away from the login page, but it does not contain the logic that executes immediately after a successful login (such as navigation or state updates).\n\n**Closest files I found:** `frontend/src/routes/login.tsx`, `frontend/src/routes/recover-password.tsx`, `frontend/src/routes/signup.tsx`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 1,
+    "answers_question": "no",
+    "reason": "The assistant correctly identified that the provided code does not contain the logic for post-login behavior.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c48",
+   "category": "what-happens-when",
+   "question": "What happens in the UI after a password change succeeds in user settings?",
+   "standalone_question": "What happens in the UI after a password change succeeds in user settings?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "frontend/src/components/UserSettings/ChangePassword.tsx",
+     "start_line": 54,
+     "end_line": 62
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:41-67",
+     "score": 0.6896
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:128-144",
+     "score": 0.6707
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:69-98",
+     "score": 0.6654
+    },
+    {
+     "location": "frontend/src/components/UserSettings/ChangePassword.tsx:68-127",
+     "score": 0.6642
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:99-158",
+     "score": 0.6575
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:159-166",
+     "score": 0.6571
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.6562
+    },
+    {
+     "location": "backend/app/api/routes/users.py:103-121",
+     "score": 0.6553
+    },
+    {
+     "location": "release-notes.md:481-520",
+     "score": 0.6535
+    },
+    {
+     "location": "frontend/src/routes/recover-password.tsx:51-79",
+     "score": 0.6527
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.4,
+    "retrieval": 163.9,
+    "embed_query": 137.1,
+    "vector_search": 22.9,
+    "downweight": 3.6,
+    "generation": 3288.4
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "After a successful password change in the user settings, the application displays a success toast notification with the message \"Password updated successfully\" and resets the form fields.",
+   "citations": [
+    "frontend/src/components/UserSettings/ChangePassword.tsx:53-56"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the behavior defined in the onSuccess callback of the mutation in ChangePassword.tsx.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c51",
+   "category": "config",
+   "question": "How long is an access token valid by default?",
+   "standalone_question": "How long is an access token valid by default?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/core/config.py",
+     "start_line": 24,
+     "end_line": 25
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/security.py:22-26",
+     "score": 0.6747
+    },
+    {
+     "location": "backend/app/core/config.py:15-31",
+     "score": 0.6613
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.657
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.6559
+    },
+    {
+     "location": "backend/app/utils.py:105-115",
+     "score": 0.6355
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:14-16",
+     "score": 0.6281
+    },
+    {
+     "location": "backend/app/api/deps.py:30-46",
+     "score": 0.6263
+    },
+    {
+     "location": "backend/app/api/routes/login.py:77-97",
+     "score": 0.6161
+    },
+    {
+     "location": "packages/react-email/emails/reset_password.tsx:7-12",
+     "score": 0.6116
+    },
+    {
+     "location": ".github/workflows/pre-commit.yml:31-70",
+     "score": 0.6111
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 0.5
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 213.5,
+    "embed_query": 191.0,
+    "vector_search": 19.3,
+    "downweight": 3.0,
+    "generation": 2017.9
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "By default, an access token is valid for 8 days (calculated as 60 minutes * 24 hours * 8 days).",
+   "citations": [
+    "backend/app/core/config.py:22-22"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the default expiration time from the configuration file.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c52",
+   "category": "config",
+   "question": "How is the DATABASE_URL adjusted to use the psycopg driver?",
+   "standalone_question": "How is the DATABASE_URL adjusted to use the psycopg driver?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "backend/app/core/config.py",
+     "start_line": 33,
+     "end_line": 40
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "backend/app/core/config.py:33-40",
+     "score": 0.8582
+    },
+    {
+     "location": "backend/app/alembic/env.py:33-34",
+     "score": 0.7266
+    },
+    {
+     "location": ".env:1-18",
+     "score": 0.7
+    },
+    {
+     "location": "backend/app/core/db.py:1-12",
+     "score": 0.6942
+    },
+    {
+     "location": "backend/pyproject.toml:1-40",
+     "score": 0.6924
+    },
+    {
+     "location": "backend/README.md:91-130",
+     "score": 0.6826
+    },
+    {
+     "location": "backend/app/alembic/env.py:37-55",
+     "score": 0.6763
+    },
+    {
+     "location": "backend/app/api/deps.py:26-27",
+     "score": 0.6724
+    },
+    {
+     "location": "backend/app/api/deps.py:21-23",
+     "score": 0.6718
+    },
+    {
+     "location": "backend/app/alembic/env.py:58-80",
+     "score": 0.6708
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 1.2,
+    "retrieval": 182.8,
+    "embed_query": 153.1,
+    "vector_search": 25.6,
+    "downweight": 3.8,
+    "generation": 69.0
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The `DATABASE_URL` is adjusted by the `_use_psycopg_driver` method in `backend/app/core/config.py`. This method is a Pydantic field validator that checks if the URL starts with `postgres://` or `postgresql://` and replaces the scheme with `postgresql+psycopg://` to ensure the `psycopg` driver is used.",
+   "citations": [
+    "backend/app/core/config.py:33-40"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately describes the mechanism used to adjust the DATABASE_URL based on the provided code.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c54",
+   "category": "config",
+   "question": "Which ports does the local Mailpit mail catcher expose in development?",
+   "standalone_question": "Which ports does the local Mailpit mail catcher expose in development?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "compose.override.yml",
+     "start_line": 66,
+     "end_line": 75
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "compose.override.yml:31-70",
+     "score": 0.6373
+    },
+    {
+     "location": "development.md:61-100",
+     "score": 0.6356
+    },
+    {
+     "location": "compose.override.yml:61-100",
+     "score": 0.6258
+    },
+    {
+     "location": "release-notes.md:511-550",
+     "score": 0.6081
+    },
+    {
+     "location": "development.md:1-40",
+     "score": 0.6038
+    },
+    {
+     "location": "frontend/.dockerignore:1-2",
+     "score": 0.5903
+    },
+    {
+     "location": "backend/README.md:1-40",
+     "score": 0.5849
+    },
+    {
+     "location": "release-notes.md:61-100",
+     "score": 0.5823
+    },
+    {
+     "location": "release-notes.md:991-1020",
+     "score": 0.5764
+    },
+    {
+     "location": "compose.override.yml:1-40",
+     "score": 0.5756
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 1.0,
+    "hit_at_5": 1.0,
+    "recall_at_10": 1.0,
+    "mrr": 1.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 173.9,
+    "embed_query": 146.1,
+    "vector_search": 24.3,
+    "downweight": 3.1,
+    "generation": 1678.3
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "In development, the Mailpit service exposes ports `8025` (for the web interface) and `1025` (for SMTP traffic).",
+   "citations": [
+    "compose.override.yml:73-76"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 1,
+    "correct_citations": 1,
+    "precision": 1.0,
+    "any_correct": 1.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies the ports exposed by the Mailpit service as defined in the provided docker-compose configuration.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c56",
+   "category": "config",
+   "question": "Which environment variables does the backend container need in docker compose?",
+   "standalone_question": "Which environment variables does the backend container need in docker compose?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "compose.yml",
+     "start_line": 55,
+     "end_line": 65
+    }
+   ],
+   "retrieved": [
+    {
+     "location": "development.md:91-130",
+     "score": 0.8088
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.7804
+    },
+    {
+     "location": "backend/Dockerfile:31-65",
+     "score": 0.7584
+    },
+    {
+     "location": "deployment-docker-compose.md:61-100",
+     "score": 0.7579
+    },
+    {
+     "location": ".github/workflows/test-docker-compose.yml:1-29",
+     "score": 0.7533
+    },
+    {
+     "location": ".github/workflows/deploy-docker-compose.yml:31-41",
+     "score": 0.7503
+    },
+    {
+     "location": "development.md:61-100",
+     "score": 0.7501
+    },
+    {
+     "location": "compose.override.yml:31-70",
+     "score": 0.746
+    },
+    {
+     "location": "compose.override.yml:1-40",
+     "score": 0.7413
+    },
+    {
+     "location": "backend/README.md:1-40",
+     "score": 0.7352
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 163.3,
+    "embed_query": 136.1,
+    "vector_search": 23.4,
+    "downweight": 3.5,
+    "generation": 75.4
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The backend container uses environment variables defined in the `.env` file for configuration, which Docker Compose uses for variable interpolation. Additionally, in the local development environment defined in `compose.override.yml`, the backend container is explicitly configured with the following environment variables: `FASTAPI_ENV` set to \"development\", `SMTP_HOST` set to \"mailpit\", `SMTP_PORT` set to \"1025\", and `SMTP_TLS` set to \"false\".",
+   "citations": [
+    "development.md:91-92",
+    "compose.override.yml:55-58"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "citation_scores": {
+    "citation_count": 2,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies the source of environment variables and lists the specific variables defined in the provided compose.override.yml file.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "c58",
+   "category": "config",
+   "question": "How is the backend container health check configured in docker compose?",
+   "standalone_question": "How is the backend container health check configured in docker compose?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [
+    {
+     "path": "compose.yml",
+     "start_line": 67,
+     "end_line": 71
+    }
+   ],
+   "retrieved": [
+    {
+     "location": ".github/workflows/test-docker-compose.yml:1-29",
+     "score": 0.7828
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.7703
+    },
+    {
+     "location": "compose.override.yml:31-70",
+     "score": 0.7435
+    },
+    {
+     "location": ".github/workflows/deploy-docker-compose.yml:31-41",
+     "score": 0.7358
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.7272
+    },
+    {
+     "location": "README.md:1-40",
+     "score": 0.7174
+    },
+    {
+     "location": "compose.override.yml:1-40",
+     "score": 0.7171
+    },
+    {
+     "location": "development.md:61-100",
+     "score": 0.716
+    },
+    {
+     "location": "README.md:61-88",
+     "score": 0.7083
+    },
+    {
+     "location": "development.md:91-130",
+     "score": 0.7077
+    }
+   ],
+   "overview": [],
+   "retrieval": {
+    "hit_at_1": 0.0,
+    "hit_at_5": 0.0,
+    "recall_at_10": 0.0,
+    "mrr": 0.0
+   },
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 149.4,
+    "embed_query": 128.5,
+    "vector_search": 17.6,
+    "downweight": 3.0,
+    "generation": 55.9
+   },
+   "used_llm": true,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I don't know based on the indexed code. While the provided files show how to run, build, and test the backend using Docker Compose, they do not contain the specific `healthcheck` configuration for the backend container.\n\n**Closest files I found:** `.github/workflows/test-docker-compose.yml`, `backend/README.md`, `compose.override.yml`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "citation_scores": {
+    "citation_count": 0,
+    "correct_citations": 0,
+    "precision": 0.0,
+    "any_correct": 0.0
+   },
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "no",
+    "reason": "The provided context does not contain a healthcheck configuration for the backend container, so the assistant correctly stated it does not know.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "o01",
+   "category": "overview",
+   "question": "What does this repository do?",
+   "standalone_question": "What does this repository do?",
+   "rewrite_method": "unchanged",
+   "route": "overview",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": ".github/workflows/guard-dependencies.yml:1-40",
+     "score": 0.6575
+    },
+    {
+     "location": ".github/workflows/guard-dependencies.yml:31-52",
+     "score": 0.649
+    },
+    {
+     "location": ".github/workflows/pre-commit.yml:1-40",
+     "score": 0.6411
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.6402
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.6401
+    },
+    {
+     "location": "CONTRIBUTING.md:31-68",
+     "score": 0.6358
+    },
+    {
+     "location": ".github/workflows/pre-commit.yml:31-70",
+     "score": 0.6338
+    },
+    {
+     "location": "release-notes.md:541-580",
+     "score": 0.6288
+    },
+    {
+     "location": ".github/workflows/pre-commit.yml:91-114",
+     "score": 0.6278
+    },
+    {
+     "location": "backend/README.md:91-130",
+     "score": 0.6275
+    }
+   ],
+   "overview": [
+    {
+     "location": "@overview/structure:1-60",
+     "score": 0.6976
+    },
+    {
+     "location": "@overview/repository:1-3",
+     "score": 0.652
+    },
+    {
+     "location": "@overview/structure:61-120",
+     "score": 0.6384
+    }
+   ],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.1,
+    "retrieval": 168.2,
+    "embed_query": 134.1,
+    "vector_search": 30.0,
+    "downweight": 3.8,
+    "overview_embed": 118.0,
+    "overview_search": 22.0,
+    "generation": 3270.0
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "This repository is a full-stack template project that provides a FastAPI and SQLModel Python backend alongside a React and TypeScript frontend. It includes support for PostgreSQL database integration, JWT authentication, and automated testing tools such as Pytest and Playwright. The project is configured for development with Docker Compose, including local settings for source synchronization and automatic image rebuilds, and includes VS Code configurations for debugging and testing.",
+   "citations": [
+    "backend/README.md:31-70"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately summarizes the repository based on the provided context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "o02",
+   "category": "overview",
+   "question": "What is the tech stack of this project?",
+   "standalone_question": "What is the tech stack of this project?",
+   "rewrite_method": "unchanged",
+   "route": "overview",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "README.md:1-40",
+     "score": 0.6283
+    },
+    {
+     "location": "frontend/playwright.config.ts:1-60",
+     "score": 0.6225
+    },
+    {
+     "location": ".agents/skills/library-skills/SKILL.md:1-37",
+     "score": 0.6201
+    },
+    {
+     "location": "frontend/README.md:1-40",
+     "score": 0.6173
+    },
+    {
+     "location": ".claude/skills/library-skills/SKILL.md:1-37",
+     "score": 0.6141
+    },
+    {
+     "location": "CONTRIBUTING.md:1-40",
+     "score": 0.6124
+    },
+    {
+     "location": ".github/workflows/playwright.yml:61-100",
+     "score": 0.6074
+    },
+    {
+     "location": "release-notes.md:271-310",
+     "score": 0.6065
+    },
+    {
+     "location": "backend/README.md:1-40",
+     "score": 0.602
+    },
+    {
+     "location": "release-notes.md:451-490",
+     "score": 0.5986
+    }
+   ],
+   "overview": [
+    {
+     "location": "@overview/repository:1-3",
+     "score": 0.655
+    },
+    {
+     "location": "README.md:1-80",
+     "score": 0.6239
+    },
+    {
+     "location": "@overview/folder/root:1-4",
+     "score": 0.6113
+    }
+   ],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.1,
+    "retrieval": 180.7,
+    "embed_query": 150.2,
+    "vector_search": 27.8,
+    "downweight": 2.4,
+    "overview_embed": 107.1,
+    "overview_search": 7.6,
+    "generation": 3220.1
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "The project is a full-stack template with the following technology stack:\n\n* **Backend**: FastAPI (Python) with SQLModel for ORM, Pydantic for data validation, and PostgreSQL as the database.\n* **Frontend**: React, TypeScript, Vite, Tailwind CSS, and shadcn/ui. The frontend is built into the backend application and served by FastAPI.\n* **Authentication**: JWT (JSON Web Token) with secure password hashing.\n* **Testing**: Pytest for backend testing and Playwright for end-to-end frontend testing.\n* **Infrastructure & Deployment**: Docker Compose for local services and self-hosted deployment, Traefik as a reverse proxy, and GitHub Actions for CI/CD. It also supports FastAPI Cloud for deployment.\n* **Development Tools**: Mailpit for local email testing and React Email for email templates.",
+   "citations": [
+    "README.md:7-32"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately summarizes the technology stack described in the provided context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "o03",
+   "category": "overview",
+   "question": "How is the project structured into folders?",
+   "standalone_question": "How is the project structured into folders?",
+   "rewrite_method": "unchanged",
+   "route": "overview",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "development.md:31-70",
+     "score": 0.6328
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.6297
+    },
+    {
+     "location": "development.md:91-130",
+     "score": 0.6265
+    },
+    {
+     "location": "frontend/src/components/ui/separator.tsx:26-26",
+     "score": 0.6262
+    },
+    {
+     "location": "release-notes.md:841-880",
+     "score": 0.6223
+    },
+    {
+     "location": "frontend/biome.json:1-40",
+     "score": 0.6217
+    },
+    {
+     "location": "package.json:1-16",
+     "score": 0.6186
+    },
+    {
+     "location": "frontend/src/components/ui/skeleton.tsx:13-13",
+     "score": 0.6165
+    },
+    {
+     "location": "development.md:121-138",
+     "score": 0.6157
+    },
+    {
+     "location": ".github/pr-push.yml:1-2",
+     "score": 0.613
+    }
+   ],
+   "overview": [
+    {
+     "location": "@overview/structure:1-60",
+     "score": 0.693
+    },
+    {
+     "location": "@overview/folder/.github/workflows:1-1",
+     "score": 0.6911
+    },
+    {
+     "location": "@overview/folder/.github:1-1",
+     "score": 0.6873
+    }
+   ],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 1.6,
+    "retrieval": 149.5,
+    "embed_query": 123.4,
+    "vector_search": 22.8,
+    "downweight": 3.0,
+    "overview_embed": 114.6,
+    "overview_search": 7.1,
+    "generation": 4250.6
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "The project is structured into several main directories:\n\n* `.agents/` and `.claude/`: Contain agent-related skills and configurations.\n* `.github/`: Contains CI/CD workflows, GitHub Actions, and project management configurations.\n* `.vscode/`: Contains VS Code specific configurations.\n* `backend/`: Contains the FastAPI backend application, including database models, API routes, CRUD utilities, tests, and scripts for development and testing.\n* `frontend/`: Contains the frontend application code.",
+   "citations": [],
+   "invalid_citations": 1,
+   "declined": false,
+   "judge": {
+    "faithfulness": 4,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer correctly identifies the project structure based on the provided context, with a minor note that the 'frontend/' folder is referenced in documentation rather than the explicit file tree overview.",
+    "unsupported": [
+     "The context does not explicitly show a 'frontend/' directory in the file structure overview, although it is referenced in documentation snippets."
+    ]
+   }
+  },
+  {
+   "id": "o04",
+   "category": "overview",
+   "question": "What are the main components of the backend?",
+   "standalone_question": "What are the main components of the backend?",
+   "rewrite_method": "unchanged",
+   "route": "overview",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "development.md:31-70",
+     "score": 0.6722
+    },
+    {
+     "location": "frontend/src/components/Sidebar/Main.tsx:19-21",
+     "score": 0.6651
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.6578
+    },
+    {
+     "location": "backend/README.md:121-145",
+     "score": 0.6562
+    },
+    {
+     "location": "frontend/components.json:1-22",
+     "score": 0.6528
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.6498
+    },
+    {
+     "location": "backend/README.md:1-40",
+     "score": 0.6429
+    },
+    {
+     "location": "frontend/README.md:1-40",
+     "score": 0.639
+    },
+    {
+     "location": "frontend/README.md:31-70",
+     "score": 0.6336
+    },
+    {
+     "location": "README.md:31-70",
+     "score": 0.6309
+    }
+   ],
+   "overview": [
+    {
+     "location": "@overview/folder/frontend/src/components:1-7",
+     "score": 0.7154
+    },
+    {
+     "location": "@overview/folder/backend/app/core:1-3",
+     "score": 0.7043
+    },
+    {
+     "location": "@overview/folder/frontend/src/components/ui:1-12",
+     "score": 0.6891
+    }
+   ],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 151.9,
+    "embed_query": 122.7,
+    "vector_search": 26.6,
+    "downweight": 2.3,
+    "overview_embed": 114.4,
+    "overview_search": 7.4,
+    "generation": 5040.3
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The backend is structured to handle application configuration, database connections, and security utilities. Key components include:\n\n- **Configuration**: `backend/app/core/config.py` manages application settings and environment variables using Pydantic BaseSettings.\n- **Security**: `backend/app/core/security.py` handles password hashing (Argon2 and Bcrypt) and JWT token creation.\n- **Data and API**: Models are defined in `backend/app/models.py`, API endpoints in `backend/app/api/`, and CRUD operations in `backend/app/crud.py`.\n- **Migrations**: Database migrations are managed using Alembic, with revision files located in `backend/app/alembic/versions/`.\n- **Email Templates**: Email templates are generated from React Email components located in `./packages/react-email/`, with the final HTML output stored in `backend/app/email-templates/`.",
+   "citations": [
+    "backend/README.md:31-31",
+    "backend/README.md:121-125",
+    "backend/README.md:131-145"
+   ],
+   "invalid_citations": 2,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately summarizes the backend components based on the provided documentation.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "o05",
+   "category": "overview",
+   "question": "How is the frontend organized?",
+   "standalone_question": "How is the frontend organized?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "frontend/README.md:1-40",
+     "score": 0.6868
+    },
+    {
+     "location": "development.md:31-70",
+     "score": 0.6822
+    },
+    {
+     "location": "frontend/README.md:31-70",
+     "score": 0.6553
+    },
+    {
+     "location": "frontend/components.json:1-22",
+     "score": 0.6437
+    },
+    {
+     "location": "frontend/src/routes/_layout/admin.tsx:20-37",
+     "score": 0.6424
+    },
+    {
+     "location": "frontend/README.md:61-100",
+     "score": 0.6404
+    },
+    {
+     "location": "frontend/src/routes/_layout/items.tsx:20-29",
+     "score": 0.635
+    },
+    {
+     "location": "frontend/src/routes/_layout/index.tsx:1-14",
+     "score": 0.633
+    },
+    {
+     "location": "frontend/src/components/Sidebar/Main.tsx:19-21",
+     "score": 0.6326
+    },
+    {
+     "location": "README.md:31-70",
+     "score": 0.6317
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 165.8,
+    "embed_query": 142.8,
+    "vector_search": 19.1,
+    "downweight": 3.6,
+    "generation": 60.2
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The frontend code is organized within the `frontend/src` directory, with the following structure:\n\n* `frontend/src`: Main frontend code.\n* `frontend/public`: Static assets.\n* `frontend/src/client`: Generated OpenAPI client.\n* `frontend/src/components`: Frontend components, including `shadcn/ui` components in `frontend/src/components/ui`.\n* `frontend/src/hooks`: Custom hooks.\n* `frontend/src/lib`: Shared frontend utilities.\n* `frontend/src/routes`: Frontend routes and pages.",
+   "citations": [
+    "frontend/README.md:81-89"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately summarizes the frontend directory structure as described in the provided documentation.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "o06",
+   "category": "overview",
+   "question": "Give me an overview of how authentication works across the backend and frontend.",
+   "standalone_question": "Give me an overview of how authentication works across the backend and frontend.",
+   "rewrite_method": "unchanged",
+   "route": "overview",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/login.py:45-50",
+     "score": 0.6616
+    },
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.655
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:60-81",
+     "score": 0.6532
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:18-67",
+     "score": 0.6531
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:130-142",
+     "score": 0.6511
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.6491
+    },
+    {
+     "location": "frontend/src/routes/login.tsx:53-69",
+     "score": 0.6475
+    },
+    {
+     "location": "frontend/src/routes/signup.tsx:142-187",
+     "score": 0.6446
+    },
+    {
+     "location": "frontend/src/hooks/useAuth.ts:1-12",
+     "score": 0.6404
+    },
+    {
+     "location": "frontend/src/routes/reset-password.tsx:1-45",
+     "score": 0.6397
+    }
+   ],
+   "overview": [
+    {
+     "location": "@overview/folder/frontend/src/routes:1-7",
+     "score": 0.6957
+    },
+    {
+     "location": "@overview/folder/backend/app/core:1-3",
+     "score": 0.6802
+    },
+    {
+     "location": "@overview/folder/backend/app/api/routes:1-4",
+     "score": 0.6721
+    }
+   ],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 155.1,
+    "embed_query": 134.7,
+    "vector_search": 17.8,
+    "downweight": 2.3,
+    "overview_embed": 113.3,
+    "overview_search": 7.4,
+    "generation": 2225.0
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "Authentication in the application is handled through a combination of JWT-based access tokens and user management services. \n\n- **Backend**: The `backend/app/api/routes/login.py` module handles OAuth2 access token generation. Password verification is performed using `backend/app/core/security.py` (utilizing Argon2/Bcrypt), and the `backend/app/crud.py` module ensures secure authentication by preventing timing attacks during password verification. The `test-token` endpoint allows for validating current user sessions.\n- **Frontend**: The `useAuth` hook manages authentication state. It uses `LoginService` to obtain and store JWT access tokens in `localStorage`. It also provides mutations for logging in and signing up, and handles user registration via `UsersService`. Protected routes and navigation are managed based on the presence of these tokens and the current user's session state.",
+   "citations": [
+    "backend/app/api/routes/login.py:45-50",
+    "backend/app/crud.py:45-60",
+    "frontend/src/hooks/useAuth.ts:18-67"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "judge": {
+    "faithfulness": 4,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer is accurate, but it makes a minor unsupported claim about how protected routes are managed, as the provided context only mentions the existence of routes and the useAuth hook, not the specific implementation logic for route protection.",
+    "unsupported": [
+     "Protected routes and navigation are managed based on the presence of these tokens and the current user's session state."
+    ]
+   }
+  },
+  {
+   "id": "o07",
+   "category": "overview",
+   "question": "What is the architecture of the Docker Compose deployment setup?",
+   "standalone_question": "What is the architecture of the Docker Compose deployment setup?",
+   "rewrite_method": "unchanged",
+   "route": "overview",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "deployment-docker-compose.md:61-100",
+     "score": 0.7977
+    },
+    {
+     "location": ".github/workflows/deploy-docker-compose.yml:1-40",
+     "score": 0.762
+    },
+    {
+     "location": "deployment-docker-compose.md:1-40",
+     "score": 0.7556
+    },
+    {
+     "location": "deployment-docker-compose.md:91-129",
+     "score": 0.7528
+    },
+    {
+     "location": "development.md:91-130",
+     "score": 0.7516
+    },
+    {
+     "location": "deployment-docker-compose.md:31-70",
+     "score": 0.7492
+    },
+    {
+     "location": ".github/workflows/deploy-docker-compose.yml:31-41",
+     "score": 0.7482
+    },
+    {
+     "location": "README.md:61-88",
+     "score": 0.74
+    },
+    {
+     "location": ".github/dependabot.yml:61-77",
+     "score": 0.7365
+    },
+    {
+     "location": "compose.override.yml:31-70",
+     "score": 0.7293
+    }
+   ],
+   "overview": [
+    {
+     "location": "@overview/folder/root:1-4",
+     "score": 0.7845
+    },
+    {
+     "location": "@overview/repository:1-3",
+     "score": 0.6949
+    },
+    {
+     "location": "@overview/structure:1-60",
+     "score": 0.6896
+    }
+   ],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 158.8,
+    "embed_query": 123.1,
+    "vector_search": 31.8,
+    "downweight": 3.5,
+    "overview_embed": 112.5,
+    "overview_search": 7.3,
+    "generation": 4278.4
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The Docker Compose deployment architecture uses a multi-container setup managed by `compose.yml` and `compose.deploy.yml`. It includes a Traefik proxy to handle HTTPS and route traffic to the application services, a PostgreSQL database, and an Adminer interface for database management. The backend Docker image is designed to build the frontend internally, eliminating the need for external Bun or prebuilt frontend files on the server. Deployment can be automated via a GitHub Actions workflow that utilizes a self-hosted runner on the target server to execute Docker Compose commands.",
+   "citations": [
+    "deployment-docker-compose.md:1-4",
+    "deployment-docker-compose.md:61-62",
+    ".github/workflows/deploy-docker-compose.yml:14-39"
+   ],
+   "invalid_citations": 1,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately summarizes the architecture described in the provided documentation.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "o08",
+   "category": "overview",
+   "question": "Which database and ORM does the project use?",
+   "standalone_question": "Which database and ORM does the project use?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "backend/app/models.py:69-72",
+     "score": 0.6438
+    },
+    {
+     "location": "backend/README.md:1-40",
+     "score": 0.6421
+    },
+    {
+     "location": "backend/app/core/db.py:15-33",
+     "score": 0.6371
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.6371
+    },
+    {
+     "location": "backend/app/core/db.py:1-12",
+     "score": 0.6294
+    },
+    {
+     "location": "backend/app/models.py:86-93",
+     "score": 0.6284
+    },
+    {
+     "location": "README.md:1-40",
+     "score": 0.6283
+    },
+    {
+     "location": "development.md:1-40",
+     "score": 0.6267
+    },
+    {
+     "location": "backend/app/models.py:64-66",
+     "score": 0.6256
+    },
+    {
+     "location": "backend/app/alembic/env.py:58-80",
+     "score": 0.6248
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 177.7,
+    "embed_query": 137.7,
+    "vector_search": 36.0,
+    "downweight": 3.6,
+    "generation": 76.7
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The project uses **PostgreSQL** as the SQL database and **SQLModel** for Python SQL database interactions (ORM).",
+   "citations": [
+    "README.md:8-9"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies the database and ORM based on the provided documentation.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "o09",
+   "category": "overview",
+   "question": "Where should I start reading to understand the backend?",
+   "standalone_question": "Where should I start reading to understand the backend?",
+   "rewrite_method": "unchanged",
+   "route": "overview",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.6438
+    },
+    {
+     "location": "development.md:31-70",
+     "score": 0.632
+    },
+    {
+     "location": "backend/README.md:61-100",
+     "score": 0.6316
+    },
+    {
+     "location": "backend/README.md:1-40",
+     "score": 0.6265
+    },
+    {
+     "location": "README.md:61-88",
+     "score": 0.6244
+    },
+    {
+     "location": "frontend/README.md:31-70",
+     "score": 0.618
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.6084
+    },
+    {
+     "location": "frontend/README.md:1-40",
+     "score": 0.5982
+    },
+    {
+     "location": "frontend/README.md:91-123",
+     "score": 0.5963
+    },
+    {
+     "location": "backend/README.md:91-130",
+     "score": 0.5948
+    }
+   ],
+   "overview": [
+    {
+     "location": "@overview/folder/backend:1-3",
+     "score": 0.627
+    },
+    {
+     "location": "@overview/folder/backend/scripts:1-1",
+     "score": 0.6204
+    },
+    {
+     "location": "@overview/folder/backend/app:1-6",
+     "score": 0.6164
+    }
+   ],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 161.1,
+    "embed_query": 140.1,
+    "vector_search": 16.9,
+    "downweight": 3.8,
+    "overview_embed": 113.0,
+    "overview_search": 7.1,
+    "generation": 3057.7
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "To understand the backend, you should start by reading the `backend/README.md` file, which provides an overview of the requirements, local development workflow, testing procedures, and database migration processes. Additionally, the `backend/app/` directory contains the core application logic, including API routes, database models, and CRUD operations.",
+   "citations": [
+    "backend/README.md:1-100"
+   ],
+   "invalid_citations": 1,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer provides a clear and accurate starting point for understanding the backend based on the provided documentation.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "o10",
+   "category": "overview",
+   "question": "What testing tools and test suites does the project include?",
+   "standalone_question": "What testing tools and test suites does the project include?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "release-notes.md:601-640",
+     "score": 0.6969
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:1-40",
+     "score": 0.6955
+    },
+    {
+     "location": "backend/README.md:31-70",
+     "score": 0.6872
+    },
+    {
+     "location": "release-notes.md:901-940",
+     "score": 0.6815
+    },
+    {
+     "location": "frontend/tsconfig.build.json:1-4",
+     "score": 0.6811
+    },
+    {
+     "location": ".github/workflows/test-backend.yml:31-45",
+     "score": 0.677
+    },
+    {
+     "location": "packages/react-email/emails/test_email.tsx:6-9",
+     "score": 0.6729
+    },
+    {
+     "location": "backend/README.md:61-100",
+     "score": 0.6719
+    },
+    {
+     "location": "frontend/playwright.config.ts:1-60",
+     "score": 0.6708
+    },
+    {
+     "location": "README.md:1-40",
+     "score": 0.6708
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 26.8,
+    "retrieval": 149.3,
+    "embed_query": 122.5,
+    "vector_search": 24.1,
+    "downweight": 2.5,
+    "generation": 5631.4
+   },
+   "used_llm": true,
+   "refused": false,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "medium",
+   "answer": "The project uses **Pytest** for backend testing, which can be executed via `scripts/test.sh` or `scripts/tests-start.sh`. For frontend and end-to-end (e2e) testing, the project includes **Playwright**. Test coverage is generated and reported, with a requirement to maintain at least 90% coverage.",
+   "citations": [
+    "release-notes.md:605-610",
+    "backend/README.md:64-64",
+    "backend/README.md:75-75",
+    "backend/README.md:85-85",
+    ".github/workflows/test-backend.yml:39-40"
+   ],
+   "invalid_citations": 0,
+   "declined": false,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "fully",
+    "reason": "The answer accurately identifies the testing tools (Pytest, Playwright) and test-related configurations mentioned in the provided context.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "u01",
+   "category": "unanswerable",
+   "question": "How does the app process Stripe payments for paid plans?",
+   "standalone_question": "How does the app process Stripe payments for paid plans?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": ".github/workflows/bump-pre-commit-hooks.yml:1-40",
+     "score": 0.5647
+    },
+    {
+     "location": ".github/workflows/playwright.yml:1-40",
+     "score": 0.5452
+    },
+    {
+     "location": ".github/workflows/bump-pre-commit-hooks.yml:31-70",
+     "score": 0.5389
+    },
+    {
+     "location": "frontend/src/components/ui/card.tsx:84-92",
+     "score": 0.537
+    },
+    {
+     "location": "release-notes.md:271-310",
+     "score": 0.532
+    },
+    {
+     "location": ".github/workflows/pre-commit.yml:1-40",
+     "score": 0.5318
+    },
+    {
+     "location": ".github/workflows/guard-dependencies.yml:1-40",
+     "score": 0.5311
+    },
+    {
+     "location": "release-notes.md:31-70",
+     "score": 0.5285
+    },
+    {
+     "location": "release-notes.md:181-220",
+     "score": 0.5279
+    },
+    {
+     "location": "backend/app/api/routes/users.py:32-51",
+     "score": 0.5272
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 159.5,
+    "embed_query": 134.1,
+    "vector_search": 21.9,
+    "downweight": 3.3
+   },
+   "used_llm": false,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I couldn't find code in this repository that answers that question.\n\n**Closest files I found:** `.github/workflows/bump-pre-commit-hooks.yml`, `.github/workflows/playwright.yml`, `frontend/src/components/ui/card.tsx`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "no",
+    "reason": "The provided context does not contain any information regarding Stripe payment processing, so the assistant correctly stated it could not find the answer.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "u02",
+   "category": "unanswerable",
+   "question": "Where are real-time WebSocket notifications pushed to connected clients?",
+   "standalone_question": "Where are real-time WebSocket notifications pushed to connected clients?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "development.md:61-100",
+     "score": 0.6112
+    },
+    {
+     "location": "release-notes.md:271-310",
+     "score": 0.6031
+    },
+    {
+     "location": "frontend/src/components/Pending/PendingUsers.tsx:11-51",
+     "score": 0.5959
+    },
+    {
+     "location": "frontend/src/components/Pending/PendingUsers.tsx:53-53",
+     "score": 0.5916
+    },
+    {
+     "location": "frontend/README.md:61-100",
+     "score": 0.5896
+    },
+    {
+     "location": "release-notes.md:331-370",
+     "score": 0.5891
+    },
+    {
+     "location": "frontend/src/client/core/serverSentEvents.gen.ts:219-238",
+     "score": 0.5818
+    },
+    {
+     "location": "frontend/src/client/core/serverSentEvents.gen.ts:239-242",
+     "score": 0.5764
+    },
+    {
+     "location": "frontend/src/client/core/serverSentEvents.gen.ts:82-98",
+     "score": 0.5718
+    },
+    {
+     "location": "frontend/src/client/core/serverSentEvents.gen.ts:5-64",
+     "score": 0.5708
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 163.5,
+    "embed_query": 140.2,
+    "vector_search": 21.9,
+    "downweight": 1.1,
+    "generation": 3859.0
+   },
+   "used_llm": true,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I don't know based on the indexed code. The provided files contain information about Server-Sent Events (SSE) retry logic in `frontend/src/client/core/serverSentEvents.gen.ts`, but there is no mention of WebSocket implementation or notification pushing mechanisms.\n\n**Closest files I found:** `development.md`, `release-notes.md`, `frontend/src/components/Pending/PendingUsers.tsx`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "no",
+    "reason": "The provided context does not contain information about WebSocket notifications, and the assistant correctly identified this limitation.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "u03",
+   "category": "unanswerable",
+   "question": "How is the Redis cache invalidated when an item is updated?",
+   "standalone_question": "How is the Redis cache invalidated when an item is updated?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "backend/app/api/routes/items.py:75-96",
+     "score": 0.712
+    },
+    {
+     "location": "frontend/src/components/Items/EditItem.tsx:45-77",
+     "score": 0.6946
+    },
+    {
+     "location": "frontend/src/components/Items/AddItem.tsx:40-71",
+     "score": 0.689
+    },
+    {
+     "location": "frontend/src/components/Items/DeleteItem.tsx:27-53",
+     "score": 0.6753
+    },
+    {
+     "location": "backend/app/api/routes/items.py:61-72",
+     "score": 0.6746
+    },
+    {
+     "location": ".gitignore:1-8",
+     "score": 0.674
+    },
+    {
+     "location": "backend/app/crud.py:63-68",
+     "score": 0.6657
+    },
+    {
+     "location": "backend/app/alembic/script.py.mako:1-25",
+     "score": 0.6638
+    },
+    {
+     "location": "frontend/package.json:1-40",
+     "score": 0.6587
+    },
+    {
+     "location": ".agents/skills/library-skills/.library-skills.json:1-4",
+     "score": 0.657
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 172.6,
+    "embed_query": 150.0,
+    "vector_search": 19.7,
+    "downweight": 2.6,
+    "generation": 3307.9
+   },
+   "used_llm": true,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I don't know based on the indexed code. The provided files do not contain any references to Redis or cache invalidation logic related to Redis; the `update_item` function in `backend/app/api/routes/items.py` only performs database operations using SQLAlchemy/SQLModel.\n\n**Closest files I found:** `backend/app/api/routes/items.py`, `frontend/src/components/Items/EditItem.tsx`, `frontend/src/components/Items/AddItem.tsx`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "no",
+    "reason": "The provided code does not contain any implementation of Redis or server-side cache invalidation.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "u04",
+   "category": "unanswerable",
+   "question": "How are two-factor authentication TOTP codes verified at login?",
+   "standalone_question": "How are two-factor authentication TOTP codes verified at login?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "backend/app/crud.py:45-60",
+     "score": 0.6463
+    },
+    {
+     "location": "backend/app/utils.py:118-125",
+     "score": 0.6294
+    },
+    {
+     "location": "backend/app/api/routes/private.py:16-20",
+     "score": 0.628
+    },
+    {
+     "location": "backend/app/core/security.py:29-32",
+     "score": 0.6269
+    },
+    {
+     "location": "backend/app/api/routes/login.py:23-42",
+     "score": 0.6178
+    },
+    {
+     "location": "backend/app/core/config.py:79-88",
+     "score": 0.6124
+    },
+    {
+     "location": "backend/app/api/deps.py:1-18",
+     "score": 0.6097
+    },
+    {
+     "location": "backend/tests/crud/test_user.py:96-130",
+     "score": 0.5738
+    },
+    {
+     "location": "frontend/tests/sign-up.spec.ts:27-86",
+     "score": 0.5625
+    },
+    {
+     "location": "frontend/tests/sign-up.spec.ts:20-25",
+     "score": 0.5596
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.3,
+    "retrieval": 177.1,
+    "embed_query": 152.0,
+    "vector_search": 21.4,
+    "downweight": 3.3,
+    "generation": 2824.3
+   },
+   "used_llm": true,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I don't know based on the indexed code. The provided files describe standard email/password authentication, password hash upgrades, and JWT token generation, but there is no mention of TOTP (Time-based One-Time Password) verification logic.\n\n**Closest files I found:** `backend/app/crud.py`, `backend/app/utils.py`, `backend/app/api/routes/private.py`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "no",
+    "reason": "The provided code does not contain any implementation or reference to TOTP authentication, so the assistant correctly identified that it could not answer the question.",
+    "unsupported": []
+   }
+  },
+  {
+   "id": "u05",
+   "category": "unanswerable",
+   "question": "Where is the GraphQL schema for items defined?",
+   "standalone_question": "Where is the GraphQL schema for items defined?",
+   "rewrite_method": "unchanged",
+   "route": "code",
+   "route_method": "rule",
+   "expected": [],
+   "retrieved": [
+    {
+     "location": "backend/app/models.py:86-93",
+     "score": 0.7094
+    },
+    {
+     "location": "backend/app/models.py:69-72",
+     "score": 0.6971
+    },
+    {
+     "location": "frontend/src/routes/_layout/items.tsx:12-18",
+     "score": 0.6954
+    },
+    {
+     "location": "frontend/src/components/Items/EditItem.tsx:38-38",
+     "score": 0.6913
+    },
+    {
+     "location": "frontend/src/components/Items/AddItem.tsx:38-38",
+     "score": 0.69
+    },
+    {
+     "location": "backend/app/models.py:96-100",
+     "score": 0.6836
+    },
+    {
+     "location": "backend/app/models.py:103-105",
+     "score": 0.6805
+    },
+    {
+     "location": "backend/app/models.py:80-83",
+     "score": 0.6798
+    },
+    {
+     "location": "frontend/src/components/Items/ItemActionsMenu.tsx:14-16",
+     "score": 0.6791
+    },
+    {
+     "location": "frontend/src/client/types.gen.ts:834-844",
+     "score": 0.6632
+    }
+   ],
+   "overview": [],
+   "retrieval": null,
+   "latency_ms": {
+    "rewrite": 0.0,
+    "routing": 0.2,
+    "retrieval": 173.2,
+    "embed_query": 146.1,
+    "vector_search": 25.1,
+    "downweight": 1.7,
+    "generation": 3318.7
+   },
+   "used_llm": true,
+   "refused": true,
+   "self_check": {
+    "ran": false,
+    "supported": 0,
+    "unsupported": [],
+    "action": "none"
+   },
+   "confidence": "low",
+   "answer": "I don't know based on the indexed code. The provided files define SQLModel classes for database models and API schemas, but there is no mention of a GraphQL schema definition.\n\n**Closest files I found:** `backend/app/models.py`, `frontend/src/routes/_layout/items.tsx`, `frontend/src/components/Items/EditItem.tsx`\n\n**Questions that work for this repository:**\n- What is the overall architecture of this full stack FastAPI and React template?\n- How does backend/app/api/routes/items.py handle listing and creating items?\n- How does backend/app/core/security.py handle password hashing and JWT token creation?",
+   "citations": [],
+   "invalid_citations": 0,
+   "declined": true,
+   "judge": {
+    "faithfulness": 5,
+    "relevance": 5,
+    "answers_question": "no",
+    "reason": "The provided context does not contain a GraphQL schema, so the assistant correctly identified that it could not answer the question.",
+    "unsupported": []
+   }
+  }
+ ]
+}

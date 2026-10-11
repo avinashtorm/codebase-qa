@@ -126,6 +126,25 @@ answers.
 | 10 | Metadata filters (folder and language from the sidebar) | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | unchanged without a filter; with the answer's top-level folder selected ("oracle" filter): Hit@5 **0.857**, Recall@10 **0.862**, MRR 0.694 |
 | 11 | Streaming answers (`POST /ask/stream`, NDJSON) with validation after the stream | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | same generation call and JSON schema, so quality is unchanged; first text after ~2.3 s instead of the full ~4.6 s answer, citations and badge when the stream completes |
 
+**Before and after each part** (50 dev questions: the 35 code questions plus 10 overview and 5 unanswerable;
+`gemini-3.1-flash-lite` as generator and judge, see the note below). Retrieval and citation metrics use the 35 questions
+with expected locations; refusal accuracy uses all 50 (refuse exactly the unanswerable ones); faithfulness (1-5) is
+judged on answers that were not refusals, relevance (1-5) on answerable questions, with a fixed rubric
+([eval/judge.py](eval/judge.py)).
+
+| Configuration | Hit@1 | Hit@5 | Recall@10 | MRR | Citation precision | Answers with a correct citation | Refusal accuracy | Faithfulness | Relevance |
+|---|---|---|---|---|---|---|---|---|---|
+| Before Part A (v2 features off) | 0.571 | 0.714 | 0.767 | 0.651 | 0.700 | 0.771 | 0.96 | 4.93 | 4.84 |
+| After Part A (overview, routing, refusals, hygiene, follow-ups) | 0.571 | **0.829** | **0.805** | **0.678** | 0.710 | 0.829 | 0.94 | 4.95 | 4.89 |
+| After Part B (+ call context, self-check; expansion and parent context off) | 0.571 | **0.829** | **0.805** | **0.678** | 0.698 | **0.857** | 0.94 | **4.98** | **4.98** |
+
+Notes: the Gemini free daily quota for `gemini-3.5-flash-lite` (the production model, used for steps 0-11) ran out
+during step 12, so these three runs were repeated on `gemini-3.1-flash-lite`, which has its own quota; all three rows
+use the same model. On 3.5-flash-lite, the first two rows were 0.92 / 4.98 / 4.73 and 0.92 / 5.00 / 4.67 (refusal
+accuracy / faithfulness / relevance). The lite judge is lenient, so faithfulness sits near the ceiling; relevance and
+refusal accuracy move more. Part A's refusal accuracy dips because one more answerable question gets a "not found"
+answer; Part B's self-check removed unsupported claims from 5 of 45 cited answers.
+
 ## Running it locally
 
 Requirements: Python 3.11 ([uv](https://docs.astral.sh/uv/) recommended), git, and a Google AI Studio API key for
