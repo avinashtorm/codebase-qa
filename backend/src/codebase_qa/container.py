@@ -7,6 +7,7 @@ from codebase_qa.chunking.factory import build_chunker
 from codebase_qa.config import Settings
 from codebase_qa.context.builder import ContextBuilder
 from codebase_qa.context.catalog import ChunkCatalog, LineReader
+from codebase_qa.generation.confidence import ConfidencePolicy
 from codebase_qa.generation.generator import LLMGenerator
 from codebase_qa.generation.llm import OfflineLLM
 from codebase_qa.generation.selfcheck import SelfChecker
@@ -242,6 +243,10 @@ class Container:
             rewriter=FollowUpRewriter(self.llm) if self.settings.followup_rewrite else None,
             context_builder=self.context_builder(record),
             self_checker=SelfChecker(self.llm, self.settings.self_check_action) if self.settings.self_check else None,
+            confidence_policy=ConfidencePolicy(
+                high_score=self.settings.confidence_high_score,
+                low_score=self.settings.min_vector_score + self.settings.confidence_low_margin,
+            ),
         )
 
     def context_builder(self, record: RepoRecord) -> ContextBuilder | None:

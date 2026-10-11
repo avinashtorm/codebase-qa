@@ -160,6 +160,8 @@ class AskResponse(BaseModel):
     suggestions: list[str]
     standalone_question: str
     self_check: SelfCheckOut
+    confidence: str
+    confidence_reasons: list[str]
 
     @classmethod
     def from_result(cls, result: AskResult, commit_sha: str) -> "AskResponse":
@@ -196,6 +198,8 @@ class AskResponse(BaseModel):
             refused=result.refused,
             suggestions=result.suggestions,
             standalone_question=result.question,
+            confidence=result.confidence.level,
+            confidence_reasons=result.confidence.reasons,
             self_check=SelfCheckOut(
                 ran=result.self_check.ran,
                 supported=result.self_check.supported,

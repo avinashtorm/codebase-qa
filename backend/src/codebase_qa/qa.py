@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field, replace
 
 from codebase_qa.context.builder import ContextBuilder
+from codebase_qa.generation.confidence import Confidence, ConfidencePolicy, assess
 from codebase_qa.generation.grounding import is_low_relevance, validate_citations
 from codebase_qa.generation.refusal import NOT_FOUND_LEAD, closest_files, helpful_text, is_unknown, pick_suggestions
 from codebase_qa.generation.selfcheck import SKIPPED, SelfCheck, SelfChecker
@@ -34,6 +35,7 @@ class AskResult:
     suggestions: list[str] = field(default_factory=list)
     question: str = ""
     self_check: SelfCheck = SKIPPED
+    confidence: Confidence = Confidence("low")
 
 
 class QAPipeline:
@@ -51,6 +53,7 @@ class QAPipeline:
         rewriter: FollowUpRewriter | None = None,
         context_builder: ContextBuilder | None = None,
         self_checker: SelfChecker | None = None,
+        confidence_policy: ConfidencePolicy | None = None,
     ) -> None:
         self.retriever = retriever
         self.generator = generator
@@ -64,6 +67,7 @@ class QAPipeline:
         self.rewriter = rewriter
         self.context_builder = context_builder
         self.self_checker = self_checker
+        self.confidence_policy = confidence_policy or ConfidencePolicy()
 
     def route(self, question: str) -> RouteDecision:
         if self.router is None:
@@ -102,7 +106,11 @@ class QAPipeline:
 
     def answer(self, question: str, retrieval: Retrieval) -> AskResult:
         result = self.respond(retrieval.question or question, retrieval)
-        return replace(result, question=retrieval.question or question)
+        if result.route == "tool":
+            level = Confidence("high", ["answered from the assistant's own description"])
+        else:
+            level = assess(result.answer, result.context, result.refused, result.self_check, self.confidence_policy)
+        return replace(result, question=retrieval.question or question, confidence=level)
 
     def respond(self, question: str, retrieval: Retrieval) -> AskResult:
         timings = dict(retrieval.timings_ms)

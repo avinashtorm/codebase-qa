@@ -100,6 +100,7 @@ def test_visitor_indexes_a_repository_then_asks_about_it(page: AppTest, repo_url
     assert assistant and assistant[0].markdown[0].value.startswith("See ")
     citation = assistant[0].markdown[0].value.removeprefix("See ")
     assert any(expander.label == citation for expander in page.expander)
+    assert any("confidence</span>" in item.value for item in assistant[0].markdown)
 
 
 def test_new_repository_button_returns_to_the_landing_page(page: AppTest, repo_url: str) -> None:

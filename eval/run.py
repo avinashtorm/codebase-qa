@@ -70,6 +70,7 @@ def evaluate_question(
         result["used_llm"] = answer.used_llm
         result["refused"] = answered.refused
         result["self_check"] = asdict(answered.self_check)
+        result["confidence"] = answered.confidence.level
         result["answer"] = answer.answer
         result["citations"] = [citation.location for citation in answer.citations]
         result["invalid_citations"] = answer.invalid_citations
@@ -88,6 +89,12 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, float]:
         metrics["citation_any_correct"] = average([row["citation_scores"]["any_correct"] for row in answered])
         metrics["invalid_citations"] = sum(row["invalid_citations"] for row in answered)
         metrics["refused"] = sum(row.get("refused", not row["used_llm"]) for row in answered)
+        for level in ("high", "medium", "low"):
+            bucket = [row for row in answered if row.get("confidence") == level]
+            metrics[f"confidence_{level}"] = len(bucket)
+            if bucket:
+                correct = [row["citation_scores"]["any_correct"] for row in bucket]
+                metrics[f"confidence_{level}_correct"] = average(correct)
         checked = [row["self_check"] for row in answered if row.get("self_check", {}).get("ran")]
         if checked:
             metrics["self_checked"] = len(checked)

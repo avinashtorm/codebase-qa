@@ -71,6 +71,8 @@ class Settings(BaseSettings):
     call_max_lines: int = 150
     self_check: bool = True
     self_check_action: Literal["remove", "flag"] = "remove"
+    confidence_high_score: float = 0.70
+    confidence_low_margin: float = 0.03
 
     @property
     def repos_dir(self) -> Path:

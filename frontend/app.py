@@ -1,3 +1,4 @@
+import html
 import os
 import re
 import time
@@ -19,6 +20,7 @@ GENERIC_EXAMPLES = (
 )
 SUGGESTIONS_HEADING = "**Questions that work for this repository:**"
 MAX_TURN_CHARS = 1500
+CONFIDENCE_LABELS = {"high": "High confidence", "medium": "Medium confidence", "low": "Low confidence"}
 STYLE = """
 <style>
 .block-container {max-width: 920px; padding-top: 2.5rem;}
@@ -35,6 +37,11 @@ STYLE = """
 .repo-title {font-size: 1.5rem; font-weight: 700; margin-bottom: 0;}
 .repo-meta {color: #8B949E; font-size: 0.85rem; margin-bottom: 1rem;}
 .muted {color: #8B949E; font-size: 0.8rem;}
+.badge {display: inline-block; border-radius: 999px; padding: 0.1rem 0.6rem; font-size: 0.75rem; font-weight: 600;
+  margin: 0.2rem 0 0.4rem 0; cursor: help;}
+.badge-high {background: rgba(46, 160, 67, 0.18); color: #3FB950; border: 1px solid rgba(63, 185, 80, 0.4);}
+.badge-medium {background: rgba(187, 128, 9, 0.18); color: #D29922; border: 1px solid rgba(210, 153, 34, 0.4);}
+.badge-low {background: rgba(248, 81, 73, 0.15); color: #F85149; border: 1px solid rgba(248, 81, 73, 0.4);}
 </style>
 """
 
@@ -236,6 +243,14 @@ def question_buttons(questions: list[str], key: str) -> None:
             st.rerun()
 
 
+def confidence_badge(response: dict[str, Any]) -> str:
+    level = response.get("confidence")
+    if level not in CONFIDENCE_LABELS or response.get("route") == "tool":
+        return ""
+    reasons = html.escape("; ".join(response.get("confidence_reasons", [])), quote=True)
+    return f'<span class="badge badge-{level}" title="{reasons}">{CONFIDENCE_LABELS[level]}</span>'
+
+
 def render_assistant(message: dict[str, Any], repo: dict[str, Any], show_details: bool, key: str) -> None:
     response = message.get("response")
     if response and response.get("refused") and response.get("suggestions"):
@@ -245,6 +260,9 @@ def render_assistant(message: dict[str, Any], repo: dict[str, Any], show_details
     else:
         st.markdown(message["content"])
     if response:
+        badge = confidence_badge(response)
+        if badge:
+            st.markdown(badge, unsafe_allow_html=True)
         render_citations(response, repo)
         if show_details:
             render_details(response)
