@@ -1,7 +1,7 @@
 import argparse
 import json
 import time
-from dataclasses import asdict, replace
+from dataclasses import asdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -27,14 +27,7 @@ def ensure_indexed(container: Container, url: str) -> RepoRecord:
     if record is None or container.store.collection(record.collection).count() == 0:
         print(f"indexing {url} with chunker={container.settings.chunker} ...")
         return container.indexer.index(url)
-    if container.settings.overview and not container.indexer.has_overview(record.collection):
-        print(f"building overview for {record.repo_id} ...")
-        count = container.indexer.refresh_overview(
-            record.repo_id, record.collection, Path(record.local_path), record.files, print
-        )
-        record = replace(record, overview_count=count)
-        container.registry.save(record.collection, record)
-    return record
+    return container.indexer.backfill_insights(record, print)
 
 
 def describe(item: RetrievedChunk) -> dict[str, Any]:
@@ -70,6 +63,7 @@ def evaluate_question(
         if "generation" in answered.timings_ms:
             result["latency_ms"]["generation"] = answered.timings_ms["generation"]
         result["used_llm"] = answer.used_llm
+        result["refused"] = answered.refused
         result["answer"] = answer.answer
         result["citations"] = [citation.location for citation in answer.citations]
         result["invalid_citations"] = answer.invalid_citations
@@ -87,7 +81,7 @@ def aggregate(rows: list[dict[str, Any]]) -> dict[str, float]:
         metrics["citation_precision"] = average([row["citation_scores"]["precision"] for row in answered])
         metrics["citation_any_correct"] = average([row["citation_scores"]["any_correct"] for row in answered])
         metrics["invalid_citations"] = sum(row["invalid_citations"] for row in answered)
-        metrics["refused"] = sum(not row["used_llm"] for row in answered)
+        metrics["refused"] = sum(row.get("refused", not row["used_llm"]) for row in answered)
     for route in ("code", "overview", "tool"):
         metrics[f"route_{route}"] = sum(row.get("route") == route for row in rows)
     stages = sorted({stage for row in rows for stage in row["latency_ms"]})

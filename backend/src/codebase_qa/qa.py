@@ -1,17 +1,13 @@
 from dataclasses import dataclass, field, replace
 
 from codebase_qa.generation.grounding import is_low_relevance, validate_citations
+from codebase_qa.generation.refusal import NOT_FOUND_LEAD, closest_files, helpful_text, is_unknown, pick_suggestions
 from codebase_qa.interfaces import Generator, Retriever
 from codebase_qa.models import GeneratedAnswer, RetrievedChunk
 from codebase_qa.routing.router import QuestionRouter, RouteDecision
 from codebase_qa.routing.rules import Route
 from codebase_qa.routing.tool import ToolAnswerer
 from codebase_qa.timing import timed
-
-NOT_FOUND_ANSWER = (
-    "The indexed repository doesn't seem to contain code related to this question, "
-    "so I did not generate an answer."
-)
 
 
 @dataclass(frozen=True)
@@ -29,6 +25,8 @@ class AskResult:
     context: list[RetrievedChunk]
     timings_ms: dict[str, float] = field(default_factory=dict)
     route: Route = "code"
+    refused: bool = False
+    suggestions: list[str] = field(default_factory=list)
 
 
 class QAPipeline:
@@ -42,6 +40,7 @@ class QAPipeline:
         overview: Retriever | None = None,
         tool: ToolAnswerer | None = None,
         overview_k: int = 3,
+        suggestions: list[str] | None = None,
     ) -> None:
         self.retriever = retriever
         self.generator = generator
@@ -51,6 +50,7 @@ class QAPipeline:
         self.overview = overview
         self.tool = tool or ToolAnswerer(None)
         self.overview_k = overview_k
+        self.suggestions = suggestions or []
 
     def route(self, question: str) -> RouteDecision:
         if self.router is None:
@@ -87,9 +87,26 @@ class QAPipeline:
             return AskResult(answer=answered, context=[], timings_ms=timings, route="tool")
         context = self.context_for(retrieval)
         if retrieval.route == "code" and is_low_relevance(context, self.refusal_thresholds):
-            refusal = GeneratedAnswer(answer=NOT_FOUND_ANSWER, citations=[], used_llm=False)
-            return AskResult(answer=refusal, context=context, timings_ms=timings, route=retrieval.route)
+            return self.helpful(NOT_FOUND_LEAD, context, timings, retrieval.route, used_llm=False)
         generated = timed(timings, "generation", lambda: self.generator.generate(question, context))
         valid, invalid = validate_citations(generated.citations, context)
         grounded = replace(generated, citations=valid, invalid_citations=generated.invalid_citations + invalid)
+        if is_unknown(grounded):
+            return self.helpful(grounded.answer, context, timings, retrieval.route, grounded.invalid_citations)
         return AskResult(answer=grounded, context=context, timings_ms=timings, route=retrieval.route)
+
+    def helpful(
+        self,
+        lead: str,
+        context: list[RetrievedChunk],
+        timings: dict[str, float],
+        route: Route,
+        invalid_citations: int = 0,
+        used_llm: bool = True,
+    ) -> AskResult:
+        suggestions = pick_suggestions(self.suggestions)
+        text = helpful_text(lead, closest_files(context), suggestions)
+        answer = GeneratedAnswer(answer=text, citations=[], used_llm=used_llm, invalid_citations=invalid_citations)
+        return AskResult(
+            answer=answer, context=context, timings_ms=timings, route=route, refused=True, suggestions=suggestions
+        )

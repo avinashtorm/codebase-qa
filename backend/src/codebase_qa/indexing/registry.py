@@ -23,6 +23,7 @@ class RepoRecord:
     chunk_count: int = 0
     overview_count: int = 0
     files: dict[str, FileRecord] = field(default_factory=dict)
+    suggested_questions: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict) -> "RepoRecord":

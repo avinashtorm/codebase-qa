@@ -290,6 +290,7 @@ The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git 
 | `OVERVIEW` | no | Build a repository overview (folder tree, README, one-line LLM summaries) when indexing (default true) |
 | `OVERVIEW_MAX_CALLS` | no | Most LLM calls per repository for overview summaries (default 5; each call summarizes up to `OVERVIEW_BATCH_SIZE`=20 items). `OVERVIEW_MAX_FILES` (60), `OVERVIEW_MAX_FOLDERS` (25) and `OVERVIEW_FILE_CHARS` (1200) bound the cost further |
 | `ROUTING` / `ROUTING_LLM` | no | Route questions to a help answer (about the tool), the overview, or code search; rules decide first and the LLM is asked only when they are unsure (both default true). `OVERVIEW_K` (3) overview chunks are added for overview questions |
+| `SUGGESTED_QUESTIONS` | no | After indexing, generate 5 example questions (one LLM call) shown as buttons and in refusals (default true) |
 
 ## Step 11: Start the stack
 

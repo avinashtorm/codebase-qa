@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
@@ -10,7 +11,7 @@ from streamlit.testing.v1 import AppTest
 
 from codebase_qa.api.app import create_app
 from codebase_qa.container import Container
-from tests.fakes import fake_embedder, fake_generator, make_settings
+from tests.fakes import FakeLLM, fake_embedder, fake_generator, make_settings
 
 APP = str(Path(__file__).resolve().parents[2] / "frontend" / "app.py")
 OWNER_PASSWORD = "test-owner-password"
@@ -28,10 +29,12 @@ def repo_url(make_repo: RepoFactory) -> str:
     return make_repo().as_uri()
 
 
-@pytest.fixture
-def backend_url(tmp_path: Path, repo_url: str) -> Iterator[str]:
-    settings = make_settings(tmp_path / "data", demo_password=OWNER_PASSWORD)
-    container = Container(settings, embedder_factory=fake_embedder, generator_factory=fake_generator)
+@contextmanager
+def running_backend(data_dir: Path, **overrides: object) -> Iterator[str]:
+    settings = make_settings(data_dir, demo_password=OWNER_PASSWORD, **overrides)
+    container = Container(
+        settings, embedder_factory=fake_embedder, generator_factory=fake_generator, llm_factory=lambda _: FakeLLM()
+    )
     port = free_port()
     server = uvicorn.Server(uvicorn.Config(create_app(container), host="127.0.0.1", port=port, log_level="error"))
     thread = threading.Thread(target=server.run, daemon=True)
@@ -42,6 +45,12 @@ def backend_url(tmp_path: Path, repo_url: str) -> Iterator[str]:
     yield f"http://127.0.0.1:{port}"
     server.should_exit = True
     thread.join(timeout=10)
+
+
+@pytest.fixture
+def backend_url(tmp_path: Path) -> Iterator[str]:
+    with running_backend(tmp_path / "data") as url:
+        yield url
 
 
 @pytest.fixture
@@ -105,3 +114,19 @@ def test_owner_tools_are_hidden_unless_requested(page: AppTest, repo_url: str) -
     page.query_params["owner"] = "1"
     page.run()
     assert page.text_input(key="owner_password").label == "Owner password"
+
+
+def test_suggested_questions_and_helpful_refusal(
+    tmp_path: Path, repo_url: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    with running_backend(tmp_path / "strict", min_vector_score=0.99) as url:
+        monkeypatch.setenv("BACKEND_URL", url)
+        page = AppTest.from_file(APP, default_timeout=60).run()
+        index(page, repo_url)
+        labels = [item.label for item in page.button if (item.key or "").startswith("example_")]
+        assert labels and "What does this repository do and how is it organized?" in labels
+        page.chat_input[0].set_value("banana bread recipe").run()
+        assistant = [message for message in page.chat_message if message.name == "assistant"][0]
+        assert "couldn't find code" in assistant.markdown[0].value
+        assert "Questions that work" not in assistant.markdown[0].value
+        assert any((item.key or "").startswith("suggest_1_") for item in page.button)

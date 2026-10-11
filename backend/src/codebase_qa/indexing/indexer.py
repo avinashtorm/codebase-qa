@@ -15,6 +15,7 @@ from codebase_qa.interfaces import Chunker, Embedder
 from codebase_qa.models import Chunk, ClonedRepo, SourceFile
 from codebase_qa.overview.builder import OverviewBuilder
 from codebase_qa.overview.store import OverviewIndex, OverviewStore
+from codebase_qa.overview.suggestions import QuestionSuggester
 from codebase_qa.retrieval.bm25 import BM25Index
 from codebase_qa.retrieval.vector_store import ChromaStore, VectorCollection, collection_name
 from codebase_qa.timing import timed
@@ -28,6 +29,13 @@ def ignore_progress(_: str) -> None:
 
 def now_iso() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+@dataclass(frozen=True)
+class OverviewRefresh:
+    count: int
+    chunks: list[Chunk]
+    changed: bool
 
 
 @dataclass(frozen=True)
@@ -63,6 +71,7 @@ class Indexer:
         max_repo_bytes: int | None = None,
         overview: OverviewBuilder | None = None,
         overview_store: OverviewStore | None = None,
+        suggester: QuestionSuggester | None = None,
     ) -> None:
         self.store = store
         self.embedder = embedder
@@ -74,6 +83,7 @@ class Indexer:
         self.max_repo_bytes = max_repo_bytes
         self.overview = overview
         self.overview_store = overview_store
+        self.suggester = suggester
 
     def collection_for(self, repo_id: str) -> str:
         return collection_name(repo_id, self.chunker.name)
@@ -103,7 +113,8 @@ class Indexer:
         files = self.add_sources(collection, sources)
         progress("building keyword index")
         self.rebuild_bm25(collection)
-        overview_count = self.refresh_overview(cloned.repo_id, name, Path(cloned.local_path), files, progress)
+        refreshed = self.refresh_overview(cloned.repo_id, name, Path(cloned.local_path), files, progress)
+        suggestions = self.suggest(collection, refreshed, [], progress)
         record = RepoRecord(
             repo_id=cloned.repo_id,
             url=cloned.url,
@@ -115,7 +126,8 @@ class Indexer:
             file_count=len(files),
             chunk_count=collection.count(),
             files=files,
-            overview_count=overview_count,
+            overview_count=refreshed.count,
+            suggested_questions=suggestions,
         )
         self.registry.save(name, record)
         logger.info("indexed repo", extra={"repo_id": cloned.repo_id, "chunks": record.chunk_count})
@@ -150,11 +162,16 @@ class Indexer:
         if changes.file_count:
             timed(stages, "bm25_rebuild", lambda: self.rebuild_bm25(collection))
         overview_count = record.overview_count
-        if changes.file_count or not self.has_overview(record.collection):
-            overview_count = timed(
+        suggestions = record.suggested_questions
+        if changes.file_count or not self.has_overview(record.collection) or not suggestions:
+            refreshed = timed(
                 stages,
                 "overview",
                 lambda: self.refresh_overview(record.repo_id, record.collection, repo_path, files, progress),
+            )
+            overview_count = refreshed.count
+            suggestions = timed(
+                stages, "suggestions", lambda: self.suggest(collection, refreshed, record.suggested_questions, progress)
             )
         updated = replace(
             record,
@@ -164,6 +181,7 @@ class Indexer:
             chunk_count=collection.count(),
             files=files,
             overview_count=overview_count,
+            suggested_questions=suggestions,
         )
         self.registry.save(record.collection, updated)
         report = ReindexReport(
@@ -183,14 +201,39 @@ class Indexer:
         logger.info("reindexed repo", extra={"repo_id": record.repo_id, "files_changed": report.files_changed})
         return updated, report
 
+    def needs_insights(self, record: RepoRecord) -> bool:
+        missing_overview = self.overview is not None and not self.has_overview(record.collection)
+        return missing_overview or (self.suggester is not None and not record.suggested_questions)
+
+    def backfill_insights(self, record: RepoRecord, progress: Progress = ignore_progress) -> RepoRecord:
+        if not self.needs_insights(record):
+            return record
+        repo_path = Path(record.local_path)
+        refreshed = self.refresh_overview(record.repo_id, record.collection, repo_path, record.files, progress)
+        collection = self.store.collection(record.collection)
+        suggestions = self.suggest(collection, refreshed, record.suggested_questions, progress)
+        updated = replace(record, overview_count=refreshed.count, suggested_questions=suggestions)
+        self.registry.save(record.collection, updated)
+        return updated
+
     def has_overview(self, name: str) -> bool:
         return self.overview_store is None or self.overview_store.path(name).exists()
 
+    def suggest(
+        self, collection: VectorCollection, refreshed: OverviewRefresh, current: list[str], progress: Progress
+    ) -> list[str]:
+        if self.suggester is None or not refreshed.chunks:
+            return current
+        if current and not refreshed.changed:
+            return current
+        progress("suggesting example questions")
+        return self.suggester.suggest(refreshed.chunks, collection)
+
     def refresh_overview(
         self, repo_id: str, name: str, repo_path: Path, files: dict[str, FileRecord], progress: Progress
-    ) -> int:
+    ) -> OverviewRefresh:
         if self.overview is None or self.overview_store is None:
-            return 0
+            return OverviewRefresh(0, [], False)
         progress("summarizing files and folders")
         previous = self.overview_store.load(name)
 
@@ -210,7 +253,8 @@ class Indexer:
             "built overview",
             extra={"repo_id": repo_id, "chunks": len(build.chunks), "llm_calls": build.llm_calls},
         )
-        return len(build.chunks)
+        changed = previous is None or [c.chunk_id for c in previous.chunks] != [c.chunk_id for c in build.chunks]
+        return OverviewRefresh(len(build.chunks), build.chunks, changed)
 
     def bm25_path(self, name: str) -> Path:
         return self.bm25_dir / name

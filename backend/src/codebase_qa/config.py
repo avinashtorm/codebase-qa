@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     overview_max_calls: int = 5
     overview_file_chars: int = 1200
     overview_k: int = 3
+    suggested_questions: bool = True
     routing: bool = True
     routing_llm: bool = True
 

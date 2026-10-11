@@ -1,6 +1,7 @@
 from codebase_qa.generation.grounding import is_low_relevance, snippet_for, validate_citations
+from codebase_qa.generation.refusal import FALLBACK_SUGGESTIONS, NOT_FOUND_LEAD, is_unknown, main_text
 from codebase_qa.models import Chunk, Citation, GeneratedAnswer, RetrievedChunk
-from codebase_qa.qa import NOT_FOUND_ANSWER, QAPipeline
+from codebase_qa.qa import QAPipeline
 
 
 def item(path: str, start: int, end: int, scores: dict[str, float] | None = None) -> RetrievedChunk:
@@ -62,12 +63,35 @@ class ListRetriever:
 
 def test_pipeline_refuses_without_calling_llm_when_scores_are_low() -> None:
     generator = CountingGenerator([])
-    retriever = ListRetriever([item("a.py", 1, 2, {"vector": 0.2})])
-    pipeline = QAPipeline(retriever, generator, refusal_thresholds={"vector": 0.5})
+    retriever = ListRetriever([item("a.py", 1, 2, {"vector": 0.2}), item("b.py", 1, 2, {"vector": 0.1})])
+    suggestions = ["Where is login?", "How are users stored?", "What does main do?", "Fourth?"]
+    pipeline = QAPipeline(retriever, generator, refusal_thresholds={"vector": 0.5}, suggestions=suggestions)
     result = pipeline.ask("what is the weather?")
-    assert result.answer.answer == NOT_FOUND_ANSWER
+    assert result.answer.answer.startswith(NOT_FOUND_LEAD)
+    assert "**Closest files I found:** `a.py`, `b.py`" in result.answer.answer
+    assert "- Where is login?\n- How are users stored?\n- What does main do?" in result.answer.answer
+    assert result.refused and result.suggestions == suggestions[:3]
     assert result.answer.used_llm is False
     assert generator.calls == 0
+
+
+class UnknownGenerator:
+    def generate(self, question: str, context: list[RetrievedChunk]) -> GeneratedAnswer:
+        return GeneratedAnswer(answer="I don't know based on the indexed code; payments are not shown.", citations=[])
+
+
+def test_llm_unknown_answer_becomes_helpful() -> None:
+    result = QAPipeline(ListRetriever(CONTEXT), UnknownGenerator()).ask("How are payments refunded?")
+    assert result.refused and result.answer.used_llm
+    assert result.answer.answer.startswith("I don't know based on the indexed code")
+    assert "`app/db.py`" in result.answer.answer and result.suggestions == list(FALLBACK_SUGGESTIONS)
+    assert main_text(result.answer.answer).endswith("`app/db.py`")
+
+
+def test_is_unknown_requires_no_citations() -> None:
+    assert is_unknown(GeneratedAnswer("The context does not contain a refund handler.", []))
+    assert not is_unknown(GeneratedAnswer("I don't know everything, but login is here.", [Citation("a.py", 1, 2)]))
+    assert not is_unknown(GeneratedAnswer("Login hashes the password.", []))
 
 
 def test_pipeline_drops_and_counts_invalid_citations() -> None:

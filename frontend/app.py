@@ -12,17 +12,12 @@ BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
 JOB_TIMEOUT_SECONDS = 900
 VISITOR_ID = re.compile(r"^[0-9a-f]{32}$")
 SAMPLE_REPO_URL = os.environ.get("SAMPLE_REPO_URL", "https://github.com/fastapi/full-stack-fastapi-template")
-DEMO_EXAMPLES = (
-    "Where is the JWT access token created?",
-    "What happens when a normal user requests an item that belongs to someone else?",
-    "How does listing items differ between superusers and normal users?",
-)
 GENERIC_EXAMPLES = (
-    "Where is authentication handled?",
-    "How is the database connection configured?",
-    "What happens when a request fails validation?",
+    "What does this repository do and how is it organized?",
+    "Where is the application's entry point?",
+    "How is configuration loaded?",
 )
-EXAMPLES_BY_REPO = {"fastapi__full-stack-fastapi-template": DEMO_EXAMPLES}
+SUGGESTIONS_HEADING = "**Questions that work for this repository:**"
 STYLE = """
 <style>
 .block-container {max-width: 920px; padding-top: 2.5rem;}
@@ -229,36 +224,49 @@ def render_details(response: dict[str, Any]) -> None:
         st.caption(f"LLM called: {response['used_llm']} | invalid citations dropped: {response['invalid_citations']}")
 
 
-def render_assistant(message: dict[str, Any], repo: dict[str, Any], show_details: bool) -> None:
+def main_text(answer: str) -> str:
+    return answer.split("\n\n" + SUGGESTIONS_HEADING, 1)[0]
+
+
+def question_buttons(questions: list[str], key: str) -> None:
+    for number, question in enumerate(questions):
+        if st.button(question, key=f"{key}_{number}", icon=":material/arrow_forward:"):
+            st.session_state["pending_question"] = question
+            st.rerun()
+
+
+def render_assistant(message: dict[str, Any], repo: dict[str, Any], show_details: bool, key: str) -> None:
     response = message.get("response")
-    st.markdown(message["content"])
+    if response and response.get("refused") and response.get("suggestions"):
+        st.markdown(main_text(message["content"]))
+        st.markdown('<div class="section-label">Try one of these instead</div>', unsafe_allow_html=True)
+        question_buttons(response["suggestions"], key)
+    else:
+        st.markdown(message["content"])
     if response:
         render_citations(response, repo)
         if show_details:
             render_details(response)
 
 
-def example_buttons(repo_id: str) -> None:
-    st.markdown('<div class="section-label">Try asking</div>', unsafe_allow_html=True)
-    for number, question in enumerate(EXAMPLES_BY_REPO.get(repo_id, GENERIC_EXAMPLES)):
-        if st.button(question, key=f"example_{number}", icon=":material/arrow_forward:"):
-            st.session_state["pending_question"] = question
-            st.rerun()
+def example_buttons(repo: dict[str, Any]) -> None:
+    st.markdown('<div class="section-label">Suggested questions</div>', unsafe_allow_html=True)
+    question_buttons(repo.get("suggested_questions") or list(GENERIC_EXAMPLES), "example")
 
 
 def chat(repo: dict[str, Any], show_details: bool) -> None:
     history: list[dict[str, Any]] = st.session_state.setdefault("history", {}).setdefault(repo["repo_id"], [])
-    for message in history:
+    for position, message in enumerate(history):
         with st.chat_message(message["role"]):
             if message["role"] == "assistant":
-                render_assistant(message, repo, show_details)
+                render_assistant(message, repo, show_details, f"suggest_{position}")
             else:
                 st.markdown(message["content"])
     typed = st.chat_input(f"Ask a question about {repo_name(repo)}")
     question = typed or st.session_state.pop("pending_question", None)
     if not question:
         if not history:
-            example_buttons(repo["repo_id"])
+            example_buttons(repo)
         return
     history.append({"role": "user", "content": question})
     with st.chat_message("user"):
@@ -271,7 +279,7 @@ def chat(repo: dict[str, Any], show_details: bool) -> None:
         except BackendError as exc:
             message = {"role": "assistant", "content": f"Sorry, that didn't work: {exc}"}
         history.append(message)
-        render_assistant(message, repo, show_details)
+        render_assistant(message, repo, show_details, f"suggest_{len(history) - 1}")
 
 
 def main() -> None:

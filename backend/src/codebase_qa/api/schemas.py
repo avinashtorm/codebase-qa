@@ -21,6 +21,7 @@ class RepoOut(BaseModel):
     indexed_at: str
     file_count: int
     chunk_count: int
+    suggested_questions: list[str] = []
 
     @classmethod
     def from_record(cls, record: RepoRecord) -> "RepoOut":
@@ -32,6 +33,7 @@ class RepoOut(BaseModel):
             indexed_at=record.indexed_at,
             file_count=record.file_count,
             chunk_count=record.chunk_count,
+            suggested_questions=record.suggested_questions,
         )
 
 
@@ -137,6 +139,8 @@ class AskResponse(BaseModel):
     invalid_citations: int
     commit_sha: str
     route: str
+    refused: bool
+    suggestions: list[str]
 
     @classmethod
     def from_result(cls, result: AskResult, commit_sha: str) -> "AskResponse":
@@ -170,4 +174,6 @@ class AskResponse(BaseModel):
             invalid_citations=result.answer.invalid_citations,
             commit_sha=commit_sha,
             route=result.route,
+            refused=result.refused,
+            suggestions=result.suggestions,
         )

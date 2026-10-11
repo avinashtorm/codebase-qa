@@ -13,6 +13,7 @@ from codebase_qa.indexing.registry import RepoRecord, RepoRegistry
 from codebase_qa.interfaces import LLM, Embedder, Generator, Reranker, Retriever
 from codebase_qa.overview.builder import OverviewBuilder
 from codebase_qa.overview.store import OverviewIndex, OverviewStore
+from codebase_qa.overview.suggestions import QuestionSuggester
 from codebase_qa.overview.summarizer import LLMSummarizer
 from codebase_qa.qa import QAPipeline
 from codebase_qa.retrieval.bm25 import BM25Index, BM25Retriever
@@ -122,7 +123,13 @@ class Container:
             max_repo_bytes=self.settings.max_repo_size_mb * 1024 * 1024,
             overview=self.overview_builder(),
             overview_store=self.overview_store,
+            suggester=self.suggester(),
         )
+
+    def suggester(self) -> QuestionSuggester | None:
+        if not self.settings.suggested_questions:
+            return None
+        return QuestionSuggester(self.llm, self.embedder, self.settings.min_vector_score)
 
     @cached_property
     def access(self) -> AccessStore:
@@ -210,4 +217,5 @@ class Container:
             overview=self.overview_retriever(record),
             tool=ToolAnswerer(self.llm),
             overview_k=self.settings.overview_k,
+            suggestions=record.suggested_questions,
         )
