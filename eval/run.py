@@ -164,6 +164,8 @@ def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
         "query_expansion": settings.query_expansion,
         "expansion_original_weight": settings.expansion_original_weight,
         "expansion_skip_above": settings.expansion_skip_above,
+        "parent_context": settings.parent_context,
+        "call_context": settings.call_context,
         "hygiene": settings.hygiene,
         "downweight_factor": settings.downweight_factor,
         "downweight_tests": settings.downweight_tests,

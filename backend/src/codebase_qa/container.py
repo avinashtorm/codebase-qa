@@ -1,9 +1,12 @@
 from collections.abc import Callable
 from datetime import timedelta
 from functools import cached_property
+from pathlib import Path
 
 from codebase_qa.chunking.factory import build_chunker
 from codebase_qa.config import Settings
+from codebase_qa.context.builder import ContextBuilder
+from codebase_qa.context.catalog import ChunkCatalog, LineReader
 from codebase_qa.generation.generator import LLMGenerator
 from codebase_qa.generation.llm import OfflineLLM
 from codebase_qa.indexing.access import AccessStore
@@ -70,6 +73,7 @@ class Container:
         self.llm_factory = llm_factory
         self.bm25_cache: dict[tuple[str, str], BM25Index] = {}
         self.overview_cache: dict[tuple[str, str], OverviewIndex] = {}
+        self.catalog_cache: dict[tuple[str, str], ChunkCatalog] = {}
 
     @cached_property
     def embedder(self) -> Embedder:
@@ -235,4 +239,23 @@ class Container:
             overview_k=self.settings.overview_k,
             suggestions=record.suggested_questions,
             rewriter=FollowUpRewriter(self.llm) if self.settings.followup_rewrite else None,
+            context_builder=self.context_builder(record),
+        )
+
+    def context_builder(self, record: RepoRecord) -> ContextBuilder | None:
+        settings = self.settings
+        if not settings.parent_context and not settings.call_context:
+            return None
+        key = (record.collection, record.indexed_at)
+        if key not in self.catalog_cache:
+            self.catalog_cache = {key: ChunkCatalog.build(self.bm25_index(record).chunks)}
+        return ContextBuilder(
+            self.catalog_cache[key],
+            LineReader(Path(record.local_path)),
+            parent=settings.parent_context,
+            calls=settings.call_context,
+            parent_max_lines=settings.parent_max_lines,
+            window=settings.parent_window,
+            call_max_functions=settings.call_max_functions,
+            call_max_lines=settings.call_max_lines,
         )

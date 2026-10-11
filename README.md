@@ -118,6 +118,9 @@ answers.
 | 5 | Follow-up rewriting (chat history -> standalone question; rules decide when the LLM is needed) | 0.571 | 0.829 | 0.805 | 0.678 | 0.762 | dev set has no history, so unchanged. On 8 follow-up questions ([eval/followups.jsonl](eval/followups.jsonl)): Hit@1 0.125 -> **0.500**, Hit@5 0.625 -> 0.750, Recall@10 0.563 -> 0.813, MRR 0.306 -> 0.614, citation precision 0.438 -> 0.688 |
 | 6a | Query expansion (3 LLM variants, plain RRF) | 0.486 | 0.829 | 0.805 | 0.631 | 0.729 | worse ranking, +1.5-5 s per question |
 | 6b | Query expansion, original query weighted x4 in RRF | **0.629** | 0.800 | 0.805 | **0.714** | 0.671 | better Hit@1/MRR but Hit@5 -2.9 points and citation precision -9 points; **off by default** (`QUERY_EXPANSION=false`) |
+| 7a | Parent context (methods -> whole class, split parts -> whole function, top-level/config chunks +-10 lines; cap 100 lines) | 0.571 | 0.829 | 0.805 | 0.678 | 0.729 | answers only: any-correct 0.771, refused 5; off by default |
+| 7b | Call context (definitions of repo functions called by retrieved code; max 4 functions / 150 lines) | 0.571 | 0.829 | 0.805 | 0.678 | 0.743 | any-correct **0.829** (+1 question), refused 3; **on by default** |
+| 7c | Parent + call context | 0.571 | 0.829 | 0.805 | 0.678 | 0.719 | any-correct 0.800, refused 3 |
 
 ## Running it locally
 

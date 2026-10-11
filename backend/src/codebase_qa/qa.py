@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field, replace
 
+from codebase_qa.context.builder import ContextBuilder
 from codebase_qa.generation.grounding import is_low_relevance, validate_citations
 from codebase_qa.generation.refusal import NOT_FOUND_LEAD, closest_files, helpful_text, is_unknown, pick_suggestions
 from codebase_qa.interfaces import Generator, Retriever
@@ -46,6 +47,7 @@ class QAPipeline:
         overview_k: int = 3,
         suggestions: list[str] | None = None,
         rewriter: FollowUpRewriter | None = None,
+        context_builder: ContextBuilder | None = None,
     ) -> None:
         self.retriever = retriever
         self.generator = generator
@@ -57,6 +59,7 @@ class QAPipeline:
         self.overview_k = overview_k
         self.suggestions = suggestions or []
         self.rewriter = rewriter
+        self.context_builder = context_builder
 
     def route(self, question: str) -> RouteDecision:
         if self.router is None:
@@ -105,6 +108,9 @@ class QAPipeline:
         context = self.context_for(retrieval)
         if retrieval.route == "code" and is_low_relevance(context, self.refusal_thresholds):
             return self.helpful(NOT_FOUND_LEAD, context, timings, retrieval.route, used_llm=False)
+        builder = self.context_builder
+        if builder is not None:
+            context = timed(timings, "context", lambda: builder.build(context))
         generated = timed(timings, "generation", lambda: self.generator.generate(question, context))
         valid, invalid = validate_citations(generated.citations, context)
         grounded = replace(generated, citations=valid, invalid_citations=generated.invalid_citations + invalid)

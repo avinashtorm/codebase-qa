@@ -63,6 +63,12 @@ class Settings(BaseSettings):
     expansion_variants: int = 3
     expansion_original_weight: int = 4
     expansion_skip_above: float = 0.0
+    parent_context: bool = False
+    parent_max_lines: int = 100
+    parent_window: int = 10
+    call_context: bool = True
+    call_max_functions: int = 4
+    call_max_lines: int = 150
 
     @property
     def repos_dir(self) -> Path:
