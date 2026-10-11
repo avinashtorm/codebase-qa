@@ -116,6 +116,8 @@ answers.
 | 3 | Helpful refusals + 5 suggested questions per repo | 0.571 | 0.714 | 0.767 | 0.651 | 0.729 | refusals now list the closest files and 3 suggested questions; the 3 dev answers where the LLM said "I don't know" (all retrieval misses, Hit@5 = 0) are now reported as refusals; suggestions come from 1 LLM call per repo and are kept only if code retrieval scores them above the refusal threshold |
 | 4 | Index hygiene: skip data files, down-weight generated code, fixtures, migrations and tests (x0.9) | 0.571 | **0.829** | **0.805** | **0.678** | **0.762** | nothing skipped in this repo; 21 generated/migration files and the tests are down-weighted at query time. Generated code only: Hit@5 0.743 / MRR 0.656; adding tests: 0.829 / 0.678; factor 0.8 = 0.9 > 0.95 |
 | 5 | Follow-up rewriting (chat history -> standalone question; rules decide when the LLM is needed) | 0.571 | 0.829 | 0.805 | 0.678 | 0.762 | dev set has no history, so unchanged. On 8 follow-up questions ([eval/followups.jsonl](eval/followups.jsonl)): Hit@1 0.125 -> **0.500**, Hit@5 0.625 -> 0.750, Recall@10 0.563 -> 0.813, MRR 0.306 -> 0.614, citation precision 0.438 -> 0.688 |
+| 6a | Query expansion (3 LLM variants, plain RRF) | 0.486 | 0.829 | 0.805 | 0.631 | 0.729 | worse ranking, +1.5-5 s per question |
+| 6b | Query expansion, original query weighted x4 in RRF | **0.629** | 0.800 | 0.805 | **0.714** | 0.671 | better Hit@1/MRR but Hit@5 -2.9 points and citation precision -9 points; **off by default** (`QUERY_EXPANSION=false`) |
 
 ## Running it locally
 

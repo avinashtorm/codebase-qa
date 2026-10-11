@@ -17,6 +17,7 @@ from codebase_qa.overview.suggestions import QuestionSuggester
 from codebase_qa.overview.summarizer import LLMSummarizer
 from codebase_qa.qa import QAPipeline
 from codebase_qa.retrieval.bm25 import BM25Index, BM25Retriever
+from codebase_qa.retrieval.expansion import ExpandingRetriever, QueryExpander
 from codebase_qa.retrieval.hybrid import HybridRetriever
 from codebase_qa.retrieval.overview import OverviewRetriever
 from codebase_qa.retrieval.reranker import RerankingRetriever
@@ -177,6 +178,15 @@ class Container:
         rules = self.settings.hygiene_rules
         if rules.enabled and rules.factor != 1.0:
             base = DownweightingRetriever(base, rules)
+        if self.settings.query_expansion:
+            settings = self.settings
+            base = ExpandingRetriever(
+                base,
+                QueryExpander(self.llm, settings.expansion_variants),
+                rrf_k=settings.rrf_k,
+                original_weight=settings.expansion_original_weight,
+                skip_above=settings.expansion_skip_above if settings.expansion_skip_above > 0 else None,
+            )
         if not self.settings.rerank:
             return base
         return RerankingRetriever(

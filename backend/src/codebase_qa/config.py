@@ -59,6 +59,10 @@ class Settings(BaseSettings):
     routing: bool = True
     routing_llm: bool = True
     followup_rewrite: bool = True
+    query_expansion: bool = False
+    expansion_variants: int = 3
+    expansion_original_weight: int = 4
+    expansion_skip_above: float = 0.0
 
     @property
     def repos_dir(self) -> Path:
