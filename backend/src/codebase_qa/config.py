@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from codebase_qa.ingestion.hygiene import DEFAULT_DOWNWEIGHT, DEFAULT_SKIP, HygieneRules
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
@@ -47,6 +49,12 @@ class Settings(BaseSettings):
     overview_max_calls: int = 5
     overview_file_chars: int = 1200
     overview_k: int = 3
+    hygiene: bool = True
+    hygiene_extra_skip: list[str] = []
+    hygiene_extra_downweight: list[str] = []
+    downweight_factor: float = 0.9
+    downweight_tests: bool = True
+    max_json_kb: int = 50
     suggested_questions: bool = True
     routing: bool = True
     routing_llm: bool = True
@@ -66,6 +74,17 @@ class Settings(BaseSettings):
     @property
     def bm25_dir(self) -> Path:
         return self.data_dir / "bm25"
+
+    @property
+    def hygiene_rules(self) -> HygieneRules:
+        return HygieneRules(
+            skip=DEFAULT_SKIP + tuple(self.hygiene_extra_skip),
+            downweight=DEFAULT_DOWNWEIGHT + tuple(self.hygiene_extra_downweight),
+            factor=self.downweight_factor,
+            max_json_kb=self.max_json_kb,
+            downweight_tests=self.downweight_tests,
+            enabled=self.hygiene,
+        )
 
     @property
     def overview_dir(self) -> Path:

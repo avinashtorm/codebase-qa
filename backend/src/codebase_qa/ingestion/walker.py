@@ -2,6 +2,7 @@ import hashlib
 from collections.abc import Iterator
 from pathlib import Path
 
+from codebase_qa.ingestion.hygiene import HygieneRules
 from codebase_qa.ingestion.languages import detect_language
 from codebase_qa.models import SourceFile
 
@@ -46,6 +47,7 @@ LOCKFILES: frozenset[str] = frozenset(
 MINIFIED_SUFFIXES: tuple[str, ...] = (".min.js", ".min.css", ".bundle.js", ".map")
 MAX_FILE_BYTES = 500_000
 MAX_AVERAGE_LINE_LENGTH = 300
+DEFAULT_RULES = HygieneRules()
 
 
 def content_hash(content: str) -> str:
@@ -83,7 +85,9 @@ def iter_candidate_paths(root: Path) -> Iterator[Path]:
             yield path
 
 
-def load_source_file(root: Path, relative_path: str, repo_id: str, max_bytes: int) -> SourceFile | None:
+def load_source_file(
+    root: Path, relative_path: str, repo_id: str, max_bytes: int, rules: HygieneRules = DEFAULT_RULES
+) -> SourceFile | None:
     if is_skipped_path(relative_path):
         return None
     language = detect_language(relative_path)
@@ -91,6 +95,8 @@ def load_source_file(root: Path, relative_path: str, repo_id: str, max_bytes: in
         return None
     path = root / relative_path
     if not path.is_file() or path.is_symlink():
+        return None
+    if rules.skips(relative_path, path.stat().st_size):
         return None
     content = read_text(path, max_bytes)
     if content is None or not content.strip() or looks_minified(content):
@@ -105,13 +111,15 @@ def load_source_file(root: Path, relative_path: str, repo_id: str, max_bytes: in
     )
 
 
-def walk_repo(root: Path, repo_id: str, max_bytes: int = MAX_FILE_BYTES) -> list[SourceFile]:
+def walk_repo(
+    root: Path, repo_id: str, max_bytes: int = MAX_FILE_BYTES, rules: HygieneRules = DEFAULT_RULES
+) -> list[SourceFile]:
     files: list[SourceFile] = []
     for path in iter_candidate_paths(root):
         relative_path = path.relative_to(root).as_posix()
         if relative_path.split("/")[0] == ".git":
             continue
-        source = load_source_file(root, relative_path, repo_id, max_bytes)
+        source = load_source_file(root, relative_path, repo_id, max_bytes, rules)
         if source is not None:
             files.append(source)
     return files

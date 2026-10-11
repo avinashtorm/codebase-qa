@@ -156,6 +156,9 @@ def describe_settings(settings: Settings, record: RepoRecord) -> dict[str, Any]:
         "overview": settings.overview,
         "routing": settings.routing,
         "routing_llm": settings.routing_llm,
+        "hygiene": settings.hygiene,
+        "downweight_factor": settings.downweight_factor,
+        "downweight_tests": settings.downweight_tests,
         "reranker_model": settings.reranker_model if settings.rerank else None,
         "top_k": settings.top_k,
         "embedding_model": settings.embedding_model,
@@ -175,6 +178,9 @@ def settings_overrides(args: argparse.Namespace) -> dict[str, Any]:
     }
     if args.llm_model:
         overrides["gemini_model"] = args.llm_model
+    for assignment in args.set:
+        key, _, value = assignment.partition("=")
+        overrides[key.strip()] = value.strip()
     return overrides
 
 
@@ -191,6 +197,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--delay", type=float, default=0.0, help="seconds between LLM calls")
     parser.add_argument("--llm-model", default=None, help="override GEMINI_MODEL for this run")
     parser.add_argument("--no-routing", action="store_true", help="send every question down the code path")
+    parser.add_argument("--set", action="append", default=[], metavar="KEY=VALUE", help="override any setting")
     parser.add_argument("--questions", type=Path, default=DEFAULT_QUESTIONS)
     parser.add_argument("--results-dir", type=Path, default=RESULTS_DIR)
     parser.add_argument("--repo-url", default=DEFAULT_REPO_URL)

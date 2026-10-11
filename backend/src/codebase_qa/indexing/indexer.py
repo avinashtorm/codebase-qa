@@ -10,7 +10,8 @@ from codebase_qa.indexing.jobs import Progress
 from codebase_qa.indexing.registry import FileRecord, RepoRecord, RepoRegistry
 from codebase_qa.ingestion.git import clone_repo, pull_latest
 from codebase_qa.ingestion.github import RepoTooLarge, directory_size_bytes
-from codebase_qa.ingestion.walker import MAX_FILE_BYTES, load_source_file, walk_repo
+from codebase_qa.ingestion.hygiene import HygieneRules
+from codebase_qa.ingestion.walker import DEFAULT_RULES, MAX_FILE_BYTES, load_source_file, walk_repo
 from codebase_qa.interfaces import Chunker, Embedder
 from codebase_qa.models import Chunk, ClonedRepo, SourceFile
 from codebase_qa.overview.builder import OverviewBuilder
@@ -72,6 +73,7 @@ class Indexer:
         overview: OverviewBuilder | None = None,
         overview_store: OverviewStore | None = None,
         suggester: QuestionSuggester | None = None,
+        rules: HygieneRules = DEFAULT_RULES,
     ) -> None:
         self.store = store
         self.embedder = embedder
@@ -84,6 +86,10 @@ class Indexer:
         self.overview = overview
         self.overview_store = overview_store
         self.suggester = suggester
+        self.rules = rules
+
+    def load(self, repo_path: Path, path: str, repo_id: str) -> SourceFile | None:
+        return load_source_file(repo_path, path, repo_id, MAX_FILE_BYTES, self.rules)
 
     def collection_for(self, repo_id: str) -> str:
         return collection_name(repo_id, self.chunker.name)
@@ -108,7 +114,7 @@ class Indexer:
         self.store.delete_collection(name)
         collection = self.store.collection(name)
         progress("reading files")
-        sources = walk_repo(Path(cloned.local_path), cloned.repo_id)
+        sources = walk_repo(Path(cloned.local_path), cloned.repo_id, rules=self.rules)
         progress(f"chunking and embedding {len(sources)} files")
         files = self.add_sources(collection, sources)
         progress("building keyword index")
@@ -145,7 +151,9 @@ class Indexer:
             changes = timed(
                 stages,
                 "detect_changes",
-                lambda: detect_changes(repo_path, record.repo_id, record.commit_sha, new_sha, record.files),
+                lambda: detect_changes(
+                    repo_path, record.repo_id, record.commit_sha, new_sha, record.files, self.rules
+                ),
             )
         collection = self.store.collection(record.collection)
         removed = timed(stages, "delete_chunks", lambda: collection.delete_paths(changes.removed_paths))
@@ -154,7 +162,7 @@ class Indexer:
         sources = [
             source
             for path in changes.changed_paths
-            if (source := load_source_file(repo_path, path, record.repo_id, MAX_FILE_BYTES)) is not None
+            if (source := self.load(repo_path, path, record.repo_id)) is not None
         ]
         progress(f"re-indexing {len(sources)} changed files")
         added_files = timed(stages, "chunk_embed_add", lambda: self.add_sources(collection, sources))
@@ -238,7 +246,7 @@ class Indexer:
         previous = self.overview_store.load(name)
 
         def read(path: str) -> str | None:
-            source = load_source_file(repo_path, path, repo_id, MAX_FILE_BYTES)
+            source = self.load(repo_path, path, repo_id)
             return source.content if source is not None else None
 
         build = self.overview.build(repo_id, files, read, previous.entries if previous else {})

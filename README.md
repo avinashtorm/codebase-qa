@@ -114,6 +114,7 @@ answers.
 | 1 | Index-time repository overview (tree, README, LLM summaries) | 0.571 | 0.714 | 0.767 | 0.651 | 0.729 | overview stored separately, not used by code retrieval yet; 31 overview chunks from 5 LLM calls; citation change is LLM run-to-run noise after a cache-key change |
 | 2 | Question routing (tool / overview / code; rules first, LLM only when unsure) | 0.571 | 0.714 | 0.767 | 0.651 | 0.729 | all 35 dev questions routed to code by rules (0 extra LLM calls, 0.4 ms); tool questions skip retrieval; overview questions get 3 overview chunks + 5 code chunks |
 | 3 | Helpful refusals + 5 suggested questions per repo | 0.571 | 0.714 | 0.767 | 0.651 | 0.729 | refusals now list the closest files and 3 suggested questions; the 3 dev answers where the LLM said "I don't know" (all retrieval misses, Hit@5 = 0) are now reported as refusals; suggestions come from 1 LLM call per repo and are kept only if code retrieval scores them above the refusal threshold |
+| 4 | Index hygiene: skip data files, down-weight generated code, fixtures, migrations and tests (x0.9) | 0.571 | **0.829** | **0.805** | **0.678** | **0.762** | nothing skipped in this repo; 21 generated/migration files and the tests are down-weighted at query time. Generated code only: Hit@5 0.743 / MRR 0.656; adding tests: 0.829 / 0.678; factor 0.8 = 0.9 > 0.95 |
 
 ## Running it locally
 

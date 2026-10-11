@@ -22,6 +22,7 @@ from codebase_qa.retrieval.overview import OverviewRetriever
 from codebase_qa.retrieval.reranker import RerankingRetriever
 from codebase_qa.retrieval.vector import VectorRetriever
 from codebase_qa.retrieval.vector_store import ChromaStore
+from codebase_qa.retrieval.weighting import DownweightingRetriever
 from codebase_qa.routing.router import QuestionRouter
 from codebase_qa.routing.tool import ToolAnswerer
 
@@ -124,6 +125,7 @@ class Container:
             overview=self.overview_builder(),
             overview_store=self.overview_store,
             suggester=self.suggester(),
+            rules=self.settings.hygiene_rules,
         )
 
     def suggester(self) -> QuestionSuggester | None:
@@ -171,6 +173,9 @@ class Container:
 
     def retriever(self, record: RepoRecord) -> Retriever:
         base = self.first_stage_retriever(record)
+        rules = self.settings.hygiene_rules
+        if rules.enabled and rules.factor != 1.0:
+            base = DownweightingRetriever(base, rules)
         if not self.settings.rerank:
             return base
         return RerankingRetriever(

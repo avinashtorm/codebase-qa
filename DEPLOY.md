@@ -291,6 +291,7 @@ The secrets live only on the VM, in `~/codebase-qa/.env`. They are never in git 
 | `OVERVIEW_MAX_CALLS` | no | Most LLM calls per repository for overview summaries (default 5; each call summarizes up to `OVERVIEW_BATCH_SIZE`=20 items). `OVERVIEW_MAX_FILES` (60), `OVERVIEW_MAX_FOLDERS` (25) and `OVERVIEW_FILE_CHARS` (1200) bound the cost further |
 | `ROUTING` / `ROUTING_LLM` | no | Route questions to a help answer (about the tool), the overview, or code search; rules decide first and the LLM is asked only when they are unsure (both default true). `OVERVIEW_K` (3) overview chunks are added for overview questions |
 | `SUGGESTED_QUESTIONS` | no | After indexing, generate 5 example questions (one LLM call) shown as buttons and in refusals (default true) |
+| `HYGIENE`, `DOWNWEIGHT_FACTOR`, `DOWNWEIGHT_TESTS`, `MAX_JSON_KB`, `HYGIENE_EXTRA_SKIP`, `HYGIENE_EXTRA_DOWNWEIGHT` | no | Index hygiene (defaults: on, 0.9, true, 50). Data files (JSON in fixtures/data/locales folders, JSON over 50 KB that is not a manifest), snapshots, lockfiles and source maps are not indexed; generated code, fixtures, migrations and tests get their search score multiplied by the factor. The two extra lists take JSON arrays of patterns such as `["*/vendor_data/*"]` |
 
 ## Step 11: Start the stack
 

@@ -3,7 +3,8 @@ from pathlib import Path
 
 from codebase_qa.indexing.registry import FileRecord
 from codebase_qa.ingestion.git import GitError, diff_name_status
-from codebase_qa.ingestion.walker import walk_repo
+from codebase_qa.ingestion.hygiene import HygieneRules
+from codebase_qa.ingestion.walker import DEFAULT_RULES, walk_repo
 
 
 @dataclass
@@ -44,8 +45,10 @@ def parse_name_status(rows: list[list[str]]) -> ChangeSet:
     return changes
 
 
-def changes_by_hash(repo_path: Path, repo_id: str, known: dict[str, FileRecord]) -> ChangeSet:
-    current = {source.path: source.content_hash for source in walk_repo(repo_path, repo_id)}
+def changes_by_hash(
+    repo_path: Path, repo_id: str, known: dict[str, FileRecord], rules: HygieneRules = DEFAULT_RULES
+) -> ChangeSet:
+    current = {source.path: source.content_hash for source in walk_repo(repo_path, repo_id, rules=rules)}
     return ChangeSet(
         method="hash",
         added=sorted(path for path in current if path not in known),
@@ -55,9 +58,14 @@ def changes_by_hash(repo_path: Path, repo_id: str, known: dict[str, FileRecord])
 
 
 def detect_changes(
-    repo_path: Path, repo_id: str, old_sha: str, new_sha: str, known: dict[str, FileRecord]
+    repo_path: Path,
+    repo_id: str,
+    old_sha: str,
+    new_sha: str,
+    known: dict[str, FileRecord],
+    rules: HygieneRules = DEFAULT_RULES,
 ) -> ChangeSet:
     try:
         return parse_name_status(diff_name_status(repo_path, old_sha, new_sha))
     except GitError:
-        return changes_by_hash(repo_path, repo_id, known)
+        return changes_by_hash(repo_path, repo_id, known, rules)
