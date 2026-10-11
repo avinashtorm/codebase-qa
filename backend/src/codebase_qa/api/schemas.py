@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -6,6 +7,7 @@ from codebase_qa.generation.grounding import snippet_for
 from codebase_qa.indexing.indexer import ReindexReport
 from codebase_qa.indexing.jobs import Job
 from codebase_qa.indexing.registry import RepoRecord
+from codebase_qa.observability.store import Stats
 from codebase_qa.qa import AskResult
 from codebase_qa.retrieval.filters import SearchFilter
 from codebase_qa.routing.followup import Turn
@@ -120,6 +122,25 @@ class FiltersIn(BaseModel):
 
     def to_filter(self) -> SearchFilter:
         return SearchFilter(folder=self.folder.strip().strip("/"), languages=tuple(self.languages))
+
+
+class StatsOut(BaseModel):
+    model: str
+    questions: int
+    errors: int
+    avg_latency_ms: float
+    p95_latency_ms: float
+    total_cost_usd: float
+    refusal_rate: float
+    input_tokens: int
+    output_tokens: int
+    llm_calls: int
+    cached_calls: int
+    avg_stage_ms: dict[str, float]
+
+    @classmethod
+    def from_stats(cls, stats: Stats, model: str) -> "StatsOut":
+        return cls(model=model, **asdict(stats))
 
 
 class ScopeOut(BaseModel):

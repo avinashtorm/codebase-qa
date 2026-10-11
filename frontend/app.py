@@ -94,6 +94,37 @@ def wait_for_job(job: dict[str, Any], label: str) -> dict[str, Any]:
 
 def select_repo(repo_id: str | None) -> None:
     st.session_state["active_repo"] = repo_id
+    st.session_state["view"] = "chat"
+
+
+def show_stats() -> None:
+    st.session_state["view"] = "stats"
+
+
+def stats_page() -> None:
+    st.markdown('<div class="hero-title">Usage stats</div>', unsafe_allow_html=True)
+    try:
+        stats = client().stats()
+    except BackendError as exc:
+        st.error(str(exc))
+        return
+    st.markdown(
+        f'<div class="hero-subtitle">All questions answered by this deployment. Cost is estimated at paid-tier '
+        f'prices for {stats["model"]}; cached answers cost nothing.</div>',
+        unsafe_allow_html=True,
+    )
+    first, second, third = st.columns(3)
+    first.metric("Questions asked", stats["questions"])
+    second.metric("Average latency", f'{stats["avg_latency_ms"] / 1000:.1f} s')
+    third.metric("p95 latency", f'{stats["p95_latency_ms"] / 1000:.1f} s')
+    fourth, fifth, sixth = st.columns(3)
+    fourth.metric("Estimated total cost", f'${stats["total_cost_usd"]:.4f}')
+    fifth.metric("Refusal rate", f'{stats["refusal_rate"] * 100:.0f}%')
+    sixth.metric("LLM calls (cached)", f'{stats["llm_calls"]} ({stats["cached_calls"]})')
+    if stats["avg_stage_ms"]:
+        st.markdown('<div class="section-label">Average time per stage (ms)</div>', unsafe_allow_html=True)
+        rows = [{"stage": stage, "ms": ms} for stage, ms in stats["avg_stage_ms"].items()]
+        st.dataframe(rows, hide_index=True)
 
 
 def repo_scope(repo_id: str) -> dict[str, Any]:
@@ -157,6 +188,7 @@ def sidebar(
         filters = scope_controls(active) if active is not None else {"folder": "", "languages": []}
         st.markdown('<div class="section-label">Settings</div>', unsafe_allow_html=True)
         show_details = st.toggle("Show retrieval details", value=False)
+        st.button("Usage stats", icon=":material/monitoring:", type="tertiary", on_click=show_stats)
         repos_per_day = health["index_per_visitor_per_day"]
         questions_per_day = health["ask_per_visitor_per_day"]
         hours = f'{health["repo_ttl_hours"]:.0f}'
@@ -373,6 +405,9 @@ def main() -> None:
     by_id = {repo["repo_id"]: repo for repo in repos}
     active = by_id.get(st.session_state.get("active_repo") or "")
     show_details, filters = sidebar(health, repos, active)
+    if st.session_state.get("view") == "stats":
+        stats_page()
+        return
     if active is None:
         landing()
         return

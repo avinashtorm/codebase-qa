@@ -13,6 +13,7 @@ import httpx
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 
+from codebase_qa.api.observe import observed_ask
 from codebase_qa.api.rate_limit import DailyLimiter, SlidingWindowLimiter, client_ip, enforce, enforce_daily
 from codebase_qa.api.schemas import (
     AskRequest,
@@ -23,6 +24,7 @@ from codebase_qa.api.schemas import (
     ReindexOut,
     RepoOut,
     ScopeOut,
+    StatsOut,
 )
 from codebase_qa.config import get_settings
 from codebase_qa.container import Container
@@ -236,6 +238,10 @@ def create_app(container: Container | None = None) -> FastAPI:
     def list_repos(services: Services, visitor: Visitor) -> list[RepoOut]:
         return [RepoOut.from_record(record) for record in services.visible_records(visitor)]
 
+    @app.get("/stats", response_model=StatsOut)
+    def stats(services: Services) -> StatsOut:
+        return StatsOut.from_stats(services.stats.stats(), services.settings.gemini_model)
+
     @app.get("/repos/{repo_id}/scope", response_model=ScopeOut)
     def repo_scope(repo_id: str, services: Services, visitor: Visitor) -> ScopeOut:
         record = services.repo_record(repo_id)
@@ -262,7 +268,7 @@ def create_app(container: Container | None = None) -> FastAPI:
     def ask(body: AskRequest, request: Request, services: Services, visitor: Visitor) -> AskResponse:
         record = authorize_ask(body, request, services, visitor)
         try:
-            result = services.pipeline(record, body.filters.to_filter()).ask(body.question, body.turns())
+            result = observed_ask(services, record, body.question, body.turns(), body.filters.to_filter())
         except QuotaExhaustedError as exc:
             raise HTTPException(status_code=503, detail=QUOTA_MESSAGE) from exc
         except GenerationError as exc:
@@ -298,9 +304,13 @@ def stream_answer(
     services: Container, record: RepoRecord, body: AskRequest, events: "queue.Queue[dict[str, Any] | None]"
 ) -> None:
     try:
-        pipeline = services.pipeline(record, body.filters.to_filter())
-        result = pipeline.ask(
-            body.question, body.turns(), on_delta=lambda text: events.put({"type": "delta", "text": text})
+        result = observed_ask(
+            services,
+            record,
+            body.question,
+            body.turns(),
+            body.filters.to_filter(),
+            on_delta=lambda text: events.put({"type": "delta", "text": text}),
         )
         response = AskResponse.from_result(result, record.commit_sha)
         events.put({"type": "final", "response": response.model_dump()})

@@ -73,9 +73,12 @@ class GeminiLLM:
 
     def stream(self, system: str, prompt: str, schema: type[BaseModel] | None = None) -> Iterator[str]:
         key = self.cache_key(system, prompt, schema)
-        cached = self.cache.get(key) if self.cache else None
-        if cached is not None:
-            yield cached
+        entry = self.cache.get_entry(key) if self.cache else None
+        if entry is not None:
+            text = str(entry["text"])
+            input_tokens, output_tokens = int(entry.get("input_tokens", 0)), int(entry.get("output_tokens", 0))
+            self.last_usage = LLMResponse(text, input_tokens, output_tokens, cached=True)
+            yield text
             return
         parts: list[str] = []
         usage = (0, 0)

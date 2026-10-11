@@ -16,6 +16,8 @@ from codebase_qa.indexing.indexer import Indexer
 from codebase_qa.indexing.janitor import RepoJanitor
 from codebase_qa.indexing.registry import RepoRecord, RepoRegistry
 from codebase_qa.interfaces import LLM, Embedder, Generator, Reranker, Retriever
+from codebase_qa.observability.store import StatsStore
+from codebase_qa.observability.usage import MeteredLLM, Pricing
 from codebase_qa.overview.builder import OverviewBuilder
 from codebase_qa.overview.store import OverviewIndex, OverviewStore
 from codebase_qa.overview.suggestions import QuestionSuggester
@@ -84,7 +86,15 @@ class Container:
 
     @cached_property
     def llm(self) -> LLM:
-        return self.llm_factory(self.settings)
+        return MeteredLLM(self.llm_factory(self.settings))
+
+    @cached_property
+    def stats(self) -> StatsStore:
+        return StatsStore(self.settings.stats_path)
+
+    @property
+    def pricing(self) -> Pricing:
+        return Pricing(self.settings.llm_input_price_per_million, self.settings.llm_output_price_per_million)
 
     @cached_property
     def generator(self) -> Generator:

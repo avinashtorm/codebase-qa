@@ -202,6 +202,7 @@ Other tools: `eval.calibrate` (refusal threshold), `eval.benchmark_reindex` (inc
 | `POST /repos/{id}/reindex` | Start an incremental re-index job; its result is the change report |
 | `GET /jobs/{id}` | Job status, progress text, result or error |
 | `POST /ask/stream` | Same request as `/ask`; streams `{"type": "delta", "text"}` lines as the answer is generated, then one `final` line with the full `/ask` response (validated citations, self-check, confidence) or an `error` line |
+| `GET /stats` | Questions asked, average and p95 latency, per-stage averages, tokens, LLM calls (cached), estimated cost, refusal rate |
 | `GET /repos/{id}/scope` | Folders (two levels) and languages with file counts, for the search-scope filters |
 | `POST /ask` `{"repo_id", "question"}` | Answer, validated citations with code snippets, retrieved chunks with scores, per-stage latency |
 

@@ -95,5 +95,8 @@ class BackendClient:
         except httpx.HTTPError as exc:
             raise BackendError(f"backend is not reachable ({type(exc).__name__})") from exc
 
+    def stats(self) -> dict[str, Any]:
+        return self.request("GET", "/stats")
+
     def scope(self, repo_id: str) -> dict[str, Any]:
         return self.request("GET", f"/repos/{repo_id}/scope")

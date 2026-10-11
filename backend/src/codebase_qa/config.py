@@ -73,6 +73,8 @@ class Settings(BaseSettings):
     self_check_action: Literal["remove", "flag"] = "remove"
     confidence_high_score: float = 0.70
     confidence_low_margin: float = 0.03
+    llm_input_price_per_million: float = 0.10
+    llm_output_price_per_million: float = 0.40
 
     @property
     def repos_dir(self) -> Path:
@@ -100,6 +102,10 @@ class Settings(BaseSettings):
             downweight_tests=self.downweight_tests,
             enabled=self.hygiene,
         )
+
+    @property
+    def stats_path(self) -> Path:
+        return self.data_dir / "stats.sqlite3"
 
     @property
     def overview_dir(self) -> Path:

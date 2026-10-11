@@ -140,3 +140,11 @@ def test_search_scope_controls_send_filters(page: AppTest, repo_url: str) -> Non
     page.chat_input[0].set_value("AuthService login").run()
     assistant = [message for message in page.chat_message if message.name == "assistant"][0]
     assert assistant.markdown[0].value.startswith("See web/index.ts")
+
+
+def test_stats_page_shows_metrics(page: AppTest, repo_url: str) -> None:
+    index(page, repo_url)
+    page.button(key="example_0").click().run()
+    button(page, "Usage stats").click().run()
+    labels = {metric.label: metric.value for metric in page.metric}
+    assert labels["Questions asked"] == "1" and "Refusal rate" in labels and "p95 latency" in labels
