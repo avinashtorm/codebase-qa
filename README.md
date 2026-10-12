@@ -104,14 +104,18 @@ answers with a correct citation (0.906), using `gemini-3.1-flash-lite` for both 
 
 **Held-out set (15 questions, used only here)**
 
-| Configuration | Hit@1 | Hit@5 | Recall@10 | MRR | Citation precision | Answers with a correct citation |
-|---|---|---|---|---|---|---|
-| Baseline: 40-line chunks + vector search | 0.200 | 0.667 | 0.700 | 0.364 | 0.633 (v1 run) | 0.733 (v1 run) |
-| v1 final: tree-sitter + vector + grounded generation | 0.533 | 0.733 | 0.800 | 0.613 | 0.633 | 0.733 |
-| **Final (v2)** | **0.533** | **0.800** | **0.800** | **0.619** | pending\*\* | pending\*\* |
+| Configuration | Hit@1 | Hit@5 | Recall@10 | MRR | Citation precision | Answers with a correct citation | Refusal accuracy | Faithfulness | Relevance |
+|---|---|---|---|---|---|---|---|---|---|
+| Baseline: 40-line chunks + vector search | 0.200 | 0.667 | 0.700 | 0.364 | 0.456 | 0.667 | 1.00 | 4.80 | 4.67 |
+| v1 final: tree-sitter + vector + grounded generation | 0.533 | 0.733 | 0.800 | 0.613 | 0.633\* | 0.733\* | - | - | - |
+| **Final (v2)** | **0.533** | **0.800** | **0.800** | **0.619** | **0.544** | **0.733** | 0.93 | 4.79 | 4.60 |
 
-\*\* Answer-level held-out runs for v2 are pending: every free Gemini model available to this key hit its daily quota
-on the day of the final evaluation. Retrieval metrics need no LLM and are final.
+Baseline and v2 answer metrics were measured with the same model (`gemini-3.1-flash-lite`) and judge on the same day.
+\* The v1 row was measured earlier with a different model, so its answer metrics are not directly comparable.
+On held-out questions v2 raised citation precision from 0.456 to 0.544 and Hit@1 from 0.200 to 0.533. It also
+declined one answerable question (c33, how the end-to-end tests read emails): the answer lives in test code, which
+index hygiene ranks slightly lower, so refusal accuracy fell from 1.00 to 0.93. Confidence was useful: 9 of the 10
+high-confidence answers had a correct citation, none of the 2 low-confidence ones did.
 
 **Answer quality by part** (50 dev questions: 35 code + 10 overview + 5 unanswerable; `gemini-3.1-flash-lite` as
 generator and judge). Refusal accuracy: refuse exactly the unanswerable questions. Faithfulness (1-5, answers that were
@@ -317,10 +321,10 @@ count per IP so a new link does not reset them. Visitor repositories are deleted
 - **LLM judge.** The judge is the same family of lite model as the generator, grades leniently (faithfulness near
   5/5) and may prefer its own style; refusal accuracy and citation metrics are more reliable signals here.
 - **Free-tier Gemini.** Daily quotas are small and per model. When they run out the demo shows the best code locations
-  instead of answers; development evals had to move between models, and the v2 held-out answer-level metrics are
-  pending for that reason.
+  instead of answers; development evals had to move between models, so answer metrics are only compared within one model.
 - **Retrieval.** A small general-purpose embedding model; reranking, hybrid search and query expansion did not help on
-  this repository. Tree-sitter rules cover Python, JS, TS/TSX, Go and Java; other languages use line windows.
+  this repository. Down-weighting test files helps most questions but hides answers that live in tests (one
+  held-out miss). Tree-sitter rules cover Python, JS, TS/TSX, Go and Java; other languages use line windows.
 - **Overview and routing.** Overview summaries describe files from their first lines and can miss details; routing
   rules are English-only.
 - **Scale.** One process, one indexing worker, in-memory jobs and rate limits, SQLite and JSON files: fine for a demo,
